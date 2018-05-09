@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace GuitarTab
 {
+
     public class MouseStateConverter : BaseViewModel
     {
-        //mouseseelctions wraps
+        //mouseselections wraps
         private Selection selection_state;
         public Selection SelectionState
         {
@@ -28,10 +29,7 @@ namespace GuitarTab
         public EffectType SelectedEffectType
         {
             get { return effect_type; }
-            set
-            {
-                SetProperty(ref effect_type, value);
-            }
+            set { SetProperty(ref effect_type, value); }
         }
 
         //AddItemControl directly references

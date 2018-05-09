@@ -120,7 +120,7 @@ namespace GuitarTab
         public bool validateAction()
         {
             if (part == null || measure == null || chord == null || note == null) { return false; }
-            if (chord.Length.getLength() >= measure.getTotalSpace()) { return false; }
+            if (chord.Length.getLength() > measure.getTotalSpace()) { return false; }
             return true;
         }
     }

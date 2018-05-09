@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,8 @@ namespace GuitarTab
         public AddItemView(MouseStateConverter conv, Dictionary<string, string> uri_dict)
         {
             converter = conv;
+            converter.PropertyChanged += handleAddItemChanged;
+
             Images = getImages(uri_dict);
             Item = AddItem.None;
         }
@@ -45,6 +48,14 @@ namespace GuitarTab
             }
 
             return image_dict;
+        }
+
+        public void handleAddItemChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(MouseStateConverter.GuiSelectionState))
+            {
+                onPropertyChanged(nameof(Item));
+            }
         }
     }
 

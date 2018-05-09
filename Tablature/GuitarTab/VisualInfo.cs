@@ -242,6 +242,14 @@ namespace GuitarTab
             }
         }
 
+        public void jumpToNextBar()
+        {
+            Y += dimensions.LineHeight;
+            X = dimensions.BarMargin;
+            CurrentBar++;
+            if (CurrentBar > MaxBar) { MaxBar = CurrentBar; }
+        }
+
         public int truncateHorizontalLengthIfNeeded(int prop_length)
         {
             int available = dimensions.BarMargin + dimensions.BarWidth - X;

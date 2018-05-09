@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace GuitarTab
 
         public NoteLength Length
         {
-            get { return selections.SelectedLength.NoteType; }
+            get { return selections.SelectedLength?.NoteType ?? NoteLength.None; }
             set { selections.SelectedLength = new Length(value); }
         }
 
@@ -25,6 +26,7 @@ namespace GuitarTab
         public LengthView(CommandSelections sel, Dictionary<string, string> image_uri)
         {
             selections = sel;
+            selections.PropertyChanged += handleLengthChanged;
             Images = getImages(image_uri);
             Length = NoteLength.None;
         }
@@ -42,6 +44,14 @@ namespace GuitarTab
             }
 
             return image_dict;
+        }
+
+        public void handleLengthChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == nameof(CommandSelections.SelectedLength))
+            {
+                onPropertyChanged(nameof(Length));
+            }
         }
     }
 

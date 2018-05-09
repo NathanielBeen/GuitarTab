@@ -8,14 +8,16 @@ namespace GuitarTab
 {
     public class CommandExecutor
     {
-        public void executeCommand(IActionBuilder builder)
+        public bool executeCommand(IActionBuilder builder)
         {
             var validator = builder.buildValidator();
             if (validator.validateAction())
             {
                 var command = builder.buildCommand();
                 command?.executeAction();
+                return true;
             }
+            return false;
         }
     }
 }

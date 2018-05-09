@@ -34,10 +34,16 @@ namespace GuitarTab
 
         public void executeCommandBase(IActionBuilder builder, UpdateType update, bool rebar)
         {
-            executor.executeCommand(builder);
-            runUpdate(update);
-            if (rebar) { Updater.rebarMeasures(selections.SelectedPart, selections.SelectedMeasure); }
+            bool result = executor.executeCommand(builder);
+            if (result)
+            {
+                runUpdate(update);
+                if (rebar) { Updater.rebarMeasures(selections.SelectedPart, selections.SelectedMeasure); }
+            }
+
             selections.Clear();
+            selections.SelectedLength = null;
+            m_selections.clearOtherSelections();
             m_selections.EventHandled = true;
         }
 

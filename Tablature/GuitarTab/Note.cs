@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GuitarTab
 {
-    public class Note : IPosition, IContainModels<IEffect>
+    public class Note : IPosition, IContainModels<IEffect>, IComparable<Note>
     {
         public int Fret { get; set; }
         public int String { get; set; }
@@ -77,6 +77,11 @@ namespace GuitarTab
         {
             List<IEffect> effects = getMultiEffects();
             foreach (IEffect effect in effects) { Remove(effect); }
+        }
+
+        public int CompareTo(Note other)
+        {
+            return String - other.String;
         }
     }
 }

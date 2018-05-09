@@ -41,7 +41,11 @@ namespace GuitarTab
             position.resetPositionToMeasureBeginning(bounds);
 
             List<Measure> to_update = part.ModelCollection.getItemsMatchingCondition(x => x.Position.Index >= pos);
-            foreach (Measure mes in to_update) { updateMeasureBounds(part, measure); }
+            foreach (Measure mes in to_update)
+            {
+                var measure_bounds = tree.findMeasure(part, mes)?.ObjectBounds;
+                measure_bounds?.updateBounds();
+            }
         }
 
         public void updateMeasureBounds(Part part, Measure measure)

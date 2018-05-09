@@ -41,9 +41,6 @@ namespace GuitarTab
     {
         protected SortedSet<T> items;
 
-        public event EventHandler<ObjectAddedArgs> ModelAdded;
-        public event EventHandler<ObjectRemovedArgs> ModelRemoved;
-
         /*
         * Constructor
         */

@@ -29,12 +29,12 @@ namespace GuitarTab
 
         public void handleMouseEvent()
         {
-            if (!hitTest(mouse_selections.SelectedPoint)) { return; }
             if (mouse_selections.PositionCheck)
             {
                 mousePositionCheck();
                 return;
             }
+            if (!hitTest(mouse_selections.SelectedPoint)) { return; }
 
             switch (mouse_selections.EventType)
             {

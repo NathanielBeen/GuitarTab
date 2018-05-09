@@ -48,6 +48,11 @@ namespace GuitarTab
         
         public void getInitBoundValues(out int first_left, out int lowest_bar)
         {
+            if (info.Position.X >= info.Dimensions.BarWidth + info.Dimensions.BarMargin)
+            {
+                info.Position.jumpToNextBar();
+            }
+
             first_left = info.Position.X;
             lowest_bar = info.Position.CurrentBar;
             if (!measure.MatchesPart)
