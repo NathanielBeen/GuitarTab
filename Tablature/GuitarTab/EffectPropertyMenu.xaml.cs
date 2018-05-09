@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace GuitarTab
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for EffectPropertyMenu.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class EffectPropertyMenu : UserControl
     {
-        public MainWindow()
+        public EffectPropertyMenu()
         {
             InitializeComponent();
         }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuitarTab", "..\..\..\Visual Studio 2017\Projects\Tablature\GuitarTab\GuitarTab.csproj", "{0372ECF0-90A6-4507-B806-C29FA6152155}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuitarTab", "GuitarTab\GuitarTab.csproj", "{0372ECF0-90A6-4507-B806-C29FA6152155}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A5224A02-7A60-428A-9FBF-297337F2071F}
+		SolutionGuid = {99B97A71-C5C8-49D3-8296-FB2896D99440}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,102 @@
+PageHeight_:_600
+PageWidth_:_700
+PageHeadHeight_:_100
+LineHeight_:_145
+BarHeight_:_50
+BarWidth_:_600
+BarMargin_:_10
+BarringHeight_:_35
+BarringMargin_:_10
+EffectHeight_:_60
+EffectMargin_:_25
+MeasureHeadWidth_:_25
+MeasureHeadMargin_:_30
+StringHeight_:_10
+NoteWidth_:_14
+NoteHeight_:_10
+LineThickness_:_1
+DotSize_:_3
+DotMargin_:_1
+SingleBarLength_:_5
+BarSpacing_:_4
+FontSize_:_8
+LargeFontSize_:_15
+<>//Length Numbers
+None_:_20
+Dotted Whole_:_210
+Whole_:_210
+Dotted Half_:_160
+Half_:_110
+Dotted Quarter_:_90
+Quarter_:_60
+Dotted Eighth_:_45
+Eighth_:_30
+Dotted Sixteenth_:_20
+Sixteenth_:_20
+Thirty-Second_:_20
+<>//Length Images
+None_:_NoneLength.png
+Dotted Whole_:_DottedWholeLength.png
+Whole_:_WholeLength.png
+Dotted Half_:_DottedHalfLength.png
+Half_:_HalfLength.png
+Dotted Quarter_:_DottedQuarterLength.png
+Quarter_:_QuarterLength.png
+Dotted Eighth_:_DottedEighthLength.png
+Eighth_:_EighthLength.png
+Dotted Sixteenth_:_SixeteenthLength.png
+Sixteenth_:_DottedSixeteenthLength.png
+Thirty-Second_:_ThirtySecondLength.png
+<>//Rest
+None_:_NoRest.png
+Dotted Whole_:_HalfRest.png
+Whole_:_HalfRest.png
+Dotted Half_:_HalfRest.png
+Half_:_HalfRest.png
+Dotted Quarter_:_QuarterRest.png
+Quarter_:_QuarterRest.png
+Dotted Eighth_:_EighthRest.png
+Eighth_:_EighthRest.png
+Dotted Sixteenth_:_SixeteenthRest.png
+Sixteenth_:_SixeteenthRest.png
+Thirty-Second_:_ThirtySecondRest.png
+<>//Effect
+Vibrato_:_Vibrato.png
+WideVibrato_:_WideVibrato.png
+PinchHarmonic_:_PinchHarmonic.png
+<>//Add
+None_:_AddNone.png
+Measure_:_AddMeasure.png
+Rest_:_AddRest.png
+Note_:_AddNote.png
+PalmMute_:_AddPalmMute.png
+Bend_:_AddBend.png
+PinchHarmonic_:_AddPinchHarmonic.png
+Vibrato_:_AddVibrato.png
+Slide_:_AddSlide.png
+Hopo_:_AddHopo.png
+Tie_:_AddTie.png
+<>//State
+0_:_None.png
+1_:_EffectSelect.png
+2_:_MultiEffectSelect.png
+3_:_LengthSelect.png
+4_:_NoteSelect.png
+5_:_RestSelect.png
+6_:_MeasureSelect.png
+<>//Other Image
+deleteButton_:_DeleteButton.png
+<>//Other
+thickness_:_1
+barThickness: 3
+dashLength_:_4
+hoverColor_:_#C0C0C0
+selectedColor_:_#808080
+<>//Locations
+OtherImageLoc_:_OtherImages/
+LengthLoc_:_LengthImages/
+RestLoc_:_RestImages/
+EffectLoc_:_EffectImages/
+AddItemLoc_:_AddItemImages/
+MouseStateLoc_:_MouseStateImages/
+ResourceLoc_:_../../Resources/

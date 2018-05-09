@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0372ECF0-90A6-4507-B806-C29FA6152155}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>GuitarTab</RootNamespace>
+    <AssemblyName>GuitarTab</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="ActionAttributes.cs" />
+    <Compile Include="ActionBuilder.cs" />
+    <Compile Include="ActionCommand.cs" />
+    <Compile Include="ActionValidator.cs" />
+    <Compile Include="AddItemButtons.xaml.cs">
+      <DependentUpon>AddItemButtons.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AddItemView.cs" />
+    <Compile Include="BaseValidator.cs" />
+    <Compile Include="Chord.cs" />
+    <Compile Include="ChordBarring.cs" />
+    <Compile Include="ChordProperties.cs" />
+    <Compile Include="ChordPropertyMenu.xaml.cs">
+      <DependentUpon>ChordPropertyMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CommandSelections.cs" />
+    <Compile Include="DataTemplateSelector.cs" />
+    <Compile Include="DeleteView.cs" />
+    <Compile Include="EffectPropertyMenu.xaml.cs">
+      <DependentUpon>EffectPropertyMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FretMenu.xaml.cs">
+      <DependentUpon>FretMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FretMenuView.cs" />
+    <Compile Include="GuiTreeUpdater.cs" />
+    <Compile Include="LengthView.cs" />
+    <Compile Include="MainControl.xaml.cs">
+      <DependentUpon>MainControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MeasurePropertyMenu.xaml.cs">
+      <DependentUpon>MeasurePropertyMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MouseCanvas.xaml.cs">
+      <DependentUpon>MouseCanvas.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MouseCanvasView.cs" />
+    <Compile Include="MouseHoverView.cs" />
+    <Compile Include="MousePositionCheck.cs" />
+    <Compile Include="MouseSelectedView.cs" />
+    <Compile Include="MouseSelections.cs" />
+    <Compile Include="MouseStateConverters.cs" />
+    <Compile Include="MouseStateView.cs" />
+    <Compile Include="NotePropertyMenu.xaml.cs">
+      <DependentUpon>NotePropertyMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PropertyMenuView.cs" />
+    <Compile Include="RelayCommand.cs" />
+    <Compile Include="StateUpdateEvents.cs" />
+    <Compile Include="TimeSignature.cs" />
+    <Compile Include="ViewModelFactory.cs" />
+    <Compile Include="CommandExecutor.cs" />
+    <Compile Include="DeleteButton.xaml.cs">
+      <DependentUpon>DeleteButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EffectProperties.cs" />
+    <Compile Include="GuiChord.cs" />
+    <Compile Include="GuiDelegates.cs" />
+    <Compile Include="GuiEffect.cs" />
+    <Compile Include="GuiMeasure.cs" />
+    <Compile Include="GuiNote.cs" />
+    <Compile Include="BaseGuiObjects.cs" />
+    <Compile Include="GuiObjectTree.cs" />
+    <Compile Include="GuiObjectFactory.cs" />
+    <Compile Include="GuiPart.cs" />
+    <Compile Include="VisualInfo.cs" />
+    <Compile Include="GuiCommandExecutor.cs" />
+    <Compile Include="LengthButtons.xaml.cs">
+      <DependentUpon>LengthButtons.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainView.cs" />
+    <Compile Include="MeasureProperties.cs" />
+    <Compile Include="ModelCollectionEvents.cs" />
+    <Compile Include="NoteProperties.cs" />
+    <Compile Include="PropertyMenu.xaml.cs">
+      <DependentUpon>PropertyMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MenuEvents.cs" />
+    <Compile Include="PropertyMenuItem.cs" />
+    <Compile Include="TabVisuals.cs" />
+    <Compile Include="Tester.cs" />
+    <Compile Include="VisualBounds.cs" />
+    <Compile Include="Measure.cs" />
+    <Compile Include="MouseHandler.cs" />
+    <Compile Include="Part.cs" />
+    <Compile Include="SymbolCollection.cs" />
+    <Compile Include="TabReader.cs" />
+    <Compile Include="TabWriter.cs" />
+    <Page Include="AddItemButtons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChordPropertyMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeleteButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EffectPropertyMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FretMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LengthButtons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Effect.cs" />
+    <Compile Include="Length.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="MeasurePropertyMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MouseCanvas.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="NotePropertyMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PropertyMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Note.cs" />
+    <Compile Include="Position.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
