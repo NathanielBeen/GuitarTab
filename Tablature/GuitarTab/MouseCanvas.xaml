@@ -5,8 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GuitarTab"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Canvas Background="Transparent" PreviewMouseMove="Canvas_MouseMove" PreviewMouseDown="Canvas_PreviewMouseDown" PreviewMouseUp="Canvas_PreviewMouseUp">
+             d:DesignHeight="300" d:DesignWidth="300"
+             MouseMove="Canvas_MouseMove" MouseDown="Canvas_PreviewMouseDown" MouseUp="Canvas_PreviewMouseUp">
+    <Canvas Background="Transparent">
         <Label x:Name="stateControl"
             DataContext="{Binding StateView}"
             Canvas.Left="{Binding Left}"

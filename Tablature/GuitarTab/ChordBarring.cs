@@ -134,7 +134,7 @@ namespace GuitarTab
             ChordBounds prev_chord = null;
             foreach (ChordBounds chord in Chords)
             {
-                if (prev_chord != null)
+                if (prev_chord != null && prev_chord.Bounds.Bar == chord.Bounds.Bar)
                 {
                     int prev_conn = Math.Min(prev_chord.ChordBar.TotalBars, chord.ChordBar.TotalBars);
                     prev_chord.ChordBar.RightConnected = prev_conn;

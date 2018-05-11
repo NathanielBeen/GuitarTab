@@ -19,7 +19,11 @@ namespace GuitarTab
                 if (selection_state != value)
                 {
                     SetProperty(ref selection_state, value);
-                    GuiSelectionState = selection_state.convertToAddItem();
+
+                    if (selection_state == Selection.Standard)
+                    {
+                        GuiSelectionState = selection_state.convertToAddItem();
+                    }
                 }
             }
         }

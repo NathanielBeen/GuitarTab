@@ -129,18 +129,15 @@ namespace GuitarTab
         */
         public void updateLastItem()
         {
-            T new_last = items.Last();
+            T new_last = items.LastOrDefault();
             if (last == null)
             {
                 last = new_last;
             }
 
-            else if (!last.Equals(new_last))
-            {
-                last.Position.IsLast = false;
-                new_last.Position.IsLast = true;
-                last = new_last;
-            }
+            last.Position.IsLast = false;
+            if (new_last != null) { new_last.Position.IsLast = true; }
+            last = new_last;
         }
 
         /*

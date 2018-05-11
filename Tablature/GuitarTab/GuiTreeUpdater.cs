@@ -99,6 +99,8 @@ namespace GuitarTab
         public void rebarMeasure(Part part, Measure measure)
         {
             TreeNode measure_node = tree.findMeasure(part, measure);
+            if (measure_node == null) { return; }
+
             MeasureBarrer.barMeasure(measure_node);
             measure_node?.ObjectDrawer.refreshVisual();
         }

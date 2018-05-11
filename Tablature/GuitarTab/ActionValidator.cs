@@ -219,7 +219,7 @@ namespace GuitarTab
             if (first_measure == null || second_measure == null || first_chord == null || second_chord == null || note == null || note_string == null) { return false; }
             if (!first_measure.ModelCollection.Contains(first_chord)) { return false; }
             if (!first_chord.ModelCollection.Contains(note)) { return false; }
-            if (second_chord.Position.Index < 0 || second_chord.Position.Index > second_measure.getLastChordPosition()) { return false; }
+            if (second_chord.Position.Index < 0 || second_chord.Position.Index > second_measure.getLastChordPosition()+1) { return false; }
             if (first_chord.ModelCollection.Count() > 1 || !(first_measure.Equals(second_measure)))
             {
                 double new_space_taken = NoteLengthExtensions.roundIfWithinDoubleError(second_measure.getSpaceTaken() + second_chord.Length.getLength());

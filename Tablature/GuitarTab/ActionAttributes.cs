@@ -305,7 +305,7 @@ namespace GuitarTab
 
         public NoteChord genChord(CommandSelections selection)
         {
-            var chord = NoteChord.createInstance(selection.Position, SecondMeasure?.Position, FirstChord?.Length);
+            var chord = NoteChord.createInstance(0, SecondMeasure?.Position, FirstChord?.Length);
             if (chord != null) { selection.SelectedChord.Add(chord); }
             return chord;
         }

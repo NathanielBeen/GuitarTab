@@ -103,7 +103,11 @@ namespace GuitarTab
         {
             var text = new FormattedText(note.Fret.ToString(), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight,
                                          info.DrawingObjects.TypeFace, info.Dimensions.FontSize, info.DrawingObjects.Brush);
-            dc.DrawText(text, new Point(0, 0));
+            int x_val = (int)(info.Dimensions.NoteWidth - text.Width) / 2;
+            int y_val = (int)(info.Dimensions.StringHeight - text.Height) / 2;
+
+            dc.DrawRectangle(new SolidColorBrush(Colors.White), null, new Rect(x_val, y_val, text.Width, text.Height));
+            dc.DrawText(text, new Point(x_val, y_val));
         }
     }
 }

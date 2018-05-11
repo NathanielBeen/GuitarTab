@@ -106,13 +106,13 @@ namespace GuitarTab
     public class MultipleVisualBounds : VisualBounds
     {
         public List<VisualBounds> AllBounds { get; set; }
-        public int EndBar { get; set; }
+        public int StartBar { get; set; }
 
-        private MultipleVisualBounds(List<VisualBounds> bounds, int left, int right, int top, int bottom, int bar, int end_bar)
+        private MultipleVisualBounds(List<VisualBounds> bounds, int left, int right, int top, int bottom, int start_bar, int bar)
             :base(left, right, top, bottom, bar)
         {
             AllBounds = bounds;
-            EndBar = end_bar;
+            StartBar = start_bar;
         }
 
         public static MultipleVisualBounds createInstance(List<VisualBounds> bounds)
@@ -121,10 +121,10 @@ namespace GuitarTab
             int width = bounds.LastOrDefault()?.Width ?? 0;
             int top = bounds.FirstOrDefault()?.Top ?? 0;
             int height = bounds.LastOrDefault()?.Top + bounds.LastOrDefault()?.Height - top ?? 0;
-            int bar = bounds.FirstOrDefault()?.Bar ?? 0;
-            int end_bar = bounds.LastOrDefault()?.Bar ?? 0;
+            int start_bar = bounds.FirstOrDefault()?.Bar ?? 0;
+            int bar = bounds.LastOrDefault()?.Bar ?? 0;
 
-            return new MultipleVisualBounds(bounds, left, width, top, height, bar, end_bar);
+            return new MultipleVisualBounds(bounds, left, width, top, height, start_bar, bar);
         }
 
         public void updateInstance(List<VisualBounds> bounds)
@@ -133,8 +133,8 @@ namespace GuitarTab
             Width = bounds.LastOrDefault()?.Width ?? 0;
             Top = bounds.FirstOrDefault()?.Top ?? 0;
             Height = bounds.LastOrDefault()?.Top + bounds.LastOrDefault()?.Height - Top ?? 0;
-            Bar = bounds.FirstOrDefault()?.Bar ?? 0;
-            EndBar = bounds.LastOrDefault()?.Bar ?? 0;
+            StartBar = bounds.FirstOrDefault()?.Bar ?? 0;
+            Bar = bounds.LastOrDefault()?.Bar ?? 0;
 
             AllBounds = bounds;
         }

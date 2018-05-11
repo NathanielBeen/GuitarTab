@@ -47,13 +47,19 @@ namespace GuitarTab
 
         public void removeVisuals(IList items)
         {
-            foreach (DrawingVisual visual in items) { children.Remove(visual); }
+            foreach (DrawingVisual visual in items)
+            {
+                children.Remove(visual);
+            }
             InvalidateVisual();
         }
 
         public void addVisuals(IList items)
         {
-            foreach (DrawingVisual visual in items) { children.Add(visual); }
+            foreach (DrawingVisual visual in items)
+            {
+                children.Add(visual);
+            }
             InvalidateVisual();
         }
 

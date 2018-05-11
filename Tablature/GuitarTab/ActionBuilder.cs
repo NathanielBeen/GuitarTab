@@ -358,7 +358,7 @@ namespace GuitarTab
                 command.AddCommand(new RemoveChordFromMeasureCom(attributes.FirstMeasure, attributes.FirstChord));
             }
             command.AddCommand(new ChangeNoteStringCom(attributes.Note, (int)attributes.NoteString));
-            command.AddCommand(new AddMeasureToPartCom(attributes.Part, attributes.FirstMeasure));
+            command.AddCommand(new AddMeasureToPartCom(attributes.Part, attributes.SecondMeasure));
             command.AddCommand(new AddChordToMeasureCom(attributes.SecondMeasure, attributes.SecondChord));
             command.AddCommand(new AddNoteToChordCom(attributes.SecondChord, attributes.Note));
 

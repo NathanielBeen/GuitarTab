@@ -1,8 +1,8 @@
 PageHeight_:_600
 PageWidth_:_700
 PageHeadHeight_:_100
-LineHeight_:_145
-BarHeight_:_50
+LineHeight_:_155
+BarHeight_:_60
 BarWidth_:_600
 BarMargin_:_10
 BarringHeight_:_35
@@ -15,11 +15,11 @@ StringHeight_:_10
 NoteWidth_:_14
 NoteHeight_:_10
 LineThickness_:_1
-DotSize_:_3
-DotMargin_:_1
+DotSize_:_2
+DotMargin_:_2
 SingleBarLength_:_5
 BarSpacing_:_4
-FontSize_:_8
+FontSize_:_9
 LargeFontSize_:_15
 <>//Length Numbers
 None_:_20

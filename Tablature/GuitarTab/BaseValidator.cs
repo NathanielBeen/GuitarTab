@@ -14,6 +14,8 @@ namespace GuitarTab
 
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
+        public BaseValidator() { error_dict = new Dictionary<string, ICollection<string>>(); }
+
         private void RaiseErrorsChanged(string prop_name)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(prop_name));

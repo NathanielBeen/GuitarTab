@@ -144,7 +144,7 @@ namespace GuitarTab
         {
             //replace with variable
             int num_strings = 6;
-            int y_val = info.Position.Y + info.Dimensions.EffectHeight;
+            int y_val = info.Position.Y + info.Dimensions.EffectHeight + info.Dimensions.StringHeight / 2;
             for (int i = 0; i <= 3; i++)
             {
                 for (int j = 0; j < num_strings; j++)
@@ -152,7 +152,7 @@ namespace GuitarTab
                     dc.DrawLine(info.DrawingObjects.Pen, new Point(info.Position.X, y_val), new Point(info.Position.X + info.Dimensions.BarWidth, y_val));
                     y_val += info.Dimensions.StringHeight;
                 }
-                y_val += info.Dimensions.BarringHeight + info.Dimensions.EffectHeight - info.Dimensions.StringHeight;
+                y_val += info.Dimensions.BarringHeight + info.Dimensions.EffectHeight;
             }
         }
     }

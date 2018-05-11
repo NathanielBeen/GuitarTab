@@ -267,7 +267,7 @@ namespace GuitarTab
         public void resetPositionToMeasureBeginning(VisualBounds measure_bounds)
         {
             X = measure_bounds?.Left + measure_bounds?.Width ?? dimensions.BarMargin;
-            Y = (measure_bounds != null) ? measure_bounds.Top - dimensions.EffectHeight : dimensions.PageHeadHeight;
+            Y = (measure_bounds != null) ? measure_bounds.Top + measure_bounds.Height - dimensions.BarHeight - dimensions.EffectHeight : dimensions.PageHeadHeight;
             CurrentBar = measure_bounds?.Bar ?? 0;
         }
 
@@ -281,10 +281,8 @@ namespace GuitarTab
         public int getStringFromYPosition(int y_val)
         {
             int adj_y_pos = ((y_val - dimensions.PageHeadHeight) % dimensions.LineHeight) - dimensions.EffectHeight;
-            int half_string_height = dimensions.StringHeight / 2;
-            if (adj_y_pos < -half_string_height || adj_y_pos > NUM_STRINGS * dimensions.StringHeight + half_string_height) { return 0; }
+            if (adj_y_pos < 0 || adj_y_pos > NUM_STRINGS * dimensions.StringHeight) { return 0; }
 
-            adj_y_pos += half_string_height;
             return (int)Math.Floor((decimal)adj_y_pos / dimensions.StringHeight);
         }
     }

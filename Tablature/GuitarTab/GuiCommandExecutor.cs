@@ -224,6 +224,9 @@ namespace GuitarTab
 
         public void executeChangeNotePositionNewMeasure()
         {
+            selections.BPM = selections.SelectedPart.DefaultBPM;
+            selections.NumBeats = selections.SelectedPart.TimeSignature.NumberOfBeats;
+            selections.BeatType = selections.SelectedPart.TimeSignature.BeatType;
             selections.Position = selections.SelectedPart.ModelCollection.Count();
             selections.String = info.Position.getStringFromYPosition((int)m_selections.SelectedPoint.Y);
             executeCommandBase(new ChangeNotePositionNewMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
@@ -237,7 +240,11 @@ namespace GuitarTab
 
         public void executeChangeChordPositionNewMeasure()
         {
+            selections.BPM = selections.SelectedPart.DefaultBPM;
+            selections.NumBeats = selections.SelectedPart.TimeSignature.NumberOfBeats;
+            selections.BeatType = selections.SelectedPart.TimeSignature.BeatType;
             selections.Position = selections.SelectedPart.ModelCollection.Count();
+
             executeCommandBase(new ChangeChordPositionNewMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
@@ -274,7 +281,7 @@ namespace GuitarTab
 
         public void executeAddEffectToNote()
         {
-            executeCommandBase(new AddChordToMeasureBld(selections), UpdateType.UpdateMeasure, false);
+            executeCommandBase(new AddSingleNoteEffectBld(selections), UpdateType.UpdateMeasure, false);
         }
 
         public void executeRemoveEffectFromNote(IEffect effect)

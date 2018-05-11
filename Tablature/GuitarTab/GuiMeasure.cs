@@ -185,8 +185,8 @@ namespace GuitarTab
 
         public override void refreshDrawingContext(DrawingContext dc)
         {
-            dc.DrawLine(info.DrawingObjects.Pen, new Point(0, 0), new Point(0, info.Dimensions.BarHeight));
-            dc.DrawLine(info.DrawingObjects.Pen, new Point(Bounds.Width, Bounds.Height - info.Dimensions.BarHeight), new Point(Bounds.Width, Bounds.Height));
+            dc.DrawLine(info.DrawingObjects.Pen, new Point(0, info.Dimensions.StringHeight/2), new Point(0, info.Dimensions.BarHeight - info.Dimensions.StringHeight/2));
+            dc.DrawLine(info.DrawingObjects.Pen, new Point(Bounds.Width, Bounds.Height - info.Dimensions.BarHeight + info.Dimensions.StringHeight/2), new Point(Bounds.Width, Bounds.Height - info.Dimensions.StringHeight/2));
 
             if (!measure.MatchesPart)
             {
