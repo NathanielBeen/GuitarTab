@@ -44,8 +44,8 @@ Dotted Quarter_:_DottedQuarterLength.png
 Quarter_:_QuarterLength.png
 Dotted Eighth_:_DottedEighthLength.png
 Eighth_:_EighthLength.png
-Dotted Sixteenth_:_SixeteenthLength.png
-Sixteenth_:_DottedSixeteenthLength.png
+Dotted Sixteenth_:_DottedSixeteenthLength.png
+Sixteenth_:_SixeteenthLength.png
 Thirty-Second_:_ThirtySecondLength.png
 <>//Rest
 None_:_NoRest.png
@@ -80,10 +80,10 @@ Tie_:_AddTie.png
 0_:_None.png
 1_:_EffectSelect.png
 2_:_MultiEffectSelect.png
-3_:_LengthSelect.png
-4_:_NoteSelect.png
-5_:_RestSelect.png
-6_:_MeasureSelect.png
+3_:_NoteSelect.png
+4_:_RestSelect.png
+5_:_MeasureSelect.png
+6_:_LengthSelect.png
 <>//Other Image
 deleteButton_:_DeleteButton.png
 <>//Other

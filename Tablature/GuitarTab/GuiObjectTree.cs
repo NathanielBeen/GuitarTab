@@ -9,103 +9,20 @@ using System.Windows.Media;
 
 namespace GuitarTab
 {
-    //make the base object public. this will allow the removal of hasbaseobject, getbaseposition, and will make the findchild easier.
-    //rename findobject to findchildwithoutparent and simplify.
-    //maybe add a nodetype enum, which will contian extension methods to see if a depth is too far or not enough for findchild?
-    public class TreeNode
-    {
-        public const int PART = 0;
-        public const int MEASURE = 1;
-        public const int CHORD = 2;
-        public const int NOTE = 3;
-        public const int EFFECT = 4;
-
-        public object BaseObject { get; }
-        public IBounded ObjectBounds { get; }
-        public BaseMouseHandler ObjectHandler { get; }
-        public TabDrawingVisual ObjectDrawer { get; }
-
-        public TreeNode Parent { get; set; }
-        public List<TreeNode> Children { get; private set; }
-
-        public TreeNode(object base_obj, IBounded bounds, BaseMouseHandler handler, TabDrawingVisual drawer)
-        {
-            BaseObject = base_obj;
-            ObjectBounds = bounds;
-            ObjectHandler = handler;
-            ObjectDrawer = drawer;
-
-            Parent = null;
-            Children = new List<TreeNode>();
-        }
-
-        public TreeNode findChildWithoutParent(object child_base, int max_depth, int curr_depth)
-        {
-            if (BaseObject.Equals(child_base)) { return this; }
-            
-            if (curr_depth < max_depth)
-            {
-                foreach (TreeNode child in Children)
-                {
-                    var result = child.findChildWithoutParent(child_base, max_depth, curr_depth + 1);
-                    if (result != null) { return result; }
-                }
-            }
-
-            return null;
-        }
-
-        public TreeNode findChild(object child_base)
-        {
-            return (from child in Children
-                    where child.BaseObject.Equals(child_base)
-                    select child).FirstOrDefault();
-        }
-
-        public void addChild(TreeNode child)
-        {
-            Children.Add(child);
-    
-            child.Parent = this;
-            child.subscribeToParentDelegates(ObjectBounds.Delegate, ObjectHandler.Delegate, ObjectDrawer.Delegate);
-        }
-
-
-        public void subscribeToParentDelegates(IDelegate bounding, IDelegate mouse, IDelegate drawing)
-        {
-            bounding?.subscribeAction(ObjectBounds.updateBounds, this);
-            mouse?.subscribeAction(ObjectHandler.handleMouseEvent, this);
-            drawing?.subscribeAction(ObjectDrawer.refreshVisual, this);
-        }
-
-        public void removeChild(TreeNode child)
-        {
-            Children.Remove(child);
-
-            child.Parent = null;
-            child.unsubscribeFromParentDelegates(ObjectBounds.Delegate, ObjectHandler.Delegate, ObjectDrawer.Delegate);
-        }
-
-        public void unsubscribeFromParentDelegates(IDelegate bounding, IDelegate mouse, IDelegate drawing)
-        {
-            bounding?.unsubscribeAction(ObjectBounds.updateBounds);
-            mouse?.unsubscribeAction(ObjectHandler.handleMouseEvent);
-            drawing?.unsubscribeAction(ObjectDrawer.refreshVisual);
-        }
-    }
-
     public class GuiObjectTree
     {
         public TreeNode Root { get; set; }
         private GuiObjectFactory factory;
-        private TreeRemovedHolding holding;
+        private TreeAddedHolding added_holding;
+        private TreeRemovedHolding removed_holding;
         private TreeVisualCollection visuals;
 
-        public GuiObjectTree(GuiObjectFactory f, TreeRemovedHolding h, TreeVisualCollection v)
+        public GuiObjectTree(GuiObjectFactory f, TreeAddedHolding a, TreeRemovedHolding r, TreeVisualCollection v)
         {
             Root = null;
             factory = f;
-            holding = h;
+            added_holding = a;
+            removed_holding = r;
             visuals = v;
         }
 
@@ -249,14 +166,13 @@ namespace GuitarTab
             foreach (object obj in node_obj.getGenericModelList()) { buildAddedNode(node, obj); }
         }
 
-        //put this in the factory? 
         public void handleItemAdded(object parent_obj, ObjectAddedArgs args)
         {
             object child_obj = args.Added;
             TreeNode parent = findObjectWithoutParents(parent_obj);
             if (parent != null)
             {
-                TreeNode child = holding.searchForAddedItem(child_obj);
+                TreeNode child = removed_holding.searchForAddedItem(child_obj);
                 if (child == null) { buildAddedNode(parent, child_obj); }
                 else { attachNodeToTree(child, parent); }
             }
@@ -268,7 +184,7 @@ namespace GuitarTab
             if (removed != null)
             {
                 removed.Parent?.removeChild(removed);
-                holding.removeItem(removed);
+                removed_holding.removeItem(removed);
                 visuals.removeVisual(removed);
             }
         }
@@ -319,10 +235,28 @@ namespace GuitarTab
         public TreeNode searchForAddedItem(object to_add)
         {
             var found =  (from node in removedNodes
-                          where node.Equals(to_add)
+                          where node.BaseObject.Equals(to_add)
                           select node).FirstOrDefault();
             if (found != null) { removedNodes.Remove(found); }
             return found;
+        }
+    }
+
+    public class TreeAddedHolding
+    {
+        private List<TreeNode> addedNodes;
+
+        public TreeAddedHolding()
+        {
+            addedNodes = new List<TreeNode>();
+        }
+
+        public void clearAddedHolding() { addedNodes.Clear(); }
+
+        public void populateMouseClick(MouseClick click)
+        {
+            foreach (TreeNode node in addedNodes) { node.addToMouseClick(click); }
+            addedNodes.Clear();
         }
     }
 

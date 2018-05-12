@@ -397,7 +397,7 @@ namespace GuitarTab
 
         public static VisualBounds createInLineEffectBounds(VisualBounds note_bounds, Note note, VisualInfo info)
         {
-            int width = note_bounds.Left + info.Dimensions.getLength(note.Length.NoteType);
+            int width = note_bounds.Left + note_bounds.Height + info.Dimensions.getLength(note.Length.NoteType);
             int height = note_bounds.Height;
 
             return new VisualBounds(0, 0, width, height, 0);
@@ -405,12 +405,12 @@ namespace GuitarTab
 
         public static void updateInLineEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
         {
-            int right = note_bounds.Left + info.Dimensions.getLength(note.Length.NoteType);
-            right = info.Position.truncateHorizontalLengthIfNeeded(right);
+            int right = Math.Min(note_bounds.Left + note_bounds.Width + info.Dimensions.getLength(note.Length.NoteType),
+                info.Dimensions.BarMargin + info.Dimensions.BarWidth);
 
-            effect_bounds.Left = note_bounds.Left;
+            effect_bounds.Left = note_bounds.Left + note_bounds.Height;
             effect_bounds.Top = note_bounds.Top;
-            effect_bounds.Width = right - note_bounds.Left;
+            effect_bounds.Width = right - (note_bounds.Left + note_bounds.Height);
             effect_bounds.Height = note_bounds.Height;
             effect_bounds.Bar = note_bounds.Bar;
         }

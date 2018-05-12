@@ -37,6 +37,21 @@ namespace GuitarTab
         void Remove(T item);
     }
 
+    public interface SymbolCollection<T>
+    {
+        void Add(T item);
+        void Remove(T item);
+        void Clear();
+        bool Containes(T item);
+        T First();
+        T Last();
+        List<T> Items();
+        int Count();
+
+        T getItemMatchingCondition(Func<T, bool> condition);
+        List<T> getItemsMatchingCondition(Func<T, bool> condition);
+    }
+
     public class ModelCollection<T>
     {
         protected SortedSet<T> items;

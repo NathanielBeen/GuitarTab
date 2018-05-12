@@ -194,7 +194,7 @@ namespace GuitarTab
 
         public Uri getRestImagePath(NoteLength length) { return new Uri(rest_image_paths[length], UriKind.Relative); }
 
-        public Uri getEffectImagePath(int code) { return new Uri(effect_image_paths[code]); }
+        public Uri getEffectImagePath(int code) { return new Uri(effect_image_paths[code], UriKind.Relative); }
     }
 
     //this class does not fit in the visualinfo master class. it needs to be moved.
@@ -266,7 +266,7 @@ namespace GuitarTab
 
         public void resetPositionToMeasureBeginning(VisualBounds measure_bounds)
         {
-            X = measure_bounds?.Left + measure_bounds?.Width ?? dimensions.BarMargin;
+            X = measure_bounds?.Left ?? dimensions.BarMargin;
             Y = (measure_bounds != null) ? measure_bounds.Top + measure_bounds.Height - dimensions.BarHeight - dimensions.EffectHeight : dimensions.PageHeadHeight;
             CurrentBar = measure_bounds?.Bar ?? 0;
         }

@@ -529,13 +529,13 @@ namespace GuitarTab
             switch (selection.SelectedEffectType)
             {
                 case EffectType.Bend:
-                    effect = Bend.createInstance(selection.BendAmount, selection.Returns);
+                    effect = Bend.createInstance(selection.BendAmount ?? .5, selection.Returns ?? false);
                     break;
                 case EffectType.Pinch_Harmonic:
                     effect = PinchHarmonic.createInstance();
                     break;
                 case EffectType.Vibrato:
-                    effect = Vibrato.createInstance(selection.Wide);
+                    effect = Vibrato.createInstance(selection.Wide ?? false);
                     break;
             }
             selection.SelectedEffect = effect;
@@ -573,7 +573,7 @@ namespace GuitarTab
             switch (selection.SelectedEffectType)
             {
                 case EffectType.Slide:
-                    effect = Slide.createInstance(first, second, selection.Legato);
+                    effect = Slide.createInstance(first, second, selection.Legato ?? false);
                     break;
                 case EffectType.HOPO:
                     effect = HOPO.createInstance(first, second);

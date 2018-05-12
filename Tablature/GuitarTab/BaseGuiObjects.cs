@@ -10,13 +10,13 @@ namespace GuitarTab
 {
     public abstract class BaseMouseHandler
     {
-        public IDelegate Delegate { get; set; }
+        public IMouseDelegate Delegate { get; set; }
         protected VisualBounds bounds;
         protected CommandSelections selections;
         protected MouseSelections mouse_selections;
         protected GuiCommandExecutor executor;
 
-        public BaseMouseHandler(VisualBounds b, CommandSelections s, MouseSelections m, GuiCommandExecutor e, IDelegate d)
+        public BaseMouseHandler(VisualBounds b, CommandSelections s, MouseSelections m, GuiCommandExecutor e, IMouseDelegate d)
         {
             Delegate = d;
             bounds = b;
@@ -25,9 +25,7 @@ namespace GuitarTab
             executor = e;
         }
 
-        public bool hitTest(Point point) { return bounds.containsPoint(point); }
-
-        public void handleMouseEvent()
+        public void handleMouseEvent(MouseClick click)
         {
             if (mouse_selections.PositionCheck)
             {
@@ -39,25 +37,25 @@ namespace GuitarTab
             switch (mouse_selections.EventType)
             {
                 case MouseSelections.CLICK:
-                    mouseClick();
+                    mouseClick(click);
                     return;
                 case MouseSelections.DRAG_RELEASE:
                 case MouseSelections.MULTIPLE_DRAG_RELEASE:
-                    mouseDragRelease();
+                    mouseDragRelease(click);
                     return;
                 case MouseSelections.DRAG_SELECT:
-                    mouseDragSelect();
+                    mouseDragSelect(click);
                     return;
                 default:
                     return;
             }
         }
 
-        public abstract void mouseClick();
+        public abstract void mouseClick(MouseClick click);
 
-        public abstract void mouseDragRelease();
+        public abstract void mouseDragRelease(MouseClick click);
 
-        public abstract void mouseDragSelect();
+        public abstract void mouseDragSelect(MouseClick click);
 
         public abstract void mousePositionCheck();
 
@@ -65,21 +63,29 @@ namespace GuitarTab
 
         public abstract void addToMouseSelections();
 
-        public void invokeClickDelegate()
+        public void invokeClickDelegate(MouseClick click)
         {
-            if (!mouse_selections.EventHandled) { Delegate?.invokeDelegate(); }
+            if (!mouse_selections.EventHandled) { Delegate?.invokeDelegate(click); }
         }
     }
 
-    public interface IBounded
+    public abstract class BaseBounded
     {
         IDelegate Delegate { get; set; }
         VisualBounds Bounds { get; set; }
 
-        void updateBounds();
+        public BaseBounded(IDelegate del, VisualBounds bounds)
+        {
+            Delegate = del;
+            Bounds = bounds;
+        }
+
+        public abstract void updateBounds();
+
+        public bool hitTest(Point point) { return Bounds.containsPoint(point); }
     }
 
-    public class TabDrawingVisual : DrawingVisual
+    public abstract class TabDrawingVisual : DrawingVisual
     {
         public VisualBounds Bounds { get; set; }
         public IDelegate Delegate { get; set; }
@@ -95,14 +101,14 @@ namespace GuitarTab
             Bounds.PropertyChanged += boundsPropertyChange;
         }
 
+        public abstract void refreshDrawingContext(DrawingContext dc);
+
         public void refreshVisual()
         {
             var dc = RenderOpen();
             refreshDrawingContext(dc);
             dc.Close();
         }
-
-        public virtual void refreshDrawingContext(DrawingContext dc) { }
 
         public void boundsPropertyChange(object sender, BoundsPropertyChangedEventArgs args)
         {
@@ -116,18 +122,6 @@ namespace GuitarTab
                 if (args.PropertyName == nameof(VisualBounds.Left)) { transform.X = Bounds.Left; }
                 else if (args.PropertyName == nameof(VisualBounds.Top)) { transform.Y = Bounds.Top; }
             }
-        }
-    }
-
-    public class ModelBoundsPair
-    {
-        public VisualBounds Bounds { get; set; }
-        public object Base { get; set; }
-
-        public ModelBoundsPair(VisualBounds bounds, object base_obj)
-        {
-            Bounds = bounds;
-            Base = base_obj;
         }
     }
 }

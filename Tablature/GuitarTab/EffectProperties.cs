@@ -50,8 +50,8 @@ namespace GuitarTab
             second = s;
 
             Types = genValidEffectTypes();
-            CurrentType = init_type.getMenuName();
             CurrentStrategy = createNewStrategy(init_type);
+            CurrentType = init_type.getMenuName();
         }
 
         public List<string> genValidEffectTypes()
