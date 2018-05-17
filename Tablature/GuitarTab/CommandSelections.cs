@@ -84,6 +84,16 @@ namespace GuitarTab
             Returns = null;
             Wide = null;
             Legato = null;
+            SelectedLength = null;
+        }
+
+        public void ClearModel()
+        {
+            SelectedPart = null;
+            SelectedMeasure.Clear();
+            SelectedChord.Clear();
+            SelectedNote.Clear();
+            SelectedEffect = null;
         }
 
         public Measure getFirstMeasureByPosition()

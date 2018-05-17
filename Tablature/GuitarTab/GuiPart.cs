@@ -20,14 +20,6 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override VisualBounds initBounds()
-        {
-            int width = info.Dimensions.PageWidth;
-            int height = info.Dimensions.PageHeight;
-
-            return new VisualBounds(0, 0, width, height, 0);
-        }
-
         public override void updateBounds()
         {
             Bounds.Left = 0;
@@ -49,18 +41,18 @@ namespace GuitarTab
             if (click.matchesSelectionType(Selection.Add_Measure))
             {
                 int position = performMousePositionCheck(click);
-                executor.executeAddMeasureToPart(position);
+                executor.executeAddMeasureToPart(click, position);
             }
 
             invokeClickDelegate(click);
 
             if (click.matchesSelectionType(Selection.Add_Rest))
             {
-                executor.executeAddRestChordToPart();
+                executor.executeAddRestChordToPart(click);
             }
             else if (click.matchesSelectionType(Selection.Add_Note))
             {
-                executor.executeAddNoteToPart();
+                executor.executeAddNoteToPart(click);
             }
         }
 
@@ -69,27 +61,27 @@ namespace GuitarTab
             if (click.multipleMeasures() && !click.anyChord())
             {
                 int position = performMousePositionCheck(click);
-                executor.executeChangeMultipleMeasurePosition(position);
+                executor.executeChangeMultipleMeasurePosition(click, position);
             }
             else if (click.anyMeasure() && !click.anyChord())
             {
                 int position = performMousePositionCheck(click);
-                executor.executeChangeMeasurePosition(position);
+                executor.executeChangeMeasurePosition(click, position);
             }
 
             invokeClickDelegate(click);
 
             if (click.anyNote())
             {
-                executor.executeChangeNotePositionNewMeasure();
+                executor.executeChangeNotePositionNewMeasure(click);
             }
             else if (click.multipleChords())
             {
-                executor.executeChangeMultipleChordPositionNewMeasure();
+                executor.executeChangeMultipleChordPositionNewMeasure(click);
             }
             else if (click.anyChord())
             {
-                executor.executeChangeChordPositionNewMeasure();
+                executor.executeChangeChordPositionNewMeasure(click);
             }
         }
 

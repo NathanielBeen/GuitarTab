@@ -147,19 +147,17 @@ namespace GuitarTab
 
     public static class MeasureBarrer
     {
-        public static void barMeasure(TreeNode measure)
+        public static void barMeasure(MeasureTreeNode measure_node)
         {
-            var barred_beats = genBeats(measure);
+            var barred_beats = genBeats(measure_node);
             foreach (BarredBeat beat in barred_beats) { beat.barBeat(); }
         }
 
-        public static List<BarredBeat> genBeats(TreeNode measure)
+        public static List<BarredBeat> genBeats(MeasureTreeNode measure_node)
         {
-            Measure model_measure = ((MeasureBounds)measure.ObjectBounds).getMeasure();
-            List<ChordBounds> chords = (from chord in model_measure.ModelCollection.Items()
-                                        select (measure.findChild(chord).ObjectBounds as ChordBounds)).ToList();
-
-            int beat_length = (int)model_measure.TimeSignature.BeatType;
+            List<ChordBounds> chords = (from node in measure_node.Children
+                                        select node.ObjectBounds as ChordBounds).ToList();
+            int beat_length = (int)measure_node.getMeasure().TimeSignature.BeatType;
             var beats = new List<BarredBeat>();
             while (chords.Any())
             {

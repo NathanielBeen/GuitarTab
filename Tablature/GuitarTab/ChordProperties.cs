@@ -11,6 +11,7 @@ namespace GuitarTab
     {
         private Chord chord;
         private GuiCommandExecutor executor;
+        private NodeClick click;
 
         private NoteLength current_length;
         public string CurrentLength
@@ -21,10 +22,11 @@ namespace GuitarTab
 
         public List<string> Lengths { get; }
 
-        public ChordProperties(Chord c, GuiCommandExecutor ex)
+        public ChordProperties(Chord c, GuiCommandExecutor ex, NodeClick cl)
         {
             chord = c;
             executor = ex;
+            click = cl;
 
             CurrentLength = chord.Length.NoteType.getStringFromNoteLength();
             Lengths = NoteLengthExtensions.getAllLengthStrings();
@@ -37,7 +39,7 @@ namespace GuitarTab
 
         public void submitChanges()
         {
-            if (current_length != chord.Length.NoteType) { executor.executeChangeChordLengthFromMenu(new Length(current_length)); }
+            if (current_length != chord.Length.NoteType) { executor.executeChangeChordLengthFromMenu(click, new Length(current_length)); }
         }
     }
 }

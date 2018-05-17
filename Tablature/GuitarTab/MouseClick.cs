@@ -14,7 +14,8 @@ namespace GuitarTab
         DoubleClick,
         Select,
         Release,
-        Position
+        Position,
+        Bounds
     }
 
     public class MouseClick
@@ -52,6 +53,7 @@ namespace GuitarTab
 
         public void populateCommandSelections(CommandSelections selections)
         {
+            selections.ClearModel();
             if (PartNode != null) { selections.SelectedPart = PartNode.getPart(); }
             foreach (MeasureTreeNode node in MeasureNodes) { selections.SelectedMeasure.Add(node.getMeasure()); }
             foreach (ChordTreeNode node in ChordNodes) { selections.SelectedChord.Add(node.getChord()); }
@@ -63,6 +65,18 @@ namespace GuitarTab
         {
             return MeasureNodes.OrderBy(m => m.getMeasure().Position.Index).FirstOrDefault();
         }
+
+        public TreeNode getFirstSelected()
+        {
+            if (EffectNode != null) { return EffectNode; }
+            else if (NoteNodes.Any()) { return NoteNodes.First(); }
+            else if (ChordNodes.Any()) { return ChordNodes.First(); }
+            else if (MeasureNodes.Any()) { return MeasureNodes.First(); }
+            else if (PartNode != null) { return PartNode; }
+            return null;
+        }
+
+        public void Handled() { handled = true; }
     }
 
     public class StandardClick : NodeClick
@@ -116,13 +130,14 @@ namespace GuitarTab
         public bool ContainsRect { get; private set; }
         private Rect rectangle;
 
-        public SelectClick(Point p)
+        public SelectClick(Point p, Rect rect)
             :base(p)
         {
+            rectangle = rect;
             ContainsRect = false;
         }
 
-        public void setRectContains(VisualBounds bounds)
+        public void setContainsRect(VisualBounds bounds)
         {
             ContainsRect = bounds.containsRectangle(rectangle);
         }
@@ -193,5 +208,18 @@ namespace GuitarTab
             if (current_closest.Bar > bounds.Bar) { return false; }
             return (current_closest.Right <= bounds.Right);
         }
+    }
+
+    public class BoundsClick : MouseClick
+    {
+        public VisualBounds DeepestBounds { get; set; }
+
+        public BoundsClick(Point p)
+            :base(p)
+        {
+            DeepestBounds = null;
+        }
+
+        public override bool matchesClickType(ClickType desired) { return desired == ClickType.Bounds; }
     }
 }

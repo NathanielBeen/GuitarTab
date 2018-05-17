@@ -15,7 +15,7 @@ namespace GuitarTab
 
         public Position Position { get; set; }
 
-        public ModelCollection<Chord> ModelCollection { get; }
+        public SymbolCollection<Chord> ModelCollection { get; }
         public event EventHandler<ObjectAddedArgs> ModelAdded;
         public event EventHandler<ObjectRemovedArgs> ModelRemoved;
 

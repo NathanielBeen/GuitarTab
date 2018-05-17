@@ -89,6 +89,7 @@ namespace GuitarTab
         {
             if (click.matchesClickType(ClickType.Position)) { performPositionCheck(click as PositionClick); }
             else if (click.matchesClickType(ClickType.Select)) { checkSelectBounds(click as SelectClick); }
+            else if (click.matchesClickType(ClickType.Bounds)) { performBoundsCheck(click as BoundsClick); }
 
             else if (ObjectBounds.hitTest(click.Point))
             {
@@ -100,8 +101,17 @@ namespace GuitarTab
         public void checkSelectBounds(SelectClick click)
         {
             addToMouseClick(click);
-            click?.setRectContains(ObjectBounds.Bounds);
+            click?.setContainsRect(ObjectBounds.Bounds);
             if (click?.ContainsRect ?? false) { ObjectHandler?.invokeClickDelegate(click); }
+        }
+
+        public void performBoundsCheck(BoundsClick click)
+        {
+            if (ObjectBounds.hitTest(click.Point))
+            {
+                click.DeepestBounds = ObjectBounds.Bounds;
+                ObjectHandler?.invokeClickDelegate(click);
+            }
         }
 
         public virtual void addToMouseClick(NodeClick click) { }

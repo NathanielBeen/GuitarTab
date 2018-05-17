@@ -22,7 +22,9 @@ namespace GuitarTab
 
         public Part genPart(CommandSelections selection)
         {
-            return Part.createInstance(selection.BPM, selection.NumBeats, selection.BeatType);
+            Part part = Part.createInstance(selection.BPM, selection.NumBeats, selection.BeatType);
+            selection.SelectedPart = part;
+            return part;
         }
     }
 

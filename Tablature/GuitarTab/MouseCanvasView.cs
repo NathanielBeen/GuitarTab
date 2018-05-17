@@ -10,7 +10,6 @@ namespace GuitarTab
     public class MouseCanvasView
     {
         private MouseHandler handler;
-        private GuiObjectTree tree;
 
         public MouseStateView StateView { get; }
 
@@ -18,20 +17,18 @@ namespace GuitarTab
 
         public MouseSelectedView SelectedView { get; }
 
-        public MouseCanvasView(MouseStateView state, MouseHoverView hover, MouseSelectedView selected, MouseHandler h, GuiObjectTree t)
+        public MouseCanvasView(MouseStateView state, MouseHoverView hover, MouseSelectedView selected, MouseHandler h)
         {
             StateView = state;
             HoverView = hover;
             SelectedView = selected;
             handler = h;
-            tree = t;
         }
 
         public void handleMousePositionChanged(Point position)
         {
             StateView.changePosition(position);
-            VisualBounds new_hover = tree.GetDeepestBoundsAtPosition(position);
-            HoverView.setHoveredObject(new_hover);
+            HoverView.setHoveredObject(handler.hoverCheck(position));
         }
 
         public void handleMouseUp(Point position)

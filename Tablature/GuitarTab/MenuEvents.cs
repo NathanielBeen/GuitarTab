@@ -10,23 +10,23 @@ namespace GuitarTab
 
     public class PropertyMenuEventArgs : EventArgs
     {
-        public ModelBoundsPair Selected { get; }
+        public NodeClick Click { get; }
 
-        public PropertyMenuEventArgs(ModelBoundsPair select)
+        public PropertyMenuEventArgs(NodeClick click)
             :base()
         {
-            Selected = select;
+            Click = click;
         }
     }
 
     public class FretMenuEventArgs : EventArgs
     {
-        public Point CurrentPosition { get; }
+        public NodeClick Click { get; }
         public ContinueCommandDelegate Command { get; }
 
-        public FretMenuEventArgs(Point position, Action<NodeClick, int> command)
+        public FretMenuEventArgs(NodeClick click, Action<NodeClick, int> command)
         {
-            CurrentPosition = position;
+            Click = click;
             Command = (c,p) => command(c,p);
         }
     }

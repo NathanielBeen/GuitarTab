@@ -57,7 +57,7 @@ namespace GuitarTab
 
         public void handleStateChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (args.PropertyName == nameof(MouseSelections.SelectionState))
+            if (args.PropertyName == nameof(MouseStateConverter.SelectionState))
             {
                 CurrentImage = new ImageBrush(mouse_images[converter.SelectionState]);
             }

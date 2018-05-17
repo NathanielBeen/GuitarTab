@@ -21,9 +21,9 @@ namespace GuitarTab
         private SettingsReader reader;
         private MouseStateConverter converter;
         private CommandSelections selections;
-        private MouseSelections mouse_selections;
         private VisualInfo info;
         private GuiCommandExecutor executor;
+        private Selected selected;
         private MouseHandler handler;
         private GuiObjectFactory factory;
         private GuiObjectTree tree;
@@ -44,9 +44,9 @@ namespace GuitarTab
             reader = createSettingsReader(file_loc);
             converter = createMouseStateConverter();
             selections = createCommandSelections();
-            mouse_selections = createMouseSelections();
             info = createVisualInfo();
             executor = createExecutor();
+            selected = createSelected();
             factory = createFactory();
             tree = createTree();
             handler = createHandler();
@@ -76,11 +76,6 @@ namespace GuitarTab
             return new CommandSelections(converter);
         }
 
-        public MouseSelections createMouseSelections()
-        {
-            return new MouseSelections(converter);
-        }
-
         public VisualInfo createVisualInfo()
         {
             var dimensions = new VisualDimensions(reader.getDictionary(SettingsReader.DIMENSION), reader.getDictionary(SettingsReader.LENGTH));
@@ -99,29 +94,30 @@ namespace GuitarTab
         public GuiCommandExecutor createExecutor()
         {
             var executor = new CommandExecutor();
-            return new GuiCommandExecutor(executor, selections, mouse_selections, info);
+            return new GuiCommandExecutor(executor, selections, info);
         }
 
         public GuiObjectFactory createFactory()
         {
-            var cpos = new ChordPositionCheck();
-            var mpos = new MeasurePositionCheck();
-            return new GuiObjectFactory(info, selections, mouse_selections, executor, cpos, mpos);
+            return new GuiObjectFactory(info, executor);
         }
 
         public GuiObjectTree createTree()
         {
-            var cpos = new ChordPositionCheck();
-            var mpos = new MeasurePositionCheck();
-            var factory = new GuiObjectFactory(info, selections, mouse_selections, executor, cpos, mpos);
+            var added = new TreeAddedHolding();
             var holding = new TreeRemovedHolding(20);
             var collection = new TreeVisualCollection();
-            return new GuiObjectTree(factory, holding, collection);
+            return new GuiObjectTree(factory, added, holding, collection);
+        }
+
+        public Selected createSelected()
+        {
+            return new Selected();
         }
 
         public MouseHandler createHandler()
         {
-            return new MouseHandler(executor, mouse_selections, selections, tree);
+            return new MouseHandler(tree, selected, converter);
         }
 
         public GuiTreeUpdater createUpdater()
@@ -138,7 +134,7 @@ namespace GuitarTab
 
         public DeleteView createDeleteView()
         {
-            return new DeleteView(selections, executor, reader.getDictionaryEntry(SettingsReader.OTHER_IMG, DELETE_IMG));
+            return new DeleteView(executor, selected, reader.getDictionaryEntry(SettingsReader.OTHER_IMG, DELETE_IMG));
         }
 
         public AddItemView createAddItemView()
@@ -150,14 +146,15 @@ namespace GuitarTab
         {
             var state_view = new MouseStateView(reader.getDictionary(SettingsReader.MOUSESTATE), converter);
             var hover_view = new MouseHoverView(info.DrawingObjects.HoverBrush);
-            var selected_view = new MouseSelectedView(info.DrawingObjects.SelectedBrush, mouse_selections);
-            var canvas = new MouseCanvasView(state_view, hover_view, selected_view, handler, tree);
+            var selected_view = new MouseSelectedView(info.DrawingObjects.SelectedBrush);
+            selected.SelectedView = selected_view;
+            var canvas = new MouseCanvasView(state_view, hover_view, selected_view, handler);
             return canvas;
         }
 
         public PropertyMenuView createPropertyView()
         {
-            var fac = new PropertyMenuFactory(executor, selections);
+            var fac = new PropertyMenuFactory(executor);
             return new PropertyMenuView(fac);
         }
 
@@ -180,7 +177,8 @@ namespace GuitarTab
 
         public void initPart()
         {
-            executor.executeInitPart(120, 4, NoteLength.Quarter);
+            var click = new NodeClick(new System.Windows.Point(0, 0));
+            executor.executeInitPart(click, 120, 4, NoteLength.Quarter);
         }
     }
 

@@ -7,11 +7,11 @@ using System.Windows;
 
 namespace GuitarTab
 {
-    public class SelectedObjectChangedArgs : EventArgs
+    /*public class SelectedObjectChangedArgs : EventArgs
     {
-        public List<ModelBoundsPair> SelectedObjects { get; }
+        public List<VisualBounds> SelectedObjects { get; }
 
-        public SelectedObjectChangedArgs(List<ModelBoundsPair> selected)
+        public SelectedObjectChangedArgs(List<VisualBounds> selected)
             :base()
         {
             SelectedObjects = selected;
@@ -37,5 +37,5 @@ namespace GuitarTab
         {
             Hovered = pair;
         }
-    }
+    }*/
 }

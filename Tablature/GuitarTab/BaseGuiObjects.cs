@@ -43,7 +43,10 @@ namespace GuitarTab
             Bounds = initBounds();
         }
 
-        public abstract VisualBounds initBounds();
+        public virtual VisualBounds initBounds()
+        {
+            return new VisualBounds(0, 0, 0, 0, 0);
+        }
 
         public abstract void updateBounds();
 

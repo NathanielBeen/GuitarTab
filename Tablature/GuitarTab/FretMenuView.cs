@@ -55,6 +55,8 @@ namespace GuitarTab
             get { return closeCommand ?? (closeCommand = new RelayCommand(() => handleClose())); }
         }
 
+        public NodeClick Click { get; set; }
+
         public FretMenuView()
         {
             Fret = "0";
@@ -72,13 +74,14 @@ namespace GuitarTab
             Position = default(Point);
             Visible = Visibility.Collapsed;
             ContinueDelegate = null;
+            Click = null;
         }
 
         public void handleSubmit()
         {
-            if(int.TryParse(fret, out int conv_fret))
+            if(int.TryParse(fret, out int conv_fret) && Click != null)
             {
-                ContinueDelegate?.Invoke(conv_fret);
+                ContinueDelegate?.Invoke(Click, conv_fret);
                 resetFields();
             }
             else { Fret = "0"; }
@@ -88,6 +91,14 @@ namespace GuitarTab
         {
             CancelDelegate?.Invoke();
             resetFields();
+        }
+
+        public void launchMenu(ContinueCommandDelegate command, NodeClick click)
+        {
+            ContinueDelegate = command;
+            Click = click;
+            Position = click.Point;
+            Visible = Visibility.Visible;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace GuitarTab
         //some kind of instrumenttype thing
         public int DefaultBPM { get; set; }
         public TimeSignature TimeSignature { get; set; }
-        public ModelCollection<Measure> ModelCollection { get; }
+        public SymbolCollection<Measure> ModelCollection { get; }
 
         public static Part createInstance(int? bpm, int? num_beats, NoteLength? beat_type)
         {

@@ -31,7 +31,7 @@ namespace GuitarTab
 
     public interface IContainModels<T> : IContainModels
     {
-        ModelCollection<T> ModelCollection { get; }
+        SymbolCollection<T> ModelCollection { get; }
 
         void Add(T item);
         void Remove(T item);
@@ -42,7 +42,7 @@ namespace GuitarTab
         void Add(T item);
         void Remove(T item);
         void Clear();
-        bool Containes(T item);
+        bool Contains(T item);
         T First();
         T Last();
         List<T> Items();
@@ -50,23 +50,20 @@ namespace GuitarTab
 
         T getItemMatchingCondition(Func<T, bool> condition);
         List<T> getItemsMatchingCondition(Func<T, bool> condition);
+        void performActionOnAllItems(Action<T> action);
+        void performActionOnSpecificItems(Func<T, bool> condition, Action<T> action);
     }
 
-    public class ModelCollection<T>
+    public class ModelCollection<T> : SymbolCollection<T>
     {
-        protected SortedSet<T> items;
+        private List<T> items;
 
         /*
         * Constructor
         */
         public ModelCollection()
         {
-            items = createItemList();
-        }
-
-        public virtual SortedSet<T> createItemList()
-        {
-            return new SortedSet<T>(Comparer<T>.Default);
+            items = new List<T>();
         }
 
         /*
@@ -77,7 +74,7 @@ namespace GuitarTab
 
         public virtual void Remove(T item) { items.Remove(item); }
 
-        public virtual void Clear() { items = createItemList(); }
+        public virtual void Clear() { items.Clear(); }
 
         public bool Contains(T item) { return (items.Contains(item)); }
 
@@ -120,21 +117,22 @@ namespace GuitarTab
         }
     }
 
-    public class PositionedModelCollection<T> : ModelCollection<T>
+    public class PositionedModelCollection<T> : SymbolCollection<T>
         where T : IPosition
     {
+        protected SortedSet<T> items;
         private T last;
 
         /*
         * Constructor
         */
         public PositionedModelCollection()
-            :base()
         {
+            items = createItemList();
             last = default(T);
         }
 
-        public override SortedSet<T> createItemList()
+        public SortedSet<T> createItemList()
         {
             return new SortedSet<T>(new PositionComparer<T>());
         }
@@ -159,22 +157,63 @@ namespace GuitarTab
         * Add/Remove Methods
         */
 
-        public override void Add(T item)
+        public virtual void Add(T item)
         {
-            base.Add(item);
+            items.Add(item);
             updateLastItem();
         }
 
-        public override void Remove(T item)
+        public virtual void Remove(T item)
         {
-            base.Remove(item);
+            items.Remove(item);
             updateLastItem();
         }
 
-        public override void Clear()
+        public virtual void Clear()
         {
-            base.Clear();
+            items = createItemList();
             last = default(T);
+        }
+
+
+        public bool Contains(T item) { return (items.Contains(item)); }
+
+        public T First() { return items.FirstOrDefault(); }
+
+        public T Last() { return items.LastOrDefault(); }
+
+        public List<T> Items() { return items.ToList(); }
+
+        public int Count() { return items.Count; }
+
+        /*
+        * Search Methods
+        */
+        public T getItemMatchingCondition(Func<T, bool> condition)
+        {
+            return (from item in items
+                    where condition(item)
+                    select item).FirstOrDefault();
+        }
+
+        public List<T> getItemsMatchingCondition(Func<T, bool> condition)
+        {
+            return (from item in items
+                    where condition(item)
+                    select item).ToList();
+        }
+
+        public void performActionOnAllItems(Action<T> operation)
+        {
+            foreach (T item in items) { operation(item); }
+        }
+
+        public void performActionOnSpecificItems(Func<T, bool> condition, Action<T> operation)
+        {
+            foreach (T item in items)
+            {
+                if (condition(item)) { operation(item); }
+            }
         }
     }
 

@@ -38,7 +38,7 @@ namespace GuitarTab
             var bounds_list = new List<VisualBounds>();
             for (int i = lowest_bar; i <= highest_bar; i++) { bounds_list.Add(genSingleMeasureBounds(first_left, last_right, lowest_bar, highest_bar, i)); }
 
-            (Bounds as MultipleVisualBounds)?.updateInstance(bounds_list);
+            (Bounds as MultipleVisualBounds).updateInstance(bounds_list);
         }
         
         public void getInitBoundValues(out int first_left, out int lowest_bar)
@@ -91,7 +91,7 @@ namespace GuitarTab
             if (click.matchesSelectionType(Selection.Add_Rest))
             {
                 int position = performMousePositionCheck(click);
-                executor.executeAddRestChordToMeasure(position);
+                executor.executeAddRestChordToMeasure(click, position);
             }
 
             invokeClickDelegate(click);
@@ -99,7 +99,7 @@ namespace GuitarTab
             if (click.matchesSelectionType(Selection.Add_Note))
             {
                 int position = performMousePositionCheck(click);
-                executor.executeAddNoteToMeasure(position);
+                executor.executeAddNoteToMeasure(click, position);
             }
         }
 
@@ -108,12 +108,12 @@ namespace GuitarTab
             if (click.multipleChords() && !click.anyNote())
             {
                 int position = performMousePositionCheck(click);
-                executor.executeChangeMultipleChordPosition(position);
+                executor.executeChangeMultipleChordPosition(click, position);
             }
             else if (click.anyChord() && !click.anyNote())
             {
                 int position = performMousePositionCheck(click);
-                executor.executeChangeChordPosition(position);
+                executor.executeChangeChordPosition(click, position);
             }
 
             invokeClickDelegate(click);
@@ -121,7 +121,7 @@ namespace GuitarTab
             if (click.anyNote())
             {
                 int position = performMousePositionCheck(click);
-                executor.executeChangeNotePositionNewChord(position);
+                executor.executeChangeNotePositionNewChord(click, position);
             }
         }
 

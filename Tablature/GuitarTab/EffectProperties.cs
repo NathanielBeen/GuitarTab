@@ -17,6 +17,7 @@ namespace GuitarTab
         private EffectType init_type;
 
         private GuiCommandExecutor executor;
+        private NodeClick click;
         private Note first;
         private Note second;
 
@@ -40,12 +41,13 @@ namespace GuitarTab
             set { SetProperty(ref current_strategy, value); }
         }
 
-        public EffectProperties(GuiCommandExecutor exec, IEffect e, Note f, Note s)
+        public EffectProperties(GuiCommandExecutor exec, NodeClick c, IEffect e, Note f, Note s)
         { 
             effect = e;
             init_type = effect?.Type ?? EffectType.No_Type;
 
             executor = exec;
+            click = c;
             first = f;
             second = s;
 
@@ -65,16 +67,16 @@ namespace GuitarTab
             switch (type)
             {
                 case EffectType.Vibrato:
-                    return new VibratoMenuStrategy(executor, effect as Vibrato);
+                    return new VibratoMenuStrategy(executor, click, effect as Vibrato);
                 case EffectType.Bend:
-                    return new BendMenuStrategy(executor, effect as Bend);
+                    return new BendMenuStrategy(executor, click, effect as Bend);
                 case EffectType.Slide:
-                    return new SlideMenuStrategy(executor, first, second, effect as Slide);
+                    return new SlideMenuStrategy(executor, click, first, second, effect as Slide);
                 case EffectType.Tie:
                 case EffectType.HOPO:
-                    return new MultiEffectMenuStrategy(executor, type, first, second);
+                    return new MultiEffectMenuStrategy(executor, click, type, first, second);
                 default:
-                    return new BaseEffectMenuStrategy(executor, type);
+                    return new BaseEffectMenuStrategy(executor, click, type);
             }
         }
 
@@ -94,7 +96,7 @@ namespace GuitarTab
 
         public void submitChanges()
         {
-            if (init_type != EffectType.No_Type && current_type == EffectType.No_Type) { executor.executeRemoveEffectFromNote(effect); }
+            if (init_type != EffectType.No_Type && current_type == EffectType.No_Type) { executor.executeRemoveEffectFromNote(click, effect); }
             else if (current_type != EffectType.No_Type && (init_type != current_type || CurrentStrategy.effectChanged())) { CurrentStrategy.addEffect(); }
         }
     }
@@ -103,16 +105,18 @@ namespace GuitarTab
     {
         protected EffectType type;
         protected GuiCommandExecutor executor;
+        protected NodeClick click;
 
-        public BaseEffectMenuStrategy(GuiCommandExecutor gui, EffectType t)
+        public BaseEffectMenuStrategy(GuiCommandExecutor gui, NodeClick c, EffectType t)
         {
             type = t;
+            click = c;
             executor = gui;
         }
 
         public virtual bool effectChanged() { return false; }
 
-        public virtual void addEffect() { executor.executeAddEffectToNoteProp(type); }
+        public virtual void addEffect() { executor.executeAddEffectToNoteProp(click, type); }
 
         public virtual void resetToDefault() { }
 
@@ -130,8 +134,8 @@ namespace GuitarTab
             set { SetProperty(ref wide, value); }
         }
 
-        public VibratoMenuStrategy(GuiCommandExecutor gui, Vibrato vib)
-            : base(gui, EffectType.Vibrato)
+        public VibratoMenuStrategy(GuiCommandExecutor gui, NodeClick click, Vibrato vib)
+            : base(gui, click, EffectType.Vibrato)
         {
             init_wide = vib?.Wide ?? false;
             Wide = init_wide;
@@ -139,7 +143,7 @@ namespace GuitarTab
 
         public override bool effectChanged() { return Wide != init_wide; }
 
-        public override void addEffect() { executor.executeAddVibratoToNoteProp(wide); }
+        public override void addEffect() { executor.executeAddVibratoToNoteProp(click, wide); }
 
         public override void resetToDefault() { Wide = init_wide; }
     }
@@ -169,8 +173,8 @@ namespace GuitarTab
             set { SetProperty(ref returns, value); }
         }
 
-        public BendMenuStrategy(GuiCommandExecutor gui, Bend bend)
-            : base(gui, EffectType.Bend)
+        public BendMenuStrategy(GuiCommandExecutor gui, NodeClick click, Bend bend)
+            : base(gui, click, EffectType.Bend)
         {
             init_amount = bend?.Amount ?? 1;
             init_returns = bend?.BendReturns ?? false;
@@ -180,7 +184,7 @@ namespace GuitarTab
 
         public override bool effectChanged() { return amount != init_amount || Returns != init_returns; }
 
-        public override void addEffect() { executor.executeAddBendToNoteProp(amount, returns); }
+        public override void addEffect() { executor.executeAddBendToNoteProp(click, amount, returns); }
 
         public override void resetToDefault()
         {
@@ -207,14 +211,14 @@ namespace GuitarTab
         protected Note first_note;
         protected Note second_note;
 
-        public MultiEffectMenuStrategy(GuiCommandExecutor gui, EffectType type, Note first, Note second)
-            :base(gui, type)
+        public MultiEffectMenuStrategy(GuiCommandExecutor gui, NodeClick click, EffectType type, Note first, Note second)
+            :base(gui, click, type)
         {
             first_note = first;
             second_note = second;
         }
 
-        public override void addEffect() { executor.executeAddMultiEffectToNoteProp(first_note, second_note, type); }
+        public override void addEffect() { executor.executeAddMultiEffectToNoteProp(click, first_note, second_note, type); }
     }
 
     public class SlideMenuStrategy : MultiEffectMenuStrategy
@@ -228,8 +232,8 @@ namespace GuitarTab
             set { SetProperty(ref legato, value); }
         }
 
-        public SlideMenuStrategy(GuiCommandExecutor gui, Note first, Note second, Slide init_slide)
-            :base(gui, EffectType.Slide, first, second)
+        public SlideMenuStrategy(GuiCommandExecutor gui, NodeClick click, Note first, Note second, Slide init_slide)
+            :base(gui, click, EffectType.Slide, first, second)
         {
             init_legato = init_slide?.Legato ?? false;
             legato = init_legato;
@@ -237,7 +241,7 @@ namespace GuitarTab
 
         public override bool effectChanged() { return legato != init_legato; }
 
-        public override void addEffect() { executor.executeAddSlideToNoteProp(first_note, second_note, legato); }
+        public override void addEffect() { executor.executeAddSlideToNoteProp(click, first_note, second_note, legato); }
 
         public override void resetToDefault() { Legato = init_legato; }
     }

@@ -19,7 +19,7 @@ namespace GuitarTab
     {
         private Note note;
         private GuiCommandExecutor executor;
-        private CommandSelections attributes;
+        private NodeClick click;
 
         private int note_string;
         public string String
@@ -51,21 +51,21 @@ namespace GuitarTab
         public EffectProperties StrikeEffectProperties { get; }
         public EffectProperties AfterEffectProperties { get; }
 
-        public NoteProperties(Note n, GuiCommandExecutor ex, CommandSelections attr)
+        public NoteProperties(Note n, GuiCommandExecutor ex, NodeClick c)
             :base()
         {
             note = n;
             executor = ex;
-            attributes = attr;
+            click = c;
 
             String = note.String.ToString();
             Fret = note.Fret.ToString();
 
-            Note prev_note = attributes.SelectedPart?.getPreviousNote(note) ?? null;
-            Note next_note = attributes.SelectedPart?.getNextNote(note) ?? null;
-            IntoEffectProperties = new EffectProperties(executor, note.getEffectAtPosition(EffectPosition.Into), prev_note, note);
-            StrikeEffectProperties = new EffectProperties(executor, note.getEffectAtPosition(EffectPosition.Strike), null, null);
-            AfterEffectProperties = new EffectProperties(executor, note.getEffectAtPosition(EffectPosition.After), note, next_note);
+            Note prev_note = click.PartNode?.getPart()?.getPreviousNote(note) ?? null;
+            Note next_note = click.PartNode?.getPart()?.getNextNote(note) ?? null;
+            IntoEffectProperties = new EffectProperties(executor, click, note.getEffectAtPosition(EffectPosition.Into), prev_note, note);
+            StrikeEffectProperties = new EffectProperties(executor, click, note.getEffectAtPosition(EffectPosition.Strike), null, null);
+            AfterEffectProperties = new EffectProperties(executor, click, note.getEffectAtPosition(EffectPosition.After), note, next_note);
         }
 
         public void resetToDefault()
@@ -79,11 +79,11 @@ namespace GuitarTab
 
         public void submitChanges()
         {
-            if (fret != note.Fret) { executor.continueChangeNoteFret(fret); }
+            if (fret != note.Fret) { executor.continueChangeNoteFret(click, fret); }
 
             if (note_string != note.String)
             {
-                executor.executeChangeNoteStringFromMenu(note_string);
+                executor.executeChangeNoteStringFromMenu(click, note_string);
                 //popup error if any effects tried to change
             }
             else

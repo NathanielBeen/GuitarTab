@@ -14,21 +14,16 @@ namespace GuitarTab
 
         public ObservableCollection<VisualBounds> Selected { get; set; }
 
-        public MouseSelectedView(Brush brush, MouseSelections selections)
+        public MouseSelectedView(Brush brush)
         {
             Brush = brush;
-            selections.SelectedChanged += handleSelectedChanged;
             Selected = new ObservableCollection<VisualBounds>();
         }
 
-        public void handleSelectedChanged(object sender, SelectedObjectChangedArgs args)
+        public void setSelectedObjects(List<TreeNode> selected)
         {
-            Selected?.Clear();
-            foreach (ModelBoundsPair new_selected in args.SelectedObjects)
-            {
-                if (new_selected != null) { Selected.Add(new_selected.Bounds); }
-
-            }
+            Selected.Clear();
+            foreach (TreeNode node in selected) { Selected.Add(node.ObjectBounds.Bounds); }
         }
     }
 }

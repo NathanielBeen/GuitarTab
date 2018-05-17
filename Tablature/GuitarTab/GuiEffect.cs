@@ -35,8 +35,6 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
-
         public override void updateBounds() { GuiEffectBoundDrawing.updateAboveLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
@@ -74,8 +72,6 @@ namespace GuitarTab
             note_bounds = n_bounds;
             info = v_info;
         }
-
-        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
         public override void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
     }
@@ -125,8 +121,6 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
-
         public override void updateBounds() { GuiEffectBoundDrawing.updateAboveLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
@@ -164,8 +158,6 @@ namespace GuitarTab
             note_bounds = n_bounds;
             info = v_info;
         }
-
-        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
         public override void updateBounds() { GuiEffectBoundDrawing.updateBeforeNoteEffectBounds(Bounds, note_bounds, note, info); }
     }
@@ -207,8 +199,6 @@ namespace GuitarTab
             note_bounds = n_bounds;
             info = v_info;
         }
-
-        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
         public override void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
     }
@@ -259,8 +249,6 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
-
         public override void updateBounds() { GuiEffectBoundDrawing.updateAboveNoteEffectBounds(Bounds, note_bounds, note, info); }
     }
 
@@ -297,8 +285,6 @@ namespace GuitarTab
             note_bounds = n_bounds;
             info = v_info;
         }
-
-        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
         public override void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
     }

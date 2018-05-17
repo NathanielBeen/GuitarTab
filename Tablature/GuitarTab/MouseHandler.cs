@@ -16,22 +16,26 @@ namespace GuitarTab
         public const int MOVE_THRESHOLD = 10;
         public const int DOUBLE_CLICK_TIMER = 1000;
 
-        private GuiCommandExecutor executor;
-        private MouseSelections mouse_selections;
-        private CommandSelections selections;
         private GuiObjectTree tree;
+        private Selected selected;
+        private MouseStateConverter converter;
 
         public event EventHandler<PropertyMenuEventArgs> PropertyMenuChanged;
+
+        public Selection SelectionState
+        {
+            get { return converter.SelectionState; }
+            set { converter.SelectionState = value; }
+        }
 
         private Point down_point;
         private bool double_click;
 
-        public MouseHandler(GuiCommandExecutor ex, MouseSelections m_sel, CommandSelections sel, GuiObjectTree t)
+        public MouseHandler(GuiObjectTree t, Selected s, MouseStateConverter conv)
         {
-            executor = ex;
-            mouse_selections = m_sel;
-            selections = sel;
             tree = t;
+            selected = s;
+            converter = conv;
 
             down_point = default(Point);
             double_click = false;
@@ -41,46 +45,48 @@ namespace GuitarTab
 
         public void mouseUp(Point pos)
         {
-            mouse_selections.EventHandled = false;
-            mouse_selections.SelectedPoint = pos;
             if (mouseMoved(pos))
             {
-                if (checkForDragRelease(pos, out bool multiple))
+                NodeClick click;
+                if (checkForDragRelease(pos))
                 {
-                    mouse_selections.EventType = (multiple) ? MouseSelections.MULTIPLE_DRAG_RELEASE : MouseSelections.DRAG_RELEASE;
-                    tree.HandleMouseEvent();
-                    clearAllSelections();
+                    click = new ReleaseClick(pos);
+                    selected.populateNodeClick(click);
                 }
                 else
                 {
-                    clearAllSelections();
-                    mouse_selections.EventType = MouseSelections.DRAG_SELECT;
-                    mouse_selections.SelectedRectangle = new Rect(pos, down_point);
-                    tree.HandleMouseEvent();
+                    click = new SelectClick(pos, new Rect(pos, down_point));
                 }
+                tree.HandleMouseEvent(click);
+                selected.populateFromClick(click);
             }
 
             else if (double_click)
             {
-                var args = new PropertyMenuEventArgs(mouse_selections.getFirstSelectedObject());
+                var click = new NodeClick(pos);
+                selected.populateNodeClick(click);
+
+                var args = new PropertyMenuEventArgs(click);
                 PropertyMenuChanged?.Invoke(this, args);
             }
 
             else
             {
-                if (mouse_selections.SelectionState != Selection.Add_Multi_Effect) { selections.Clear(); }
+                var click = new StandardClick(SelectionState, pos);
+                if (SelectionState == Selection.Add_Multi_Effect) { selected.populateNodeClickForMultiEffect(click); }
 
-                mouse_selections.EventType = MouseSelections.CLICK;
-                tree.HandleMouseEvent();
+                tree.HandleMouseEvent(click);
+                selected.populateFromClick(click);
 
-                if (mouse_selections.SelectionState == Selection.Standard)
-                {
-                    double_click = true;
-                    TimeDoubleClick();
-                }
+                if (SelectionState == Selection.Standard) { TimeDoubleClick(); }
             }
+        }
 
-            mouse_selections.EventHandled = true;
+        public VisualBounds hoverCheck(Point point)
+        {
+            var click = new BoundsClick(point);
+            tree.HandleMouseEvent(click);
+            return click.DeepestBounds;
         }
 
         public bool mouseMoved(Point up_point)
@@ -89,29 +95,23 @@ namespace GuitarTab
             return (Math.Abs(up_point.X - down_point.X) > MOVE_THRESHOLD || Math.Abs(up_point.Y - down_point.Y) > MOVE_THRESHOLD);
         }
 
-        public bool checkForDragRelease(Point point, out bool multiple)
+        public bool checkForDragRelease(Point point)
         {
-            List<ModelBoundsPair> selected = mouse_selections.getAllSelectedObjects();
-            multiple = (selected.Count() > 1);
+            List<VisualBounds> selected_bounds = selected.getSelected();
             if (down_point == null) { return false; }
 
-            foreach (var obj in selected)
+            foreach (var bound in selected_bounds)
             {
-                if (obj.Bounds.containsPoint(down_point)) { return true; }
+                if (bound.containsPoint(down_point)) { return true; }
             }
             return false;
         }
 
         public async Task TimeDoubleClick()
         {
+            double_click = true;
             await Task.Delay(DOUBLE_CLICK_TIMER);
             double_click = false;
-        }
-
-        public void clearAllSelections()
-        {
-            mouse_selections.clearAllSelections();
-            selections.Clear();
         }
     }
 }

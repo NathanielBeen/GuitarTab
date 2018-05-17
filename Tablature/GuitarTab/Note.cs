@@ -14,7 +14,7 @@ namespace GuitarTab
         public Position Position { get; set; }
         public Length Length { get; set; }
 
-        public ModelCollection<IEffect> ModelCollection { get; }
+        public SymbolCollection<IEffect> ModelCollection { get; }
         public event EventHandler<ObjectAddedArgs> ModelAdded;
         public event EventHandler<ObjectRemovedArgs> ModelRemoved;
 

@@ -25,43 +25,6 @@ namespace GuitarTab
             removed_holding = r;
             visuals = v;
         }
-
-        public TreeNode findPart(Part part)
-        {
-            return (Root.BaseObject.Equals(part)) ? Root : null;
-        }
-
-        public TreeNode findMeasure(Part part, Measure measure)
-        {
-            var part_node = findPart(part);
-            if (part_node is null) { return null; }
-
-            return part_node.findChild(measure);
-        }
-
-        public TreeNode findChord(Part part, Measure measure, Chord chord)
-        {
-            var measure_node = findMeasure(part, measure);
-            if (measure_node is null) { return null; }
-
-            return measure_node.findChild(chord);
-        }
-
-        public TreeNode findNote(Part part, Measure measure, Chord chord, Note note)
-        {
-            var chord_node = findChord(part, measure, chord);
-            if (chord_node is null) { return null; }
-
-            return chord_node.findChild(note);
-        }
-
-        public TreeNode findEffect(Part part, Measure measure, Chord chord, Note note, IEffect effect)
-        {
-            var note_node = findNote(part, measure, chord, note);
-            if (note_node is null) { return null; }
-
-            return note_node.findChild(effect);
-        }
         
         public TreeNode findObjectWithoutParents(object base_object)
         {
@@ -85,7 +48,7 @@ namespace GuitarTab
             else if (child is Measure) { buildMeasure((Measure)child, parent); }
             else if (child is Chord) { buildChord((Chord)child, parent); }
             else if (child is Note) { buildNote((Note)child, parent); }
-            else if (child is IEffect) { buildEffect((IEffect)child, parent); }
+            else if (child is IEffect) { buildEffect((IEffect)child, parent as NoteTreeNode); }
         }
 
         public void buildTree(Part part)
@@ -97,6 +60,7 @@ namespace GuitarTab
                 attachEventsToTree(part);
                 buildChildren(node, part);
                 Root = node;
+                added_holding.addNode(node);
             }
         }
 
@@ -108,6 +72,7 @@ namespace GuitarTab
                 attachNodeToTree(child, parent);
                 attachEventsToTree(measure);
                 buildChildren(child, measure);
+                added_holding.addNode(child);
             }
         }
 
@@ -123,6 +88,7 @@ namespace GuitarTab
                     var contained_chord = chord as IContainModels;
                     attachEventsToTree(contained_chord);
                     buildChildren(child, contained_chord);
+                    added_holding.addNode(child);
                 }
             }
         }
@@ -138,15 +104,18 @@ namespace GuitarTab
                 List<IEffect> effects = note.ModelCollection.getItemsMatchingCondition(e => !(e is IMultiEffect && e.getPosition(note) == EffectPosition.Into));
                 foreach (IEffect effect in effects)
                 {
-                    buildEffect(effect, parent);
+                    buildEffect(effect, child as NoteTreeNode);
                 }
+
+                added_holding.addNode(child);
             }
         }
 
-        public void buildEffect(IEffect effect, TreeNode parent)
+        public void buildEffect(IEffect effect, NoteTreeNode parent)
         {
             TreeNode child = factory.buildEffectNode(effect, parent);
             if (child != null) { attachNodeToTree(child, parent); }
+            added_holding.addNode(child);
         }
 
         public void attachNodeToTree(TreeNode child, TreeNode parent)
@@ -174,7 +143,11 @@ namespace GuitarTab
             {
                 TreeNode child = removed_holding.searchForAddedItem(child_obj);
                 if (child == null) { buildAddedNode(parent, child_obj); }
-                else { attachNodeToTree(child, parent); }
+                else
+                {
+                    attachNodeToTree(child, parent);
+                    added_holding.addNode(child);
+                }
             }
         }
 
@@ -194,18 +167,6 @@ namespace GuitarTab
         public void HandleMouseEvent(MouseClick click) { Root?.handleMouseClick(click); }
 
         public void populateMouseClick(NodeClick click) { added_holding.populateMouseClick(click); }
-
-        public VisualBounds GetDeepestBoundsAtPosition(Point point) { return GetDeepestBoundsAtPosition(point, Root); }
-
-        public VisualBounds GetDeepestBoundsAtPosition(Point point, TreeNode node)
-        {
-            foreach (TreeNode child in node?.Children)
-            {
-                var found = GetDeepestBoundsAtPosition(point, child);
-                if (found != null) { return found; }
-            }
-            return (node?.ObjectHandler.hitTest(point) ?? false) ? node.ObjectBounds.Bounds : null;
-        }
     }
 
     public class TreeRemovedHolding
@@ -243,6 +204,8 @@ namespace GuitarTab
         {
             addedNodes = new List<TreeNode>();
         }
+
+        public void addNode(TreeNode node) { addedNodes.Add(node); }
 
         public void clearAddedHolding() { addedNodes.Clear(); }
 

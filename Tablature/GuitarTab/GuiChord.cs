@@ -25,14 +25,6 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override VisualBounds initBounds()
-        {
-            int width = info.Dimensions.NoteWidth;
-            int height = info.Dimensions.BarHeight;
-
-            return new VisualBounds(0, 0, width, height, 0);
-        }
-
         public override void updateBounds()
         {
             Bounds.Left = info.Position.X;
@@ -45,6 +37,8 @@ namespace GuitarTab
 
             info.Position.incrementXPosition(info.Dimensions.NoteWidth + info.Dimensions.getLength(chord.Length.NoteType));
         }
+
+        public Chord getChord() { return chord; }
     }
 
     public class ChordMouseHandler : BaseMouseHandler
@@ -61,11 +55,11 @@ namespace GuitarTab
         {
             if (click.matchesSelectionType(Selection.Set_Length))
             {
-                executor.executeChangeChordLength();
+                executor.executeChangeChordLength(click);
             }
             else if (click.matchesSelectionType(Selection.Add_Note))
             { 
-                executor.executeAddNoteToChord();
+                executor.executeAddNoteToChord(click);
             }
 
             invokeClickDelegate(click);
@@ -75,11 +69,11 @@ namespace GuitarTab
         {
             if (click.anyNote() && click.chordMatchesFirst(chord))
             {
-                executor.executeChangeNoteStringFromPosition();
+                executor.executeChangeNoteStringFromPosition(click);
             }
             else if (click.anyNote() && !click.chordMatchesFirst(chord))
             {
-                executor.executeChangeNotePosition();
+                executor.executeChangeNotePosition(click);
             }
 
             invokeClickDelegate(click);

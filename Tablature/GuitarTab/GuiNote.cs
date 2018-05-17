@@ -23,14 +23,6 @@ namespace GuitarTab
 
         public Note getNote() { return note; }
 
-        public override VisualBounds initBounds()
-        {
-            int width = info.Dimensions.NoteWidth;
-            int height = info.Dimensions.NoteHeight;
-
-            return new VisualBounds(0, 0, width, height, 0);
-        }
-
         public override void updateBounds()
         {
             Bounds.Left = info.Position.X;
@@ -51,11 +43,11 @@ namespace GuitarTab
         {
             if (click.matchesSelectionType(Selection.Add_Multi_Effect) && click.multipleNotes())
             {
-                executor.executeAddMultiEffectToNotes();
+                executor.executeAddMultiEffectToNotes(click);
             }
             else if (click.matchesSelectionType(Selection.Add_Effect))
             {
-                executor.executeAddEffectToNote();
+                executor.executeAddEffectToNote(click);
             }
 
             invokeClickDelegate(click);

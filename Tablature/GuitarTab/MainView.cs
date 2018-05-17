@@ -56,17 +56,8 @@ namespace GuitarTab
             handler.PropertyMenuChanged += launchNewPropertyMenu;
         }
 
-        public void launchNewPropertyMenu(object sender, PropertyMenuEventArgs args)
-        {
-            PropertyMenuView.Selected = args.Selected;
-            PropertyMenuView.Visible = System.Windows.Visibility.Visible;
-        }
+        public void launchNewPropertyMenu(object sender, PropertyMenuEventArgs args) { PropertyMenuView.launchMenu(args.Click); }
 
-        public void launchNewFretMenu(object sender, FretMenuEventArgs args)
-        {
-            FretMenuView.ContinueDelegate = args.Command;
-            FretMenuView.Position = args.CurrentPosition;
-            FretMenuView.Visible = System.Windows.Visibility.Visible;
-        }
+        public void launchNewFretMenu(object sender, FretMenuEventArgs args) { FretMenuView.launchMenu(args.Command, args.Click); }
     }
 }

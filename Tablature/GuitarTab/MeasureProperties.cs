@@ -13,6 +13,7 @@ namespace GuitarTab
     {
         private Measure measure;
         private GuiCommandExecutor executor;
+        private NodeClick click;
 
         private int num_beats;
         public string NumBeats
@@ -53,10 +54,11 @@ namespace GuitarTab
             }
         }
 
-        public MeasureProperties(Measure m, GuiCommandExecutor exec)
+        public MeasureProperties(Measure m, GuiCommandExecutor exec, NodeClick c)
         {
             measure = m;
             executor = exec;
+            click = c;
         }
 
         public void resetToDefault()
@@ -70,9 +72,9 @@ namespace GuitarTab
         {
             if (num_beats != measure.TimeSignature.NumberOfBeats || beat_type != measure.TimeSignature.BeatType)
             {
-                executor.executeChangeMeasureTimeSigFromMenu(num_beats, beat_type);
+                executor.executeChangeMeasureTimeSigFromMenu(click, num_beats, beat_type);
             }
-            if (bpm != measure.Bpm) { executor.executeChangeMeasureBpmFromMenu(bpm); }
+            if (bpm != measure.Bpm) { executor.executeChangeMeasureBpmFromMenu(click, bpm); }
         }
 
         //write a validator for num_beats, beat_type, and bpm

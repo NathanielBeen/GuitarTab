@@ -19,41 +19,40 @@ namespace GuitarTab
         public GuiTreeUpdater Updater { get; set; }
         private CommandExecutor executor;
         private CommandSelections selections;
-        private MouseSelections m_selections;
         private VisualInfo info;
 
         public event EventHandler<FretMenuEventArgs> FretMenuLaunched;
 
-        public GuiCommandExecutor(CommandExecutor ex, CommandSelections s, MouseSelections ms, VisualInfo v_info)
+        public GuiCommandExecutor(CommandExecutor ex, CommandSelections s, VisualInfo v_info)
         {
             executor = ex;
             selections = s;
-            m_selections = ms;
             info = v_info;
         }
 
-        public void executeCommandBase(NodeClick click, IActionBuilder builder, UpdateType update, bool rebar)
+        public void executeCommandBase(NodeClick click, CommandType type, UpdateType update, bool rebar)
         {
             click.populateCommandSelections(selections);
+            IActionBuilder builder = ExecutorFactory.getBuilderFromType(type, selections);
+
             bool result = executor.executeCommand(builder);
+            Updater.populateMouseClick(click);
+
             if (result)
             {
                 runUpdate(click, update);
                 if (rebar) { Updater.rebarMeasures(click.PartNode, click.MeasureNodes); }
             }
-            Updater.populateMouseClick(click);
 
+            click.Handled();
             selections.Clear();
-            selections.SelectedLength = null;
-            m_selections.clearOtherSelections();
-            m_selections.EventHandled = true;
         }
 
-        public void executeFretMenuBase(Action<NodeClick, int> action)
+        public void executeFretMenuBase(Action<NodeClick, int> action, NodeClick click)
         {
-            var args = new FretMenuEventArgs(m_selections.SelectedPoint, action);
+            var args = new FretMenuEventArgs(click, action);
             FretMenuLaunched?.Invoke(this, args);
-            m_selections.EventHandled = true;
+            click.Handled();
         }
 
         public void runUpdate(NodeClick click, UpdateType update)
@@ -86,20 +85,22 @@ namespace GuitarTab
             selections.BeatType = beat_type;
             selections.Position = 0;
 
-            click.populateCommandSelections(selections);
             var builder = new InitPartBld(selections);
             executor.executeCommand(builder);
-            Updater.populateMouseClick(click);
 
             Updater.setTreePart(selections.SelectedPart);
+            Updater.populateMouseClick(click);
 
-            executeCommandBase(click, new AddMeasureToPartBld(selections), UpdateType.UpdatePart, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddMeasureToPart, UpdateType.UpdatePart, false);
         }
 
         public void executeAddRestChordToMeasure(NodeClick click, int position)
         {
             selections.Position = position;
-            executeCommandBase(click, new AddRestChordToMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddRestToMeasure, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeAddRestChordToPart(NodeClick click)
@@ -109,34 +110,41 @@ namespace GuitarTab
             selections.BeatType = selections.SelectedPart.TimeSignature.BeatType;
             selections.Position = selections.SelectedPart.ModelCollection.Count();
 
-            executeCommandBase(click, new AddRestChordToPartBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddRestToPart, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeAddNoteToChord(NodeClick click)
         {
-            selections.String = info.Position.getStringFromYPosition((int)m_selections.SelectedPoint.Y);
+            selections.String = info.Position.getStringFromYPosition((int)click.Point.Y);
 
-            executeFretMenuBase(continueAddNoteToChord);
+            click.populateCommandSelections(selections);
+            executeFretMenuBase(continueAddNoteToChord, click);
         }
 
         public void continueAddNoteToChord(NodeClick click, int fret)
         {
             selections.Fret = fret;
-            executeCommandBase(click, new AddNoteToChordBld(selections), UpdateType.UpdateChord, false);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddNoteToChord, UpdateType.UpdateChord, false);
         }
 
         public void executeAddNoteToMeasure(NodeClick click, int position)
         {
             selections.Position = position;
-            selections.String = info.Position.getStringFromYPosition((int)m_selections.SelectedPoint.Y);
+            selections.String = info.Position.getStringFromYPosition((int)click.Point.Y);
 
-            executeFretMenuBase(continueAddNoteToMeasure);
+            click.populateCommandSelections(selections);
+            executeFretMenuBase(continueAddNoteToMeasure, click);
         }
 
         public void continueAddNoteToMeasure(NodeClick click, int fret)
         {
             selections.Fret = fret;
-            executeCommandBase(click, new AddNoteToMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddNoteToMeasure, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeAddNoteToPart(NodeClick click)
@@ -145,35 +153,42 @@ namespace GuitarTab
             selections.NumBeats = selections.SelectedPart.TimeSignature.NumberOfBeats;
             selections.BeatType = selections.SelectedPart.TimeSignature.BeatType;
             selections.Position = selections.SelectedPart.ModelCollection.Count();
-            selections.String = info.Position.getStringFromYPosition((int)m_selections.SelectedPoint.Y);
+            selections.String = info.Position.getStringFromYPosition((int)click.Point.Y);
 
-            executeFretMenuBase(continueAddNoteToPart);
+            click.populateCommandSelections(selections);
+            executeFretMenuBase(continueAddNoteToPart, click);
         }
 
         public void continueAddNoteToPart(NodeClick click, int fret)
         {
             selections.Fret = fret;
-            executeCommandBase(click, new AddNoteToPartBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddNoteToPart, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeRemoveNote(NodeClick click)
         {
-            executeCommandBase(click, new RemoveNoteFromChordBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.RemoveNoteFromChord, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeRemoveMultipleNotes(NodeClick click)
         {
-            executeCommandBase(click, new RemoveMultipleNotesFromChordBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.RemoveMultipleNotesFromChord, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeRemoveChord(NodeClick click)
         {
-            executeCommandBase(click, new RemoveChordFromMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.RemoveChordFromMeasure, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeRemoveMultipleChords(NodeClick click)
         {
-            executeCommandBase(click, new RemoveMultipleChordsFromMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.RemoveMultipleChordsFromMeasure, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeChangeChordLengthFromMenu(NodeClick click, Length new_length)
@@ -184,12 +199,13 @@ namespace GuitarTab
 
         public void executeChangeChordLength(NodeClick click)
         {
-            executeCommandBase(click, new ChangeChordLengthBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeChordLength, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeChangeNoteStringFromPosition(NodeClick click)
         {
-            selections.String = info.Position.getStringFromYPosition((int)m_selections.SelectedPoint.Y);
+            selections.String = info.Position.getStringFromYPosition((int)click.Point.Y);
             executeChangeNoteString(click);
         }
 
@@ -201,32 +217,39 @@ namespace GuitarTab
 
         public void executeChangeNoteString(NodeClick click)
         {
-            executeCommandBase(click, new ChangeNoteStringBld(selections), UpdateType.UpdateChord, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeNoteString, UpdateType.UpdateChord, false);
         }
 
         public void executeChangeNoteFret(NodeClick click)
         {
-            executeFretMenuBase(continueChangeNoteFret);
+            executeFretMenuBase(continueChangeNoteFret, click);
         }
 
         public void continueChangeNoteFret(NodeClick click, int fret)
         {
             selections.Fret = fret;
-            executeCommandBase(click, new ChangeNoteFretBld(selections), UpdateType.UpdateChord, false);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeNoteFret, UpdateType.UpdateChord, false);
             Updater.updateDrawing(click.NoteNodes.FirstOrDefault());
         }
 
         public void executeChangeNotePosition(NodeClick click)
         {
-            selections.String = info.Position.getStringFromYPosition((int)m_selections.SelectedPoint.Y);
-            executeCommandBase(click, new ChangeNotePositionBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            selections.String = info.Position.getStringFromYPosition((int)click.Point.Y);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeNotePosition, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeChangeNotePositionNewChord(NodeClick click, int position)
         {
             selections.Position = position;
-            selections.String = info.Position.getStringFromYPosition((int)m_selections.SelectedPoint.Y);
-            executeCommandBase(click, new ChangeNotePositionNewChordBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            selections.String = info.Position.getStringFromYPosition((int)click.Point.Y);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeNotePositionNewChord, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeChangeNotePositionNewMeasure(NodeClick click)
@@ -235,14 +258,18 @@ namespace GuitarTab
             selections.NumBeats = selections.SelectedPart.TimeSignature.NumberOfBeats;
             selections.BeatType = selections.SelectedPart.TimeSignature.BeatType;
             selections.Position = selections.SelectedPart.ModelCollection.Count();
-            selections.String = info.Position.getStringFromYPosition((int)m_selections.SelectedPoint.Y);
-            executeCommandBase(click, new ChangeNotePositionNewMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            selections.String = info.Position.getStringFromYPosition((int)click.Point.Y);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeNotePositionNewMeasure, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeChangeChordPosition(NodeClick click, int position)
         {
             selections.Position = position;
-            executeCommandBase(click, new ChangeChordPositionBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeChordPosition, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeChangeChordPositionNewMeasure(NodeClick click)
@@ -252,19 +279,23 @@ namespace GuitarTab
             selections.BeatType = selections.SelectedPart.TimeSignature.BeatType;
             selections.Position = selections.SelectedPart.ModelCollection.Count();
 
-            executeCommandBase(click, new ChangeChordPositionNewMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeChordPositionNewMeasure, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeChangeMultipleChordPosition(NodeClick click, int position)
         {
             selections.Position = position;
-            executeCommandBase(click, new ChangeMultipleChordPositionBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeMultipleChordPosition, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeChangeMultipleChordPositionNewMeasure(NodeClick click)
         {
             selections.Position = selections.SelectedPart.ModelCollection.Count();
-            executeCommandBase(click, new ChangeMultipleChordPositionNewMeasureBld(selections), UpdateType.UpdateMeasuresAtAndAfter, true);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeMultipleChordPositionNewMeasure, UpdateType.UpdateMeasuresAtAndAfter, true);
         }
 
         public void executeAddEffectToNoteProp(NodeClick click, EffectType type)
@@ -288,19 +319,23 @@ namespace GuitarTab
 
         public void executeAddEffectToNote(NodeClick click)
         {
-            executeCommandBase(click, new AddSingleNoteEffectBld(selections), UpdateType.UpdateMeasure, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddSingleNoteEffect, UpdateType.UpdateMeasure, false);
         }
 
         public void executeRemoveEffectFromNote(NodeClick click, IEffect effect)
         {
             selections.SelectedEffect = effect;
-            executeCommandBase(click, new RemoveNoteEffectBld(selections), UpdateType.UpdateMeasure, false);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.RemoveNoteEffect, UpdateType.UpdateMeasure, false);
         }
 
 
         public void executeAddSlideToNoteProp(NodeClick click, Note first, Note second, bool legato)
         {
             selections.Legato = legato;
+
             executeAddMultiEffectToNoteProp(click, first, second, EffectType.Slide);
         }
 
@@ -316,7 +351,8 @@ namespace GuitarTab
 
         public void executeAddMultiEffectToNotes(NodeClick click)
         {
-            executeCommandBase(click, new AddMultiNoteEffectBld(selections), UpdateType.UpdateMeasure, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddMultiNoteEffect, UpdateType.UpdateMeasure, false);
         }
 
         public void executeAddMeasureToPart(NodeClick click, int position)
@@ -328,29 +364,36 @@ namespace GuitarTab
             selections.BeatType = selections.SelectedPart.TimeSignature.BeatType;
             selections.Position = position;
 
-            executeCommandBase(click, new AddMeasureToPartBld(selections), UpdateType.UpdateMeasuresAtAndAfter, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.AddMeasureToPart, UpdateType.UpdateMeasuresAtAndAfter, false);
         }
 
         public void executeRemoveMeasure(NodeClick click)
         {
-            executeCommandBase(click, new RemoveMeasureFromPartBld(selections), UpdateType.UpdateMeasuresAtAndAfter, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.RemoveMeasureFromPart, UpdateType.UpdateMeasuresAtAndAfter, false);
         }
 
         public void executeRemoveMultipleMeasures(NodeClick click)
         {
-            executeCommandBase(click, new RemoveMultipleMeasuresFromPartBld(selections), UpdateType.UpdateMeasuresAtAndAfter, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.RemoveMultipleMeasuresFromPart, UpdateType.UpdateMeasuresAtAndAfter, false);
         }
 
         public void executeChangeMeasurePosition(NodeClick click, int position)
         {
             selections.Position = position;
-            executeCommandBase(click, new ChangeMeasurePositionBld(selections), UpdateType.UpdateMeasuresAtAndAfter, false);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeMeasurePosition, UpdateType.UpdateMeasuresAtAndAfter, false);
         }
 
         public void executeChangeMultipleMeasurePosition(NodeClick click, int position)
         {
             selections.Position = position;
-            executeCommandBase(click, new ChangeMultipleMeasurePositionBld(selections), UpdateType.UpdateMeasuresAtAndAfter, false);
+
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeMultipleMeasurePosition, UpdateType.UpdateMeasuresAtAndAfter, false);
         }
 
         public void executeChangeMeasureTimeSigFromMenu(NodeClick click, int beats, NoteLength type)
@@ -363,7 +406,8 @@ namespace GuitarTab
 
         public void executeChangeMeasureTimeSig(NodeClick click)
         {
-            executeCommandBase(click, new ChangeMeasureBpmBld(selections), UpdateType.UpdateMeasuresAtAndAfter, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeMeasureTimeSig, UpdateType.UpdateMeasuresAtAndAfter, false);
         }
 
         public void executeChangeMeasureBpmFromMenu(NodeClick click, int bpm)
@@ -374,7 +418,8 @@ namespace GuitarTab
 
         public void executeChangeMeasureBpm(NodeClick click)
         {
-            executeCommandBase(click, new ChangeMeasureBpmBld(selections), UpdateType.UpdateMeasure, false);
+            click.populateCommandSelections(selections);
+            executeCommandBase(click, CommandType.ChangeMeasureBPM, UpdateType.UpdateMeasure, false);
         }
     }
 }

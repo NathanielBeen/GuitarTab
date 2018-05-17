@@ -96,7 +96,6 @@
     <Compile Include="MouseClick.cs" />
     <Compile Include="MouseHoverView.cs" />
     <Compile Include="MouseSelectedView.cs" />
-    <Compile Include="MouseSelections.cs" />
     <Compile Include="MouseStateConverters.cs" />
     <Compile Include="MouseStateView.cs" />
     <Compile Include="NotePropertyMenu.xaml.cs">
@@ -104,6 +103,7 @@
     </Compile>
     <Compile Include="PropertyMenuView.cs" />
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="Selected.cs" />
     <Compile Include="StateUpdateEvents.cs" />
     <Compile Include="TimeSignature.cs" />
     <Compile Include="TreeNode.cs" />

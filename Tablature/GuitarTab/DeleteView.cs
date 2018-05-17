@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -11,8 +12,8 @@ namespace GuitarTab
 {
     public class DeleteView : BaseViewModel
     {
-        private CommandSelections selections;
         private GuiCommandExecutor executor;
+        private Selected selected;
 
         public ImageBrush Image { get; set; }
 
@@ -22,10 +23,10 @@ namespace GuitarTab
             get { return deleteItemCommand ?? (deleteItemCommand = new RelayCommand(() => handleButtonClick())); }
         }
 
-        public DeleteView(CommandSelections s, GuiCommandExecutor e, string uri)
+        public DeleteView(GuiCommandExecutor e, Selected s, string uri)
         {
-            selections = s;
             executor = e;
+            selected = s;
             Image = getImageBrush(uri);
         }
 
@@ -38,29 +39,31 @@ namespace GuitarTab
 
         public void handleButtonClick()
         {
-            if (selections.SelectedNote.Count > 1)
+            var click = new ReleaseClick(default(Point));
+
+            if(click.multipleNotes())
             {
-                executor.executeRemoveMultipleNotes();
+                executor.executeRemoveMultipleNotes(click);
             }
-            else if (selections.SelectedNote.Count == 1)
+            else if (click.anyNote())
             {
-                executor.executeRemoveNote();
+                executor.executeRemoveNote(click);
             }
-            else if (selections.SelectedChord.Count > 1)
+            else if (click.multipleChords())
             {
-                executor.executeRemoveMultipleChords();
+                executor.executeRemoveMultipleChords(click);
             }
-            else if (selections.SelectedChord.Count == 1)
+            else if (click.anyChord())
             {
-                executor.executeRemoveChord();
+                executor.executeRemoveChord(click);
             }
-            else if (selections.SelectedMeasure.Count > 1)
+            else if (click.multipleMeasures())
             {
-                executor.executeRemoveMultipleMeasures();
+                executor.executeRemoveMultipleMeasures(click);
             }
-            else if (selections.SelectedMeasure.Count == 1)
+            else if (click.anyMeasure())
             {
-                executor.executeRemoveMeasure();
+                executor.executeRemoveMeasure(click);
             }
         }
     }

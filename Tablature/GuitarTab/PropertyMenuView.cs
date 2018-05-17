@@ -13,7 +13,8 @@ namespace GuitarTab
     public class PropertyMenuView : BaseViewModel
     {
         private PropertyMenuFactory factory;
-
+        private NodeClick click;
+        
         private IPropertyMenu menu;
         public IPropertyMenu Menu
         {
@@ -28,13 +29,13 @@ namespace GuitarTab
             set { SetProperty(ref visible, value); }
         }
 
-        private ModelBoundsPair selected_object;
-        public ModelBoundsPair Selected
+        private TreeNode selected_object;
+        public TreeNode Selected
         {
             get { return selected_object; }
             set
             {
-                var menu = factory.createPropertyMenu(value.Base);
+                var menu = factory.createPropertyMenu(value.BaseObject, click);
                 if (menu != null)
                 {
                     SetProperty(ref selected_object, value);
@@ -65,6 +66,14 @@ namespace GuitarTab
         {
             factory = fac;
             Visible = Visibility.Collapsed;
+            click = null;
+        }
+
+        public void launchMenu(NodeClick new_click)
+        {
+            click = new_click;
+            Selected = click.getFirstSelected();
+            Visible = Visibility.Visible;
         }
 
         public void handleReset() { Menu?.resetToDefault(); }
@@ -76,20 +85,21 @@ namespace GuitarTab
 
     public class PropertyMenuFactory
     {
-        private GuiCommandExecutor executor;
-        private CommandSelections selections;
+        public NodeClick Click { get; set; }
 
-        public PropertyMenuFactory(GuiCommandExecutor ex, CommandSelections sel)
+        private GuiCommandExecutor executor;
+
+        public PropertyMenuFactory(GuiCommandExecutor ex)
         {
+            Click = null;
             executor = ex;
-            selections = sel;
         }
 
-        public IPropertyMenu createPropertyMenu(object obj)
+        public IPropertyMenu createPropertyMenu(object obj, NodeClick click)
         {
-            if (obj is Measure) { return new MeasureProperties((Measure)obj, executor); }
-            else if (obj is Chord) { return new ChordProperties((Chord)obj, executor); }
-            else if (obj is Note) { return new NoteProperties((Note)obj, executor, selections); }
+            if (obj is Measure) { return new MeasureProperties((Measure)obj, executor, click); }
+            else if (obj is Chord) { return new ChordProperties((Chord)obj, executor, click); }
+            else if (obj is Note) { return new NoteProperties((Note)obj, executor, click); }
             else { return null; }
         }
     }
