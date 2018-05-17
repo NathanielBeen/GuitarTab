@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace GuitarTab
 {
+    //make bounds checking a type of mouse click
     public enum ClickType
     {
         Click,
@@ -17,31 +19,35 @@ namespace GuitarTab
 
     public class MouseClick
     {
-        private ClickType type;
-        private Selection selection;
-        public bool Handled { get; set; }
+        public Point Point { get; }
 
+        public MouseClick(Point p) { Point = p; }
+
+        public virtual bool matchesClickType(ClickType desired) { return false; }
+    }
+
+    public class NodeClick : MouseClick
+    {
         public PartTreeNode PartNode { get; set; }
         public List<MeasureTreeNode> MeasureNodes { get; set; }
         public List<ChordTreeNode> ChordNodes { get; set; }
         public List<NoteTreeNode> NoteNodes { get; set; }
-        public List<EffectTreeNode> EffectNodes { get; set; }
+        public EffectTreeNode EffectNode { get; set; }
 
         public VisualBounds Selected { get; set; }
+        protected bool handled;
 
-        public MouseClick(ClickType t, Selection s)
+        public NodeClick(Point p)
+            : base(p)
         {
-            type = t;
-            selection = s;
-            Handled = false;
-
             PartNode = null;
             MeasureNodes = new List<MeasureTreeNode>();
             ChordNodes = new List<ChordTreeNode>();
             NoteNodes = new List<NoteTreeNode>();
-            EffectNodes = new List<EffectTreeNode>();
+            EffectNode = null;
 
             Selected = null;
+            handled = false;
         }
 
         public void populateCommandSelections(CommandSelections selections)
@@ -50,27 +56,142 @@ namespace GuitarTab
             foreach (MeasureTreeNode node in MeasureNodes) { selections.SelectedMeasure.Add(node.getMeasure()); }
             foreach (ChordTreeNode node in ChordNodes) { selections.SelectedChord.Add(node.getChord()); }
             foreach (NoteTreeNode node in NoteNodes) { selections.SelectedNote.Add(node.getNote()); }
-            foreach (EffectTreeNode node in EffectNodes) { selections.SelectedEffect.Add(node.getEffect()); }
+            if (EffectNode != null) { selections.SelectedEffect = EffectNode.getEffect(); }
         }
 
-        public bool matchesType(ClickType desired) { return (desired == type); }
+        public MeasureTreeNode getFirstMeasureNodeByPosition()
+        {
+            return MeasureNodes.OrderBy(m => m.getMeasure().Position.Index).FirstOrDefault();
+        }
+    }
 
-        public bool matchesSelection(Selection desired) { return (desired == selection); }
+    public class StandardClick : NodeClick
+    {
+        private Selection add_type;
 
-        public bool anyPartSelected() { return PartNode != null; }
+        public StandardClick(Selection add, Point p)
+            : base(p)
+        {
+            add_type = add;
+        }
 
-        public bool anyMeasureSelected() { return MeasureNodes.Any(); }
+        public bool multipleNotes() { return NoteNodes.Count() > 1 && !handled; }
 
-        public bool multipleMeasuresSelected() { return MeasureNodes.Count() > 1; }
+        public bool matchesSelectionType(Selection wanted) { return (wanted == add_type && !handled); }
 
-        public bool anyChordSelected() { return ChordNodes.Any(); }
+        public override bool matchesClickType(ClickType desired) { return (desired == ClickType.Click); }
+    }
 
-        public bool multipleChordsSelected() { return ChordNodes.Count > 1; }
+    public class ReleaseClick : NodeClick
+    {
+        public ReleaseClick(Point p) :base(p) { }
 
-        public bool anyNoteSelected() { return NoteNodes.Any(); }
+        public bool anyPart() { return PartNode != null && !handled; }
 
-        public bool multipleNoteSelected() { return NoteNodes.Count > 1; }
+        public bool anyMeasure() { return MeasureNodes.Any() && !handled; }
 
-        public bool anyEffectSelected() { return EffectNodes.Any(); }
+        public bool multipleMeasures() { return MeasureNodes.Count() > 1 && !handled; }
+
+        public bool anyChord() { return ChordNodes.Any() && !handled; }
+
+        public bool multipleChords() { return ChordNodes.Count > 1 && !handled; }
+
+        public bool anyNote() { return NoteNodes.Any() && !handled; }
+
+        public bool multipleNotes() { return NoteNodes.Count > 1 && !handled; }
+
+        public bool anyEffect() { return EffectNode != null && !handled; }
+
+        public override bool matchesClickType(ClickType desired) { return (desired == ClickType.Release); }
+
+        public bool chordMatchesFirst(Chord chord)
+        {
+            Chord other = (ChordNodes?.FirstOrDefault()?.BaseObject as Chord) ?? null;
+            return (other == null) ? false : other.Equals(chord);
+        }
+    }
+
+    public class SelectClick : NodeClick
+    {
+        public bool ContainsRect { get; private set; }
+        private Rect rectangle;
+
+        public SelectClick(Point p)
+            :base(p)
+        {
+            ContainsRect = false;
+        }
+
+        public void setRectContains(VisualBounds bounds)
+        {
+            ContainsRect = bounds.containsRectangle(rectangle);
+        }
+
+        public override bool matchesClickType(ClickType desired) { return (desired == ClickType.Select); }
+    }
+
+    public class PositionClick : MouseClick
+    {
+        public int Position { get; protected set; }
+
+        public PositionClick(Point p)
+            :base(p)
+        {
+            Position = 0;
+        }
+
+        public virtual void checkItem(int pos, VisualBounds bounds) { }
+
+        public override bool matchesClickType(ClickType desired) { return (desired == ClickType.Position); }
+    }
+
+    public class MeasurePositionClick : PositionClick
+    {
+        public MeasurePositionClick(Point p) : base(p) { }
+
+        public override void checkItem(int pos, VisualBounds bounds)
+        {
+            if (bounds.containsPoint(Point)) { Position = pos; }
+        }
+    }
+
+    public class ChordPositionClick : PositionClick
+    {
+        private VisualBounds current_closest;
+
+        public ChordPositionClick(Point p)
+            :base(p)
+        {
+            current_closest = null;
+        }
+
+        public override void checkItem(int pos, VisualBounds bounds)
+        {
+            if (checkChordBar(bounds))
+            {
+                Position = pos;
+                current_closest = bounds;
+            }
+        }
+
+        private bool checkChordBar(VisualBounds bounds)
+        {
+            if (bounds.Top <= Point.Y && bounds.Bottom >= Point.Y && bounds.Right <= Point.X) { return checkSameBar(bounds); }
+            else if (bounds.Bottom <= Point.Y) { return checkPrevBar(bounds); }
+            return false;
+        }
+
+        private bool checkSameBar(VisualBounds bounds)
+        {
+            if (current_closest is null) { return true; }
+            return (current_closest.Right <= bounds.Right);
+        }
+
+        private bool checkPrevBar(VisualBounds bounds)
+        {
+            if (current_closest is null) { return true; }
+            if (current_closest.Bar > bounds.Bar) { return false; }
+            return (current_closest.Right <= bounds.Right);
+        }
     }
 }

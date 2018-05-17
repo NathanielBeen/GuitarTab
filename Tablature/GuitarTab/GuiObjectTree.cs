@@ -189,20 +189,13 @@ namespace GuitarTab
             }
         }
 
-        public ObservableCollection<TabDrawingVisual> getTreeVisuals()
-        {
-            return visuals.Visuals;
-        }
+        public ObservableCollection<TabDrawingVisual> getTreeVisuals() { return visuals.Visuals; }
 
-        public void HandleMouseEvent()
-        {
-            Root?.ObjectHandler.handleMouseEvent();
-        }
+        public void HandleMouseEvent(MouseClick click) { Root?.handleMouseClick(click); }
 
-        public VisualBounds GetDeepestBoundsAtPosition(Point point)
-        {
-            return GetDeepestBoundsAtPosition(point, Root);
-        }
+        public void populateMouseClick(NodeClick click) { added_holding.populateMouseClick(click); }
+
+        public VisualBounds GetDeepestBoundsAtPosition(Point point) { return GetDeepestBoundsAtPosition(point, Root); }
 
         public VisualBounds GetDeepestBoundsAtPosition(Point point, TreeNode node)
         {
@@ -253,7 +246,7 @@ namespace GuitarTab
 
         public void clearAddedHolding() { addedNodes.Clear(); }
 
-        public void populateMouseClick(MouseClick click)
+        public void populateMouseClick(NodeClick click)
         {
             foreach (TreeNode node in addedNodes) { node.addToMouseClick(click); }
             addedNodes.Clear();

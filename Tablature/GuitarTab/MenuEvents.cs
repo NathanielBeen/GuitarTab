@@ -24,14 +24,14 @@ namespace GuitarTab
         public Point CurrentPosition { get; }
         public ContinueCommandDelegate Command { get; }
 
-        public FretMenuEventArgs(Point position, Action<int> command)
+        public FretMenuEventArgs(Point position, Action<NodeClick, int> command)
         {
             CurrentPosition = position;
-            Command = (x) => command(x);
+            Command = (c,p) => command(c,p);
         }
     }
 
-    public delegate void ContinueCommandDelegate(int fret);
+    public delegate void ContinueCommandDelegate(NodeClick click, int fret);
 
     public delegate void CancelDialogueDelegate();
 }

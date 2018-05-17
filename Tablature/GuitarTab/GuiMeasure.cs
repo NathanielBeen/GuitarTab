@@ -9,32 +9,27 @@ using System.Globalization;
 
 namespace GuitarTab
 {
-    public class MeasureBounds : IBounded
+    public class MeasureBounds : BaseBounded
     {
         public const int MIN_SPACE = 300;
 
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private VisualInfo info;
 
         private Measure measure;
 
         public MeasureBounds(Measure m, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
-            Delegate = del;
             measure = m;
             info = v_info;
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds()
+        public override VisualBounds initBounds()
         {
             return MultipleVisualBounds.createInstance(new List<VisualBounds>());
         }
 
-        public Measure getMeasure() { return measure; }
-
-        public void updateBounds()
+        public override void updateBounds()
         {
             getInitBoundValues(out int first_left, out int lowest_bar);
             Delegate?.invokeDelegate();
@@ -89,86 +84,52 @@ namespace GuitarTab
 
     public class MeasureMouseHandler : BaseMouseHandler
     {
-        private Measure measure;
-        private ChordPositionCheck chord_position;
-        private MeasurePositionCheck measure_position;
+        public MeasureMouseHandler(GuiCommandExecutor e, IMouseDelegate del) :base(e, del) { }
 
-
-        public MeasureMouseHandler(VisualBounds b, CommandSelections s, MouseSelections ms, GuiCommandExecutor e, Measure m, ChordPositionCheck cpos, MeasurePositionCheck mpos, IDelegate del)
-            :base(b, s, ms, e, del)
+        public override void mouseClick(StandardClick click)
         {
-            measure = m;
-            chord_position = cpos;
-            measure_position = mpos;
-        }
-
-        public override void mouseClick()
-        {
-            addToCommandSelections();
-            addToMouseSelections();
-
-            if (mouse_selections.checkSelectionState(Selection.Add_Rest))
+            if (click.matchesSelectionType(Selection.Add_Rest))
             {
-                int position = performMousePositionCheck();
+                int position = performMousePositionCheck(click);
                 executor.executeAddRestChordToMeasure(position);
             }
 
-            invokeClickDelegate();
+            invokeClickDelegate(click);
 
-            if (mouse_selections.checkSelectionState(Selection.Add_Note))
+            if (click.matchesSelectionType(Selection.Add_Note))
             {
-                int position = performMousePositionCheck();
+                int position = performMousePositionCheck(click);
                 executor.executeAddNoteToMeasure(position);
             }
         }
 
-        public override void mouseDragRelease()
+        public override void mouseDragRelease(ReleaseClick click)
         {
-            addToCommandSelections();
-
-            if (selections.SelectedChord.Count > 1 && !selections.SelectedNote.Any())
+            if (click.multipleChords() && !click.anyNote())
             {
-                int position = performMousePositionCheck();
+                int position = performMousePositionCheck(click);
                 executor.executeChangeMultipleChordPosition(position);
             }
-            else if (selections.SelectedChord.Count == 1 && !selections.SelectedNote.Any())
+            else if (click.anyChord() && !click.anyNote())
             {
-                int position = performMousePositionCheck();
+                int position = performMousePositionCheck(click);
                 executor.executeChangeChordPosition(position);
             }
 
-            invokeClickDelegate();
+            invokeClickDelegate(click);
 
-            if (selections.SelectedNote.Count == 1)
+            if (click.anyNote())
             {
-                int position = performMousePositionCheck();
+                int position = performMousePositionCheck(click);
                 executor.executeChangeNotePositionNewChord(position);
             }
         }
 
-        public override void mouseDragSelect()
+        public int performMousePositionCheck(MouseClick click)
         {
-            addToCommandSelections();
-
-            if (bounds.containsRectangle(mouse_selections.SelectedRectangle)) { invokeClickDelegate(); }
-            else { addToMouseSelections(); }
-        }
-
-        public override void addToCommandSelections() { selections.SelectedMeasure.Add(measure); }
-
-        public override void addToMouseSelections() { mouse_selections.setToSingleSelectedObject(new ModelBoundsPair(bounds, measure)); }
-
-        public int performMousePositionCheck()
-        {
-            chord_position.beginPositionCheck(mouse_selections);
-            invokeClickDelegate();
-            mouse_selections.PositionCheck = false;
-            return chord_position.getPosition();
-        }
-
-        public override void mousePositionCheck()
-        {
-            measure_position.checkMeasure(measure, bounds);
+            var n_click = new ChordPositionClick(click.Point);
+            invokeClickDelegate(n_click);
+            return n_click.Position;
         }
     }
 

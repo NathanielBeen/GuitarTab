@@ -8,23 +8,19 @@ using System.Windows.Media;
 
 namespace GuitarTab
 {
-    public class PartBounds : IBounded
+    public class PartBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private Part part;
         private VisualInfo info;
 
         public PartBounds(Part p,  VisualInfo v_info, IDelegate del)
+            : base(del)
         {
-            Delegate = del;
             part = p;
             info = v_info;
-
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds()
+        public override VisualBounds initBounds()
         {
             int width = info.Dimensions.PageWidth;
             int height = info.Dimensions.PageHeight;
@@ -32,7 +28,7 @@ namespace GuitarTab
             return new VisualBounds(0, 0, width, height, 0);
         }
 
-        public void updateBounds()
+        public override void updateBounds()
         {
             Bounds.Left = 0;
             Bounds.Top = 0;
@@ -46,86 +42,62 @@ namespace GuitarTab
 
     public class PartMouseHandler : BaseMouseHandler
     {
-        private Part part;
-        private MeasurePositionCheck position;
+        public PartMouseHandler(GuiCommandExecutor executor, IMouseDelegate del) :base(executor, del) { }
 
-        public PartMouseHandler(VisualBounds bounds, CommandSelections command, MouseSelections mouse, GuiCommandExecutor executor, Part pa, MeasurePositionCheck pos, IDelegate del)
-            :base(bounds, command, mouse, executor, del)
+        public override void mouseClick(StandardClick click)
         {
-            part = pa;
-            position = pos;
-        }
-
-        public override void mouseClick()
-        {
-            addToCommandSelections();
-            addToMouseSelections();
-
-            if (mouse_selections.checkSelectionState(Selection.Add_Measure))
+            if (click.matchesSelectionType(Selection.Add_Measure))
             {
-                executor.executeAddMeasureToPart(performMousePositionCheck());
+                int position = performMousePositionCheck(click);
+                executor.executeAddMeasureToPart(position);
             }
 
-            invokeClickDelegate();
+            invokeClickDelegate(click);
 
-            if (mouse_selections.checkSelectionState(Selection.Add_Rest))
+            if (click.matchesSelectionType(Selection.Add_Rest))
             {
                 executor.executeAddRestChordToPart();
             }
-            else if (mouse_selections.checkSelectionState(Selection.Add_Note))
+            else if (click.matchesSelectionType(Selection.Add_Note))
             {
                 executor.executeAddNoteToPart();
             }
         }
 
-        public override void mouseDragRelease()
+        public override void mouseDragRelease(ReleaseClick click)
         {
-            addToCommandSelections();
-
-            if (selections.SelectedMeasure.Count > 1 && !selections.SelectedChord.Any())
+            if (click.multipleMeasures() && !click.anyChord())
             {
-                int position = performMousePositionCheck();
+                int position = performMousePositionCheck(click);
                 executor.executeChangeMultipleMeasurePosition(position);
             }
-            else if (selections.SelectedMeasure.Count == 1 && !selections.SelectedChord.Any())
+            else if (click.anyMeasure() && !click.anyChord())
             {
-                int position = performMousePositionCheck();
+                int position = performMousePositionCheck(click);
                 executor.executeChangeMeasurePosition(position);
             }
 
-            invokeClickDelegate();
+            invokeClickDelegate(click);
 
-            if (selections.SelectedNote.Count == 1)
+            if (click.anyNote())
             {
                 executor.executeChangeNotePositionNewMeasure();
             }
-            else if (selections.SelectedChord.Count == 1)
-            {
-                executor.executeChangeChordPositionNewMeasure();
-            }
-            else if (selections.SelectedChord.Count > 1)
+            else if (click.multipleChords())
             {
                 executor.executeChangeMultipleChordPositionNewMeasure();
             }
+            else if (click.anyChord())
+            {
+                executor.executeChangeChordPositionNewMeasure();
+            }
         }
 
-        public override void mouseDragSelect()
+        public int performMousePositionCheck(MouseClick click)
         {
-            if (bounds.containsRectangle(mouse_selections.SelectedRectangle)) { invokeClickDelegate(); }
-        }
-
-        public override void addToCommandSelections() { selections.SelectedPart = part; }
-
-        public override void addToMouseSelections() { mouse_selections.setToSingleSelectedObject(new ModelBoundsPair(bounds, part)); }
-
-        public override void mousePositionCheck() { }
-
-        public int performMousePositionCheck()
-        {
-            position.beginPositionCheck(mouse_selections);
-            invokeClickDelegate();
-            mouse_selections.PositionCheck = false;
-            return position.getPosition();
+            var n_click = new MeasurePositionClick(click.Point);
+            invokeClickDelegate(n_click);
+            return n_click.Position;
         }
     }
 

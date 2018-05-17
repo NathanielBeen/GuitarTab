@@ -22,9 +22,7 @@ namespace GuitarTab
 
         public Part genPart(CommandSelections selection)
         {
-            var part = Part.createInstance(selection.BPM, selection.NumBeats, selection.BeatType);
-            selection.SelectedPart = part;
-            return part;
+            return Part.createInstance(selection.BPM, selection.NumBeats, selection.BeatType);
         }
     }
 
@@ -41,9 +39,7 @@ namespace GuitarTab
 
         public Chord genNoteChord(CommandSelections selection)
         {
-            var chord = NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
-            if (chord != null) { selection.SelectedChord.Add(chord); }
-            return chord;
+            return NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
         }
     }
 
@@ -60,9 +56,7 @@ namespace GuitarTab
 
         public Chord genChord(CommandSelections selection)
         {
-            var chord = Chord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
-            if (chord != null) { selection.SelectedChord.Add(chord); }
-            return chord;
+            return Chord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
         }
     }
 
@@ -81,16 +75,12 @@ namespace GuitarTab
 
         public Measure genMeasure(CommandSelections selection)
         {
-            var measure = Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
-            if (measure != null) { selection.SelectedMeasure.Add(measure); }
-            return measure;
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
         }
 
         public Chord genChord(CommandSelections selection)
         {
-            var chord = Chord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
-            if (chord != null) { selection.SelectedChord.Add(chord); }
-            return chord;
+            return Chord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
         }
     }
 
@@ -107,9 +97,7 @@ namespace GuitarTab
 
         public Note genNote(CommandSelections selection)
         {
-            var note = Note.createInstance(selection.Fret, selection.String, Chord?.Position as MultiPosition, Chord?.Length);
-            if (note != null) { selection.SelectedNote.Add(note); }
-            return note;
+            return Note.createInstance(selection.Fret, selection.String, Chord?.Position as MultiPosition, Chord?.Length);
         }
     }
 
@@ -128,16 +116,12 @@ namespace GuitarTab
 
         public NoteChord genChord(CommandSelections selection)
         {
-            var chord = NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
-            if (chord != null) { selection.SelectedChord.Add(chord); }
-            return chord;
+            return NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
         }
 
         public Note genNote(CommandSelections selection)
         {
-            var note = Note.createInstance(selection.Fret, selection.String, Chord?.Position as MultiPosition, Chord?.Length);
-            if (note != null) { selection.SelectedNote.Add(note); }
-            return note;
+            return Note.createInstance(selection.Fret, selection.String, Chord?.Position as MultiPosition, Chord?.Length);
         }
     }
 
@@ -158,23 +142,17 @@ namespace GuitarTab
 
         public Measure genMeasure(CommandSelections selection)
         {
-            var measure = Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
-            if (measure != null) { selection.SelectedMeasure.Add(measure); }
-            return measure;
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
         }
 
         public NoteChord genChord(CommandSelections selection)
         {
-            var chord = NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
-            if (chord != null) { selection.SelectedChord.Add(chord); }
-            return chord;
+            return NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
         }
 
         public Note genNote(CommandSelections selection)
         {
-            var note = Note.createInstance(selection.Fret, selection.String, Chord?.Position as MultiPosition, Chord?.Length);
-            if (note != null) { selection.SelectedNote.Add(note); }
-            return note;
+            return Note.createInstance(selection.Fret, selection.String, Chord?.Position as MultiPosition, Chord?.Length);
         }
     }
 
@@ -269,9 +247,7 @@ namespace GuitarTab
 
         public NoteChord genChord(CommandSelections selection)
         {
-            var chord = NoteChord.createInstance(selection.Position, SecondMeasure?.Position, FirstChord?.Length);
-            if (chord != null) { selection.SelectedChord.Add(chord); }
-            return chord;
+            return NoteChord.createInstance(selection.Position, SecondMeasure?.Position, FirstChord?.Length);
         }
     }
 
@@ -298,16 +274,12 @@ namespace GuitarTab
 
         public Measure genMeasure(CommandSelections selection)
         {
-            var measure = Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
-            if (measure != null) { selection.SelectedMeasure.Add(measure); }
-            return measure;
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
         }
 
         public NoteChord genChord(CommandSelections selection)
         {
-            var chord = NoteChord.createInstance(0, SecondMeasure?.Position, FirstChord?.Length);
-            if (chord != null) { selection.SelectedChord.Add(chord); }
-            return chord;
+            return NoteChord.createInstance(0, SecondMeasure?.Position, FirstChord?.Length);
         }
     }
 
@@ -346,9 +318,7 @@ namespace GuitarTab
 
         public Measure genSecondMeasure(CommandSelections selection)
         {
-            var measure = Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
-            if (measure != null) { selection.SelectedMeasure.Add(measure); }
-            return measure;
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
         }
     }
 
@@ -417,9 +387,7 @@ namespace GuitarTab
 
         public Measure genSecondMeasure(CommandSelections selection)
         {
-            var measure = Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part.TimeSignature, Part.DefaultBPM, selection.Position);
-            if (measure != null) { selection.SelectedMeasure.Add(measure); }
-            return measure;
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part.TimeSignature, Part.DefaultBPM, selection.Position);
         }
     }
 
@@ -505,9 +473,7 @@ namespace GuitarTab
 
         public IEffect genPalmMute(CommandSelections selection)
         {
-            IEffect palm_mute = PalmMute.createInstance();
-            selection.SelectedEffect = palm_mute;
-            return palm_mute;
+            return PalmMute.createInstance();
         }
     }
 
@@ -600,9 +566,7 @@ namespace GuitarTab
 
         public Measure genMeasure(CommandSelections selection)
         {
-            var measure = Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
-            selection.SelectedMeasure.Add(measure);
-            return measure;
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
         }
     }
 

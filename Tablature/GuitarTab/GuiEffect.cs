@@ -12,40 +12,32 @@ namespace GuitarTab
 {
     public class EffectMouseHandler : BaseMouseHandler
     {
-        public EffectMouseHandler(VisualBounds b, CommandSelections c, MouseSelections m, GuiCommandExecutor g, IDelegate del)
-            :base(b, c, m, g, del) { }
+        public EffectMouseHandler(GuiCommandExecutor g, IMouseDelegate del)
+            :base(g, del) { }
 
-        public override void mouseClick() { }
-        public override void mouseDragRelease() { }
-        public override void mouseDragSelect() { }
-        public override void addToCommandSelections() { }
-        public override void addToMouseSelections() { }
-        public override void mousePositionCheck() { }
+        public override void mouseClick(StandardClick click) { }
+        public override void mouseDragRelease(ReleaseClick click) { }
     }
 
-    public class PalmMuteBounds : IBounded
+    public class PalmMuteBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private PalmMute palm_mute;
         private Note note;
         private VisualBounds note_bounds;
         private VisualInfo info;
 
         public PalmMuteBounds(PalmMute pm, Note n, VisualBounds n_bounds, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
-            Delegate = del;
             palm_mute = pm;
             note = n;
             note_bounds = n_bounds;
             info = v_info;
-
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds() { return GuiEffectBoundDrawing.createAboveLineEffectBounds(note_bounds, note, info); }
+        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
-        public void updateBounds() { GuiEffectBoundDrawing.updateAboveLineEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateAboveLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class PalmMuteDrawingVisual : TabDrawingVisual
@@ -67,29 +59,25 @@ namespace GuitarTab
         }
     }
 
-    public class BendBounds : IBounded
+    public class BendBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private Bend bend;
         private Note note;
         private VisualBounds note_bounds;
         private VisualInfo info;
 
         public BendBounds(Bend b, Note n, VisualBounds n_bounds, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
-            Delegate = del;
             bend = b;
             note = n;
             note_bounds = n_bounds;
             info = v_info;
-
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds() { return GuiEffectBoundDrawing.createInLineEffectBounds(note_bounds, note, info); }
+        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
-        public void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class BendDrawingVisual : TabDrawingVisual
@@ -120,29 +108,26 @@ namespace GuitarTab
         }
     }
 
-    public class PinchHarmonicBounds : IBounded
+    public class PinchHarmonicBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private PinchHarmonic pinch_harmonic;
         private Note note;
         private VisualBounds note_bounds;
         private VisualInfo info;
 
         public PinchHarmonicBounds(PinchHarmonic ph, Note n, VisualBounds n_bounds, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
             Delegate = del;
             pinch_harmonic = ph;
             note = n;
             note_bounds = n_bounds;
             info = v_info;
-
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds() { return GuiEffectBoundDrawing.createAboveLineEffectBounds(note_bounds, note, info); }
+        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
-        public void updateBounds() { GuiEffectBoundDrawing.updateAboveLineEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateAboveLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class PinchHarmonicDrawingVisual : TabDrawingVisual
@@ -164,29 +149,25 @@ namespace GuitarTab
         }
     }
 
-    public class VibratoBounds : IBounded
+    public class VibratoBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private Vibrato vibrato;
         private Note note;
         private VisualBounds note_bounds;
         private VisualInfo info;
 
         public VibratoBounds(Vibrato v, Note n, VisualBounds n_bounds, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
-            Delegate = del;
             vibrato = v;
             note = n;
             note_bounds = n_bounds;
             info = v_info;
-
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds() { return GuiEffectBoundDrawing.createBeforeNoteEffectBounds(note_bounds, note, info); }
+        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
-        public void updateBounds() { GuiEffectBoundDrawing.updateBeforeNoteEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateBeforeNoteEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class VibratoDrawingVisual : TabDrawingVisual
@@ -211,29 +192,25 @@ namespace GuitarTab
         }
     }
 
-    public class SlideBounds : IBounded
+    public class SlideBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private Slide slide;
         private Note note;
         private VisualBounds note_bounds;
         private VisualInfo info;
 
         public SlideBounds(Slide s, Note n, VisualBounds n_bounds, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
-            Delegate = del;
             slide = s;
             note = n;
             note_bounds = n_bounds;
             info = v_info;
-
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds() { return GuiEffectBoundDrawing.createInLineEffectBounds(note_bounds, note, info); }
+        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
-        public void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class SlideDrawingVisual : TabDrawingVisual
@@ -266,29 +243,25 @@ namespace GuitarTab
         }
     }
 
-    public class HOPOBounds : IBounded
+    public class HOPOBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private HOPO hopo;
         private Note note;
         private VisualBounds note_bounds;
         private VisualInfo info;
 
         public HOPOBounds(HOPO h, Note n, VisualBounds n_bounds, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
-            Delegate = del;
             hopo = h;
             note = n;
             note_bounds = n_bounds;
             info = v_info;
-
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds() { return GuiEffectBoundDrawing.createAboveNoteEffectBounds(note_bounds, note, info); }
+        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
-        public void updateBounds() { GuiEffectBoundDrawing.updateAboveNoteEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateAboveNoteEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class HOPODrawingVisual : TabDrawingVisual
@@ -309,29 +282,25 @@ namespace GuitarTab
         }
     }
 
-    public class TieBounds : IBounded
+    public class TieBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private Tie tie;
         private Note note;
         private VisualBounds note_bounds;
         private VisualInfo info;
 
         public TieBounds(Tie t, Note n, VisualBounds n_bounds, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
-            Delegate = del;
             tie = t;
             note = n;
             note_bounds = n_bounds;
             info = v_info;
-
-            Bounds = genBounds();
         }
 
-        public VisualBounds genBounds() { return GuiEffectBoundDrawing.createInLineEffectBounds(note_bounds, note, info); }
+        public override VisualBounds initBounds() { return new VisualBounds(0, 0, 0, 0, 0); }
 
-        public void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class TieDrawingVisual : TabDrawingVisual
@@ -354,15 +323,6 @@ namespace GuitarTab
 
     public static class GuiEffectBoundDrawing
     {
-
-        public static VisualBounds createAboveNoteEffectBounds(VisualBounds note_bounds, Note note, VisualInfo info)
-        {
-            int width = info.Dimensions.getLength(note.Length.NoteType) + info.Dimensions.NoteWidth;
-            int height = info.Dimensions.StringHeight;
-
-            return new VisualBounds(0, 0, width, height, 0);
-        }
-
         public static void updateAboveNoteEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
         {
             int right = note_bounds.Left + info.Dimensions.getLength(note.Length.NoteType) + info.Dimensions.NoteWidth;
@@ -373,14 +333,6 @@ namespace GuitarTab
             effect_bounds.Width = right - note_bounds.Left;
             effect_bounds.Height = info.Dimensions.StringHeight;
             effect_bounds.Bar = note_bounds.Bar;
-        }
-
-        public static VisualBounds createAboveLineEffectBounds(VisualBounds note_bounds, Note note, VisualInfo info)
-        {
-            int width = note_bounds.Width;
-            int height = info.Dimensions.EffectHeight - info.Dimensions.EffectMargin * 2;
-
-            return new VisualBounds(0, 0, width, height, 0);
         }
 
         public static void updateAboveLineEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
@@ -395,14 +347,6 @@ namespace GuitarTab
             effect_bounds.Bar = note_bounds.Bar;
         }
 
-        public static VisualBounds createInLineEffectBounds(VisualBounds note_bounds, Note note, VisualInfo info)
-        {
-            int width = note_bounds.Left + note_bounds.Height + info.Dimensions.getLength(note.Length.NoteType);
-            int height = note_bounds.Height;
-
-            return new VisualBounds(0, 0, width, height, 0);
-        }
-
         public static void updateInLineEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
         {
             int right = Math.Min(note_bounds.Left + note_bounds.Width + info.Dimensions.getLength(note.Length.NoteType),
@@ -413,14 +357,6 @@ namespace GuitarTab
             effect_bounds.Width = right - (note_bounds.Left + note_bounds.Height);
             effect_bounds.Height = note_bounds.Height;
             effect_bounds.Bar = note_bounds.Bar;
-        }
-
-        public static VisualBounds createBeforeNoteEffectBounds(VisualBounds note_bounds, Note note, VisualInfo info)
-        {
-            int width = info.Dimensions.NoteWidth;
-            int height = note_bounds.Height;
-
-            return new VisualBounds(0, 0, width, height, 0);
         }
 
         public static void updateBeforeNoteEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)

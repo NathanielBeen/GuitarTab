@@ -66,7 +66,10 @@ namespace GuitarTab
             }
         }
 
+        public int Bottom { get { return Top + Height; } }
+        public int Right { get { return Left + Width; } }
         public int Bar { get; set; }
+
         public event EventHandler<BoundsPropertyChangedEventArgs> PropertyChanged;
 
         public VisualBounds(int left, int top, int width, int height, int bar)

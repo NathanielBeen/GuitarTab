@@ -95,7 +95,6 @@
     <Compile Include="MouseCanvasView.cs" />
     <Compile Include="MouseClick.cs" />
     <Compile Include="MouseHoverView.cs" />
-    <Compile Include="MousePositionCheck.cs" />
     <Compile Include="MouseSelectedView.cs" />
     <Compile Include="MouseSelections.cs" />
     <Compile Include="MouseStateConverters.cs" />

@@ -9,24 +9,21 @@ using System.Windows.Media;
 
 namespace GuitarTab
 {
-    public class NoteBounds : IBounded
+    public class NoteBounds : BaseBounded
     {
-        public IDelegate Delegate { get; set; }
-        public VisualBounds Bounds { get; set; }
         private Note note;
         private VisualInfo info;
 
         public NoteBounds(Note n, VisualInfo v_info, IDelegate del)
+            :base(del)
         {
-            Delegate = del;
             note = n;
             info = v_info;
-            Bounds = genBounds();
         }
 
         public Note getNote() { return note; }
 
-        public VisualBounds genBounds()
+        public override VisualBounds initBounds()
         {
             int width = info.Dimensions.NoteWidth;
             int height = info.Dimensions.NoteHeight;
@@ -34,7 +31,7 @@ namespace GuitarTab
             return new VisualBounds(0, 0, width, height, 0);
         }
 
-        public void updateBounds()
+        public override void updateBounds()
         {
             Bounds.Left = info.Position.X;
             Bounds.Top = info.Position.Y + info.Dimensions.EffectHeight + note.String * info.Dimensions.StringHeight;
@@ -48,44 +45,23 @@ namespace GuitarTab
 
     public class NoteMouseHandler : BaseMouseHandler
     {
-        private Note note;
+        public NoteMouseHandler(GuiCommandExecutor e, IMouseDelegate del) :base(e, del) { }
 
-        public NoteMouseHandler(VisualBounds b, CommandSelections s, MouseSelections ms, GuiCommandExecutor e, Note n, IDelegate del)
-            :base(b, s, ms, e, del)
+        public override void mouseClick(StandardClick click)
         {
-            note = n;
-        }
-
-        public override void mouseClick()
-        {
-            addToCommandSelections();
-            addToMouseSelections();
-
-            if (mouse_selections.checkSelectionState(Selection.Add_Multi_Effect) && selections.SelectedNote.Count > 1)
+            if (click.matchesSelectionType(Selection.Add_Multi_Effect) && click.multipleNotes())
             {
                 executor.executeAddMultiEffectToNotes();
             }
-            else if (mouse_selections.checkSelectionState(Selection.Add_Effect))
+            else if (click.matchesSelectionType(Selection.Add_Effect))
             {
                 executor.executeAddEffectToNote();
             }
 
-            invokeClickDelegate();
+            invokeClickDelegate(click);
         }
 
-        public override void mouseDragRelease() { }
-
-        public override void mouseDragSelect()
-        {
-            addToCommandSelections();
-            addToMouseSelections();
-        }
-
-        public override void addToCommandSelections() { selections.SelectedNote.Add(note); }
-
-        public override void addToMouseSelections() { mouse_selections.setToSingleSelectedObject(new ModelBoundsPair(bounds, note)); }
-
-        public override void mousePositionCheck() { }
+        public override void mouseDragRelease(ReleaseClick click) { }
     }
 
     public class NoteDrawingVisual : TabDrawingVisual

@@ -11,74 +11,39 @@ namespace GuitarTab
     public abstract class BaseMouseHandler
     {
         public IMouseDelegate Delegate { get; set; }
-        protected VisualBounds bounds;
-        protected CommandSelections selections;
-        protected MouseSelections mouse_selections;
         protected GuiCommandExecutor executor;
 
-        public BaseMouseHandler(VisualBounds b, CommandSelections s, MouseSelections m, GuiCommandExecutor e, IMouseDelegate d)
+        public BaseMouseHandler(GuiCommandExecutor e, IMouseDelegate d)
         {
             Delegate = d;
-            bounds = b;
-            selections = s;
-            mouse_selections = m;
             executor = e;
         }
 
         public void handleMouseEvent(MouseClick click)
         {
-            if (mouse_selections.PositionCheck)
-            {
-                mousePositionCheck();
-                return;
-            }
-            if (!hitTest(mouse_selections.SelectedPoint)) { return; }
-
-            switch (mouse_selections.EventType)
-            {
-                case MouseSelections.CLICK:
-                    mouseClick(click);
-                    return;
-                case MouseSelections.DRAG_RELEASE:
-                case MouseSelections.MULTIPLE_DRAG_RELEASE:
-                    mouseDragRelease(click);
-                    return;
-                case MouseSelections.DRAG_SELECT:
-                    mouseDragSelect(click);
-                    return;
-                default:
-                    return;
-            }
+            if (click.matchesClickType(ClickType.Click)) { mouseClick(click as StandardClick); }
+            else if (click.matchesClickType(ClickType.Release)) { mouseDragRelease(click as ReleaseClick); }
         }
 
-        public abstract void mouseClick(MouseClick click);
+        public abstract void mouseClick(StandardClick click);
 
-        public abstract void mouseDragRelease(MouseClick click);
+        public abstract void mouseDragRelease(ReleaseClick click);
 
-        public abstract void mouseDragSelect(MouseClick click);
-
-        public abstract void mousePositionCheck();
-
-        public abstract void addToCommandSelections();
-
-        public abstract void addToMouseSelections();
-
-        public void invokeClickDelegate(MouseClick click)
-        {
-            if (!mouse_selections.EventHandled) { Delegate?.invokeDelegate(click); }
-        }
+        public void invokeClickDelegate(MouseClick click) { Delegate?.invokeDelegate(click); }
     }
 
     public abstract class BaseBounded
     {
-        IDelegate Delegate { get; set; }
-        VisualBounds Bounds { get; set; }
+        public IDelegate Delegate { get; set; }
+        public VisualBounds Bounds { get; set; }
 
-        public BaseBounded(IDelegate del, VisualBounds bounds)
+        public BaseBounded(IDelegate del)
         {
             Delegate = del;
-            Bounds = bounds;
+            Bounds = initBounds();
         }
+
+        public abstract VisualBounds initBounds();
 
         public abstract void updateBounds();
 

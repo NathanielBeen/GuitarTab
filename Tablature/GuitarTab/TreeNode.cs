@@ -15,14 +15,14 @@ namespace GuitarTab
         public const int EFFECT = 4;
 
         public virtual object BaseObject { get; }
-        public IBounded ObjectBounds { get; }
+        public BaseBounded ObjectBounds { get; }
         public BaseMouseHandler ObjectHandler { get; }
         public TabDrawingVisual ObjectDrawer { get; }
 
         public TreeNode Parent { get; set; }
         public List<TreeNode> Children { get; private set; }
 
-        public TreeNode(IBounded bounds, BaseMouseHandler handler, TabDrawingVisual drawer)
+        public TreeNode(BaseBounded bounds, BaseMouseHandler handler, TabDrawingVisual drawer)
         {
             ObjectBounds = bounds;
             ObjectHandler = handler;
@@ -71,28 +71,42 @@ namespace GuitarTab
             child.unsubscribeFromParentDelegates(ObjectBounds.Delegate, ObjectHandler.Delegate, ObjectDrawer.Delegate);
         }
 
-        public void subscribeToParentDelegates(IDelegate bounding, IDelegate mouse, IDelegate drawing)
+        public void subscribeToParentDelegates(IDelegate bounding, IMouseDelegate mouse, IDelegate drawing)
         {
             bounding?.subscribeAction(ObjectBounds.updateBounds, this);
-            mouse?.subscribeAction(ObjectHandler.handleMouseEvent, this);
+            mouse?.subscribeAction(handleMouseClick, this);
             drawing?.subscribeAction(ObjectDrawer.refreshVisual, this);
         }
 
-        public void unsubscribeFromParentDelegates(IDelegate bounding, IDelegate mouse, IDelegate drawing)
+        public void unsubscribeFromParentDelegates(IDelegate bounding, IMouseDelegate mouse, IDelegate drawing)
         {
             bounding?.unsubscribeAction(ObjectBounds.updateBounds);
-            mouse?.unsubscribeAction(ObjectHandler.handleMouseEvent);
+            mouse?.unsubscribeAction(handleMouseClick);
             drawing?.unsubscribeAction(ObjectDrawer.refreshVisual);
         }
 
         public void handleMouseClick(MouseClick click)
         {
+            if (click.matchesClickType(ClickType.Position)) { performPositionCheck(click as PositionClick); }
+            else if (click.matchesClickType(ClickType.Select)) { checkSelectBounds(click as SelectClick); }
 
-            addToMouseClick(click);
-            ObjectHandler.handleMouseEvent(click);
+            else if (ObjectBounds.hitTest(click.Point))
+            {
+                addToMouseClick(click as NodeClick);
+                ObjectHandler.handleMouseEvent(click);
+            }
         }
 
-        public virtual void addToMouseClick(MouseClick click) { click.Selected = ObjectBounds.Bounds; }
+        public void checkSelectBounds(SelectClick click)
+        {
+            addToMouseClick(click);
+            click?.setRectContains(ObjectBounds.Bounds);
+            if (click?.ContainsRect ?? false) { ObjectHandler?.invokeClickDelegate(click); }
+        }
+
+        public virtual void addToMouseClick(NodeClick click) { }
+
+        public virtual void performPositionCheck(PositionClick click) { }
     }
 
     public class PartTreeNode : TreeNode
@@ -108,7 +122,21 @@ namespace GuitarTab
 
         public Part getPart() { return part; }
 
-        public override void addToMouseClick(MouseClick click) { click.PartNode = this; } 
+        public override void addToMouseClick(NodeClick click) { click.PartNode = this; }
+
+        public MeasureTreeNode getMeasureNodeAtPosition(int pos)
+        {
+            return (from node in Children
+                    where (node as MeasureTreeNode).getMeasure().Position.Index == pos
+                    select node as MeasureTreeNode).FirstOrDefault();
+        }
+
+        public List<MeasureTreeNode> getMeasureNodesAtAndAfterPosition(int pos)
+        {
+            return (from node in Children
+                    where (node as MeasureTreeNode).getMeasure().Position.Index >= pos
+                    select node as MeasureTreeNode).ToList();
+        }
     }
 
     public class MeasureTreeNode : TreeNode
@@ -124,7 +152,9 @@ namespace GuitarTab
 
         public Measure getMeasure() { return measure; }
 
-        public override void addToMouseClick(MouseClick click) { click.MeasureNodes.Add(this); }
+        public override void addToMouseClick(NodeClick click) { click.MeasureNodes.Add(this); }
+
+        public override void performPositionCheck(PositionClick click) { click?.checkItem(measure.Position.Index, ObjectBounds.Bounds); }
     }
 
     public class ChordTreeNode : TreeNode
@@ -140,7 +170,9 @@ namespace GuitarTab
 
         public Chord getChord() { return chord; }
 
-        public override void addToMouseClick(MouseClick click) { click.ChordNodes.Add(this); }
+        public override void addToMouseClick(NodeClick click) { click.ChordNodes.Add(this); }
+
+        public override void performPositionCheck(PositionClick click) { click?.checkItem(chord.Position.Index, ObjectBounds.Bounds); }
     }
 
     public class NoteTreeNode : TreeNode
@@ -156,7 +188,7 @@ namespace GuitarTab
 
         public Note getNote() { return note; }
 
-        public override void addToMouseClick(MouseClick click) { click.NoteNodes.Add(this); }
+        public override void addToMouseClick(NodeClick click) { click.NoteNodes.Add(this); }
     }
 
     public class EffectTreeNode : TreeNode
@@ -164,7 +196,7 @@ namespace GuitarTab
         private IEffect effect;
         public override object BaseObject { get { return effect; } }
 
-        public EffectTreeNode(IEffect e, IBounded effect_bounds, EffectMouseHandler handler, TabDrawingVisual visual)
+        public EffectTreeNode(IEffect e, BaseBounded effect_bounds, EffectMouseHandler handler, TabDrawingVisual visual)
             :base(effect_bounds, handler, visual)
         {
             effect = e;
@@ -172,6 +204,6 @@ namespace GuitarTab
 
         public IEffect getEffect() { return effect; }
 
-        public override void addToMouseClick(MouseClick click) { click.EffectNodes.Add(this); }
+        public override void addToMouseClick(NodeClick click) { click.EffectNode = this; }
     }
 }
