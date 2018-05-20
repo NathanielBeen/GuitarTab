@@ -125,6 +125,20 @@ namespace GuitarTab
         public void executeAction() { chord.Length = length; }
     }
 
+    public class ChangeChordPositionCom : IActionCommand
+    {
+        private Chord chord;
+        private int position;
+
+        public ChangeChordPositionCom(Chord c, int p)
+        {
+            chord = c;
+            position = p;
+        }
+
+        public void executeAction() { chord.Position.Index = position; }
+    }
+
     public class ChangeNoteStringCom : IActionCommand
     {
         private Note note;
@@ -316,6 +330,23 @@ namespace GuitarTab
         {
             measure.Bpm = bpm;
             measure.MatchesPart = (part.TimeSignature.matchesSignature(measure.TimeSignature) && part.DefaultBPM == measure.Bpm);
+        }
+    }
+
+    public class ChangeMeasurePositionCom : IActionCommand
+    {
+        private Measure measure;
+        private int position;
+
+        public ChangeMeasurePositionCom(Measure m, int p)
+        {
+            measure = m;
+            position = p;
+        }
+
+        public void executeAction()
+        {
+            measure.Position.Index = position;
         }
     }
 }

@@ -385,7 +385,7 @@ namespace GuitarTab
         {
             var command = new MultipleActionCommand();
             command.AddCommand(new RemoveChordFromMeasureCom(attributes.FirstMeasure, attributes.Chord));
-            attributes.Chord.Position.Index = (int)attributes.Position;
+            command.AddCommand(new ChangeChordPositionCom(attributes.Chord, (int)attributes.Position));
             command.AddCommand(new AddChordToMeasureCom(attributes.SecondMeasure, attributes.Chord));
             return command;
         }
@@ -409,7 +409,7 @@ namespace GuitarTab
         {
             var command = new MultipleActionCommand();
             command.AddCommand(new RemoveChordFromMeasureCom(attributes.FirstMeasure, attributes.Chord));
-            attributes.Chord.Position.Index = attributes.Position;
+            command.AddCommand(new ChangeChordPositionCom(attributes.Chord, (int)attributes.Position));
             command.AddCommand(new AddMeasureToPartCom(attributes.Part, attributes.SecondMeasure));
             command.AddCommand(new AddChordToMeasureCom(attributes.SecondMeasure, attributes.Chord));
             return command;
@@ -441,7 +441,7 @@ namespace GuitarTab
             int curr_position = (int)attributes.Position;
             foreach (Chord chord in attributes.ChordDict.Keys)
             {
-                chord.Position.Index = curr_position;
+                command.AddCommand(new ChangeChordPositionCom(chord, curr_position));
                 command.AddCommand(new AddChordToMeasureCom(attributes.SecondMeasure, chord));
                 curr_position++;
             }
@@ -475,7 +475,7 @@ namespace GuitarTab
             int curr_position = attributes.Position;
             foreach (Chord chord in attributes.ChordDict.Keys)
             {
-                chord.Position.Index = curr_position;
+                command.AddCommand(new ChangeChordPositionCom(chord, curr_position));
                 command.AddCommand(new AddChordToMeasureCom(attributes.SecondMeasure, chord));
                 curr_position++;
             }
@@ -736,7 +736,7 @@ namespace GuitarTab
         {
             var command = new MultipleActionCommand();
             command.AddCommand(new RemoveMeasureFromPartCom(attributes.Part, attributes.Measure));
-            attributes.Measure.Position.Index = (int)attributes.Position;
+            command.AddCommand(new ChangeMeasurePositionCom(attributes.Measure, (int)attributes.Position));
             command.AddCommand(new AddMeasureToPartCom(attributes.Part, attributes.Measure));
             return command;
         }
@@ -772,7 +772,7 @@ namespace GuitarTab
             int curr_position = (int)attributes.Position;
             foreach (Measure measure in attributes.Measures)
             {
-                measure.Position.Index = curr_position;
+                command.AddCommand(new ChangeMeasurePositionCom(measure, curr_position));
                 command.AddCommand(new AddMeasureToPartCom(attributes.Part, measure));
                 curr_position++;
             }

@@ -156,6 +156,7 @@ namespace GuitarTab
         public static List<BarredBeat> genBeats(MeasureTreeNode measure_node)
         {
             List<ChordBounds> chords = (from node in measure_node.Children
+                                        orderby (node as ChordTreeNode).getChord().Position.Index
                                         select node.ObjectBounds as ChordBounds).ToList();
             int beat_length = (int)measure_node.getMeasure().TimeSignature.BeatType;
             var beats = new List<BarredBeat>();

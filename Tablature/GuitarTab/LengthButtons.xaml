@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GuitarTab"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="100">
+             d:DesignHeight="180" d:DesignWidth="60">
     <Grid Name="buttonGrid">
         <Grid.Resources>
             <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}" />

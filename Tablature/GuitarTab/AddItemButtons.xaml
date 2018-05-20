@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GuitarTab"
              mc:Ignorable="d" 
-             d:DesignHeight="40" d:DesignWidth="240">
+             d:DesignHeight="60" d:DesignWidth="400">
     <Grid Name="addItemGrid">
         <Grid.Resources>
             <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}" />
             <local:EnumToBooleanConverter x:Key="Converter"/>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="2*" />
@@ -26,34 +27,37 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <RadioButton Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Name="measureToggle" Background="{Binding Path=Images[(local:AddItem)Measure]}"
+        <RadioButton Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Name="noneToggle" Background="{Binding Path=Images[(local:AddItem)None]}"
+                     IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.None}}"/>
+        
+        <RadioButton Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Name="measureToggle" Background="{Binding Path=Images[(local:AddItem)Measure]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.Measure}}"/>
         
-        <RadioButton Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Name="restToggle" Background="{Binding Path=Images[(local:AddItem)Rest]}"
+        <RadioButton Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Name="restToggle" Background="{Binding Path=Images[(local:AddItem)Rest]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.Rest}}"/>
         
-        <RadioButton Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Name="noteToggle" Background="{Binding Path=Images[(local:AddItem)Note]}"
+        <RadioButton Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Name="noteToggle" Background="{Binding Path=Images[(local:AddItem)Note]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.Note}}"/>
 
-        <RadioButton Grid.Column="4" Grid.Row="0" Name="palmMuteToggle" Background="{Binding Path=Images[(local:AddItem)PalmMute]}"
+        <RadioButton Grid.Column="5" Grid.Row="0" Name="palmMuteToggle" Background="{Binding Path=Images[(local:AddItem)PalmMute]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.PalmMute}}"/>
 
-        <RadioButton Grid.Column="4" Grid.Row="1" Name="bendToggle" Background="{Binding Path=Images[(local:AddItem)Bend]}"
+        <RadioButton Grid.Column="5" Grid.Row="1" Name="bendToggle" Background="{Binding Path=Images[(local:AddItem)Bend]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.Bend}}"/>
 
-        <RadioButton Grid.Column="5" Grid.Row="0" Name="pinchHarmonicToggle" Background="{Binding Path=Images[(local:AddItem)PinchHarmonic]}"
+        <RadioButton Grid.Column="6" Grid.Row="0" Name="pinchHarmonicToggle" Background="{Binding Path=Images[(local:AddItem)PinchHarmonic]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.PinchHarmonic}}"/>
 
-        <RadioButton Grid.Column="5" Grid.Row="1" Name="vibratoToggle" Background="{Binding Path=Images[(local:AddItem)Vibrato]}"
+        <RadioButton Grid.Column="6" Grid.Row="1" Name="vibratoToggle" Background="{Binding Path=Images[(local:AddItem)Vibrato]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.Vibrato}}"/>
 
-        <RadioButton Grid.Column="6" Grid.Row="0" Name="slideToggle" Background="{Binding Path=Images[(local:AddItem)Slide]}"
+        <RadioButton Grid.Column="7" Grid.Row="0" Name="slideToggle" Background="{Binding Path=Images[(local:AddItem)Slide]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.Slide}}"/>
 
-        <RadioButton Grid.Column="6" Grid.Row="1" Name="HopoToggle" Background="{Binding Path=Images[(local:AddItem)Hopo]}"
+        <RadioButton Grid.Column="7" Grid.Row="1" Name="HopoToggle" Background="{Binding Path=Images[(local:AddItem)Hopo]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.Hopo}}"/>
 
-        <RadioButton Grid.Column="7" Grid.Row="0" Name="TieToggle" Background="{Binding Path=Images[(local:AddItem)Tie]}"
+        <RadioButton Grid.Column="8" Grid.Row="0" Name="TieToggle" Background="{Binding Path=Images[(local:AddItem)Tie]}"
                      IsChecked="{Binding Path=Item, Converter={StaticResource Converter}, ConverterParameter={x:Static local:AddItem.Tie}}"/>
     </Grid>
 </UserControl>

@@ -11,7 +11,6 @@ namespace GuitarTab
     public enum ClickType
     {
         Click,
-        DoubleClick,
         Select,
         Release,
         Position,
@@ -184,7 +183,7 @@ namespace GuitarTab
         {
             if (checkChordBar(bounds))
             {
-                Position = pos;
+                Position = pos + 1;
                 current_closest = bounds;
             }
         }

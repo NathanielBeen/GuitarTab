@@ -13,15 +13,15 @@ namespace GuitarTab
     {
         public TreeNode Root { get; set; }
         private GuiObjectFactory factory;
-        private TreeAddedHolding added_holding;
+        private TreeChangedHolding click_holding;
         private TreeRemovedHolding removed_holding;
         private TreeVisualCollection visuals;
 
-        public GuiObjectTree(GuiObjectFactory f, TreeAddedHolding a, TreeRemovedHolding r, TreeVisualCollection v)
+        public GuiObjectTree(GuiObjectFactory f, TreeChangedHolding c, TreeRemovedHolding r, TreeVisualCollection v)
         {
             Root = null;
             factory = f;
-            added_holding = a;
+            click_holding = c;
             removed_holding = r;
             visuals = v;
         }
@@ -60,7 +60,7 @@ namespace GuitarTab
                 attachEventsToTree(part);
                 buildChildren(node, part);
                 Root = node;
-                added_holding.addNode(node);
+                click_holding.nodeAdded(node);
             }
         }
 
@@ -72,7 +72,7 @@ namespace GuitarTab
                 attachNodeToTree(child, parent);
                 attachEventsToTree(measure);
                 buildChildren(child, measure);
-                added_holding.addNode(child);
+                click_holding.nodeAdded(child);
             }
         }
 
@@ -88,7 +88,7 @@ namespace GuitarTab
                     var contained_chord = chord as IContainModels;
                     attachEventsToTree(contained_chord);
                     buildChildren(child, contained_chord);
-                    added_holding.addNode(child);
+                    click_holding.nodeAdded(child);
                 }
             }
         }
@@ -107,7 +107,7 @@ namespace GuitarTab
                     buildEffect(effect, child as NoteTreeNode);
                 }
 
-                added_holding.addNode(child);
+                click_holding.nodeAdded(child);
             }
         }
 
@@ -115,7 +115,7 @@ namespace GuitarTab
         {
             TreeNode child = factory.buildEffectNode(effect, parent);
             if (child != null) { attachNodeToTree(child, parent); }
-            added_holding.addNode(child);
+            click_holding.nodeAdded(child);
         }
 
         public void attachNodeToTree(TreeNode child, TreeNode parent)
@@ -146,7 +146,7 @@ namespace GuitarTab
                 else
                 {
                     attachNodeToTree(child, parent);
-                    added_holding.addNode(child);
+                    click_holding.nodeAdded(child);
                 }
             }
         }
@@ -158,6 +158,7 @@ namespace GuitarTab
             {
                 removed.Parent?.removeChild(removed);
                 removed_holding.removeItem(removed);
+                click_holding.nodeRemoved(removed);
                 visuals.removeVisual(removed);
             }
         }
@@ -166,7 +167,7 @@ namespace GuitarTab
 
         public void HandleMouseEvent(MouseClick click) { Root?.handleMouseClick(click); }
 
-        public void populateMouseClick(NodeClick click) { added_holding.populateMouseClick(click); }
+        public void populateMouseClick(NodeClick click) { click_holding.populateMouseClick(click); }
     }
 
     public class TreeRemovedHolding
@@ -196,21 +197,26 @@ namespace GuitarTab
         }
     }
 
-    public class TreeAddedHolding
+    public class TreeChangedHolding
     {
         private List<TreeNode> addedNodes;
+        private List<TreeNode> removedNodes;
 
-        public TreeAddedHolding()
+        public TreeChangedHolding()
         {
             addedNodes = new List<TreeNode>();
+            removedNodes = new List<TreeNode>();
         }
 
-        public void addNode(TreeNode node) { addedNodes.Add(node); }
+        public void nodeAdded(TreeNode node) { addedNodes.Add(node); }
 
-        public void clearAddedHolding() { addedNodes.Clear(); }
+        public void nodeRemoved(TreeNode node) { removedNodes.Add(node); }
+
+        public void clearChangedHolding() { addedNodes.Clear(); }
 
         public void populateMouseClick(NodeClick click)
         {
+            foreach (TreeNode node in removedNodes) { node.removeFromMouseClick(click); }
             foreach (TreeNode node in addedNodes) { node.addToMouseClick(click); }
             addedNodes.Clear();
         }

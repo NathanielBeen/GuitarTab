@@ -116,6 +116,10 @@ namespace GuitarTab
 
         public virtual void addToMouseClick(NodeClick click) { }
 
+        public virtual void removeFromMouseClick(NodeClick click) { }
+
+        public virtual void setToSelected(Selected selected) { }
+
         public virtual void performPositionCheck(PositionClick click) { }
     }
 
@@ -134,6 +138,13 @@ namespace GuitarTab
 
         public override void addToMouseClick(NodeClick click) { click.PartNode = this; }
 
+        public override void removeFromMouseClick(NodeClick click)
+        {
+            if (click.PartNode.Equals(this)) { click.PartNode = null; }
+        }
+
+        public override void setToSelected(Selected selected) { selected.PartNode = this; }
+
         public MeasureTreeNode getMeasureNodeAtPosition(int pos)
         {
             return (from node in Children
@@ -145,6 +156,7 @@ namespace GuitarTab
         {
             return (from node in Children
                     where (node as MeasureTreeNode).getMeasure().Position.Index >= pos
+                    orderby (node as MeasureTreeNode).getMeasure().Position.Index
                     select node as MeasureTreeNode).ToList();
         }
     }
@@ -164,6 +176,17 @@ namespace GuitarTab
 
         public override void addToMouseClick(NodeClick click) { click.MeasureNodes.Add(this); }
 
+        public override void removeFromMouseClick(NodeClick click)
+        {
+            if (click.MeasureNodes.Contains(this)) { click.MeasureNodes.Remove(this); }
+        }
+
+        public override void setToSelected(Selected selected)
+        {
+            selected.MeasureNodes.Clear();
+            selected.MeasureNodes.Add(this);
+        }
+
         public override void performPositionCheck(PositionClick click) { click?.checkItem(measure.Position.Index, ObjectBounds.Bounds); }
     }
 
@@ -182,6 +205,17 @@ namespace GuitarTab
 
         public override void addToMouseClick(NodeClick click) { click.ChordNodes.Add(this); }
 
+        public override void removeFromMouseClick(NodeClick click)
+        {
+            if (click.ChordNodes.Contains(this)) { click.ChordNodes.Remove(this); }
+        }
+
+        public override void setToSelected(Selected selected)
+        {
+            selected.ChordNodes.Clear();
+            selected.ChordNodes.Add(this);
+        }
+
         public override void performPositionCheck(PositionClick click) { click?.checkItem(chord.Position.Index, ObjectBounds.Bounds); }
     }
 
@@ -199,6 +233,17 @@ namespace GuitarTab
         public Note getNote() { return note; }
 
         public override void addToMouseClick(NodeClick click) { click.NoteNodes.Add(this); }
+
+        public override void removeFromMouseClick(NodeClick click)
+        {
+            if (click.NoteNodes.Contains(this)) { click.NoteNodes.Remove(this); }
+        }
+
+        public override void setToSelected(Selected selected)
+        {
+            selected.NoteNodes.Clear();
+            selected.NoteNodes.Add(this);
+        }
     }
 
     public class EffectTreeNode : TreeNode
@@ -215,5 +260,15 @@ namespace GuitarTab
         public IEffect getEffect() { return effect; }
 
         public override void addToMouseClick(NodeClick click) { click.EffectNode = this; }
+
+        public override void removeFromMouseClick(NodeClick click)
+        {
+            if (click.EffectNode.Equals(this)) { click.EffectNode = null; }
+        }
+
+        public override void setToSelected(Selected selected)
+        {
+            selected.EffectNode = this;
+        }
     }
 }

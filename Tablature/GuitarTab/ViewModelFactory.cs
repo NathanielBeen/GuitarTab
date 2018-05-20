@@ -104,7 +104,7 @@ namespace GuitarTab
 
         public GuiObjectTree createTree()
         {
-            var added = new TreeAddedHolding();
+            var added = new TreeChangedHolding();
             var holding = new TreeRemovedHolding(20);
             var collection = new TreeVisualCollection();
             return new GuiObjectTree(factory, added, holding, collection);

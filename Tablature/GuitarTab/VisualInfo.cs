@@ -267,7 +267,14 @@ namespace GuitarTab
         public void resetPositionToMeasureBeginning(VisualBounds measure_bounds)
         {
             X = measure_bounds?.Left ?? dimensions.BarMargin;
-            Y = (measure_bounds != null) ? measure_bounds.Top + measure_bounds.Height - dimensions.BarHeight - dimensions.EffectHeight : dimensions.PageHeadHeight;
+            Y = (measure_bounds != null) ? measure_bounds.Bottom - dimensions.BarHeight - dimensions.EffectHeight : dimensions.PageHeadHeight;
+            CurrentBar = measure_bounds?.Bar ?? 0;
+        }
+
+        public void resetPositionToMeasureEnd(VisualBounds measure_bounds)
+        {
+            X = measure_bounds?.Right ?? dimensions.BarMargin;
+            Y = (measure_bounds != null) ? measure_bounds.Bottom - dimensions.BarHeight - dimensions.EffectHeight : dimensions.PageHeadHeight;
             CurrentBar = measure_bounds?.Bar ?? 0;
         }
 

@@ -107,12 +107,12 @@ namespace GuitarTab
         {
             if (click.multipleChords() && !click.anyNote())
             {
-                int position = performMousePositionCheck(click);
+                int position = performMousePositionCheck(click) - 1;
                 executor.executeChangeMultipleChordPosition(click, position);
             }
             else if (click.anyChord() && !click.anyNote())
             {
-                int position = performMousePositionCheck(click);
+                int position = performMousePositionCheck(click) - 1;
                 executor.executeChangeChordPosition(click, position);
             }
 

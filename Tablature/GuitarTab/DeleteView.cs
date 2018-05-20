@@ -40,6 +40,7 @@ namespace GuitarTab
         public void handleButtonClick()
         {
             var click = new ReleaseClick(default(Point));
+            selected.populateNodeClick(click);
 
             if(click.multipleNotes())
             {

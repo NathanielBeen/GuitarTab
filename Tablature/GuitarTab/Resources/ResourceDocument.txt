@@ -78,11 +78,11 @@ Hopo_:_AddHopo.png
 Tie_:_AddTie.png
 <>//State
 0_:_None.png
-1_:_EffectSelect.png
-2_:_MultiEffectSelect.png
+1_:_MeasureSelect.png
+2_:_RestSelect.png
 3_:_NoteSelect.png
-4_:_RestSelect.png
-5_:_MeasureSelect.png
+4_:_EffectSelect.png
+5_:_MultiEffectSelect.png
 6_:_LengthSelect.png
 <>//Other Image
 deleteButton_:_DeleteButton.png

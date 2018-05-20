@@ -10,81 +10,95 @@ namespace GuitarTab
     {
         public MouseSelectedView SelectedView { get; set; }
 
-        private PartTreeNode part_node;
-        private List<MeasureTreeNode> measure_nodes;
-        private List<ChordTreeNode> chord_nodes;
-        private List<NoteTreeNode> note_nodes;
-        private EffectTreeNode effect_node;
+        public PartTreeNode PartNode;
+        public List<MeasureTreeNode> MeasureNodes;
+        public List<ChordTreeNode> ChordNodes;
+        public List<NoteTreeNode> NoteNodes;
+        public EffectTreeNode EffectNode;
+
+        private IEnumerable<TreeNode> selected;
 
         public Selected()
         {
-            part_node = null;
-            measure_nodes = new List<MeasureTreeNode>();
-            chord_nodes = new List<ChordTreeNode>();
-            note_nodes = new List<NoteTreeNode>();
-            effect_node = null;
+            PartNode = null;
+            MeasureNodes = new List<MeasureTreeNode>();
+            ChordNodes = new List<ChordTreeNode>();
+            NoteNodes = new List<NoteTreeNode>();
+            EffectNode = null;
         }
 
         public void populateNodeClick(NodeClick click)
         {
-            click.PartNode = part_node;
-            click.MeasureNodes = measure_nodes;
-            click.ChordNodes = chord_nodes;
-            click.NoteNodes = note_nodes;
-            click.EffectNode = effect_node;
+            click.PartNode = PartNode;
+            click.MeasureNodes = MeasureNodes;
+            click.ChordNodes = ChordNodes;
+            click.NoteNodes = NoteNodes;
+            click.EffectNode = EffectNode;
         }
 
         public void populateNodeClickForMultiEffect(NodeClick click)
         {
-            click.NoteNodes = note_nodes;
+            click.NoteNodes = NoteNodes;
         }
 
         public void populateFromClick(NodeClick click)
         {
-            part_node = click.PartNode;
-            measure_nodes = click.MeasureNodes;
-            chord_nodes = click.ChordNodes;
-            note_nodes = click.NoteNodes;
-            effect_node = click.EffectNode;
-
-            setSelected();
+            Clear();
+            setSelected(click);
+            refreshSelectedTree();
+            SelectedView.setSelectedObjects(selected.ToList());
         }
 
-        private void setSelected()
+        public void Clear()
         {
-            var new_selected = new List<TreeNode>(); 
+            PartNode = null;
+            MeasureNodes.Clear();
+            ChordNodes.Clear();
+            NoteNodes.Clear();
+            EffectNode = null;
+        }
 
-            if (effect_node != null) { new_selected.Add(effect_node); }
-            else if (note_nodes.Any()) { new_selected.AddRange(note_nodes); }
-            else if (chord_nodes.Any()) { new_selected.AddRange(chord_nodes); }
-            else if (measure_nodes.Any()) { new_selected.AddRange(measure_nodes); }
-            else if (part_node != null) { new_selected.Add(part_node); }
+        private void setSelected(NodeClick click)
+        {
+            if (click.EffectNode != null) { selected = new List<TreeNode>() { click.EffectNode }; }
+            else if (click.NoteNodes.Any()) { selected = click.NoteNodes; }
+            else if (click.ChordNodes.Any()) { selected = click.ChordNodes; }
+            else if (click.MeasureNodes.Any()) { selected = click.MeasureNodes; }
+            else if (click.PartNode != null) { selected = new List<TreeNode>() { click.PartNode }; }
+        }
 
-            SelectedView.setSelectedObjects(new_selected);
+        private void refreshSelectedTree()
+        {
+            TreeNode curr_node = selected.FirstOrDefault();
+            while (curr_node != null)
+            {
+                curr_node.setToSelected(this);
+                curr_node = curr_node.Parent;
+            }
         }
 
         public List<VisualBounds> getSelected() { return SelectedView.Selected.ToList(); }
 
         public TreeNode getFirstSelected()
         {
-            if (effect_node != null) { return effect_node; }
-            else if (note_nodes.Any()) { return note_nodes.First(); }
-            else if (chord_nodes.Any()) { return chord_nodes.First(); }
-            else if (measure_nodes.Any()) { return measure_nodes.First(); }
-            else if (part_node != null) { return part_node; }
+            if (EffectNode != null) { return EffectNode; }
+            else if (NoteNodes.Any()) { return NoteNodes.First(); }
+            else if (ChordNodes.Any()) { return ChordNodes.First(); }
+            else if (MeasureNodes.Any()) { return MeasureNodes.First(); }
+            else if (PartNode != null) { return PartNode; }
             return null;
         }
     }
 
     public enum Selection
     {
+        Standard,
         Add_Measure,
         Add_Rest,
         Add_Note,
         Add_Effect,
         Add_Multi_Effect,
-        Set_Length,
-        Standard
+        Set_Length
     }
 
     public static class SelectionExtensions

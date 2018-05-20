@@ -25,7 +25,7 @@ namespace GuitarTab
 
         public void updateMeasureBoundsAtAndAfter(MeasureTreeNode prev_measure_node, List<MeasureTreeNode> to_update)
         {
-            position.resetPositionToMeasureBeginning(prev_measure_node.ObjectBounds.Bounds);
+            position.resetPositionToMeasureEnd(prev_measure_node?.ObjectBounds.Bounds);
             foreach (MeasureTreeNode measure in to_update) { measure.ObjectBounds.updateBounds(); }
         }
 
