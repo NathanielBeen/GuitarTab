@@ -5,13 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GuitarTab"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="500">
+             d:DesignHeight="500" d:DesignWidth="872">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="60"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="120"/>
             <ColumnDefinition Width="400"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="272"/>
+            <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
@@ -21,10 +23,12 @@
         </Grid.RowDefinitions>
         <local:DeleteButton Grid.Column="1" Grid.Row="0" DataContext="{Binding DeleteView}"/>
         <local:AddItemButtons Grid.Column="2" Grid.Row="0" DataContext="{Binding AddItemView}"/>
+        <local:BPMTimeSigButtons Grid.Column="4" Grid.Row="0" DataContext="{Binding BPMTimeSigView}"/>
         <local:LengthButtons Grid.Column="0" Grid.Row="2" DataContext="{Binding LengthView}"/>
-        <local:MouseCanvas x:Name="canvas" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="3" DataContext="{Binding CanvasView}" Panel.ZIndex="1"/>
-        <local:TabVisuals x:Name="tabVisuals" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="3" Panel.ZIndex="0"/>
+        <local:MouseCanvas x:Name="canvas" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="5" Grid.RowSpan="5" DataContext="{Binding CanvasView}" Panel.ZIndex="1"/>
+        <local:TabVisuals x:Name="tabVisuals" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="5" Panel.ZIndex="0"/>
         <local:PropertyMenu Grid.Column="2" Grid.Row="2" DataContext="{Binding PropertyMenuView}" Panel.ZIndex="2"/>
         <local:FretMenu Grid.Column="2" Grid.Row="2" DataContext="{Binding FretMenuView}" Panel.ZIndex="3"/>
+        <local:NoteSelectMenu Grid.Column="2" Grid.Row="3" DataContext="{Binding NoteSelectView}" Panel.ZIndex="4"/>
     </Grid>
 </UserControl>

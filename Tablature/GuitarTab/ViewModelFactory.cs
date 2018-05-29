@@ -35,6 +35,8 @@ namespace GuitarTab
         private MouseCanvasView canvas_view;
         private PropertyMenuView property_view;
         private FretMenuView fret_view;
+        private NoteSelectView select_view;
+        private BPMTimeSigView time_sig_view;
         private MainView main_view;
 
         public ViewModelFactory() { }
@@ -58,6 +60,8 @@ namespace GuitarTab
             canvas_view = createCanvasView();
             property_view = createPropertyView();
             fret_view = createFretView();
+            select_view = createNoteSelectView();
+            time_sig_view = createBPMTimeSigView();
             main_view = createMainView();
         }
         
@@ -117,7 +121,9 @@ namespace GuitarTab
 
         public MouseHandler createHandler()
         {
-            return new MouseHandler(tree, selected, converter);
+            var handler = new  MouseHandler(tree, selected, converter);
+            executor.Handler = handler;
+            return handler;
         }
 
         public GuiTreeUpdater createUpdater()
@@ -147,8 +153,9 @@ namespace GuitarTab
             var state_view = new MouseStateView(reader.getDictionary(SettingsReader.MOUSESTATE), converter);
             var hover_view = new MouseHoverView(info.DrawingObjects.HoverBrush);
             var selected_view = new MouseSelectedView(info.DrawingObjects.SelectedBrush);
+            var drag_view = new MouseDragView();
             selected.SelectedView = selected_view;
-            var canvas = new MouseCanvasView(state_view, hover_view, selected_view, handler);
+            var canvas = new MouseCanvasView(state_view, hover_view, selected_view, drag_view, handler);
             return canvas;
         }
 
@@ -163,9 +170,19 @@ namespace GuitarTab
             return new FretMenuView();
         }
 
+        public NoteSelectView createNoteSelectView()
+        {
+            return new NoteSelectView();
+        }
+
+        public BPMTimeSigView createBPMTimeSigView()
+        {
+            return new BPMTimeSigView(selections, executor, selected, reader.getDictionary(SettingsReader.LENGTH_IMG), reader.getDictionary(SettingsReader.OTHER_IMG), 120, 4, NoteLength.Quarter);
+        }
+
         public MainView createMainView()
         {
-            return new MainView(length_view, delete_view, add_item_view, canvas_view, property_view, fret_view, executor, handler);
+            return new MainView(length_view, delete_view, add_item_view, canvas_view, property_view, fret_view, select_view, time_sig_view, executor, handler);
         }
 
         public void linkToView(MainControl control)

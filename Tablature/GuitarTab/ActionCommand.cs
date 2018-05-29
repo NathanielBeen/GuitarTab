@@ -43,7 +43,10 @@ namespace GuitarTab
         {
             measure.ModelCollection.performActionOnSpecificItems(
                 c => c.Position.Index == chord.Position.Index,
-                c => c.breakEffectsAtPosition(EffectPosition.Into));
+                c => c.breakMultiEffectsAtPosition(EffectPosition.Into));
+            measure.ModelCollection.performActionOnSpecificItems(
+                c => c.Position.Index == chord.Position.Index - 1,
+                c => c.breakMultiEffectsAtPosition(EffectPosition.After));
 
             measure.ModelCollection.performActionOnSpecificItems(
                 c => c.Position.Index >= chord.Position.Index,
@@ -51,6 +54,35 @@ namespace GuitarTab
 
             measure.Add(chord);
             (chord.Position as MultiPosition)?.setMeasureReference(measure.Position);
+        }
+    }
+
+    public class AddMultipleChordsToMeasureCom : IActionCommand
+    {
+        private Measure measure;
+        private List<Chord> chords;
+
+        public AddMultipleChordsToMeasureCom(Measure m, List<Chord> c)
+        {
+            measure = m;
+            chords = c;
+        }
+
+        public void executeAction()
+        {
+            measure.ModelCollection.performActionOnSpecificItems(
+                c => c.Position.Index == chords.First().Position.Index,
+                c => c.breakMultiEffectsAtPosition(EffectPosition.Into));
+
+            measure.ModelCollection.performActionOnSpecificItems(
+                c => c.Position.Index >= chords.First().Position.Index,
+                c => c.Position.Index += chords.Count);
+
+            foreach (Chord chord in chords)
+            {
+                measure.Add(chord);
+                (chord.Position as MultiPosition)?.setMeasureReference(measure.Position);
+            }
         }
     }
 
@@ -103,6 +135,7 @@ namespace GuitarTab
         public void executeAction()
         {
             chord.breakMultiEffects();
+            measure.breakCrossMeasureEffectsAtPosition(EffectPosition.After);
 
             measure.Remove(chord);
             measure.ModelCollection.performActionOnSpecificItems(
@@ -111,18 +144,48 @@ namespace GuitarTab
         }
     }
 
+    public class RemoveMultipleChordsFromMeasureCom : IActionCommand
+    {
+        private Measure measure;
+        private List<Chord> chords;
+
+        public RemoveMultipleChordsFromMeasureCom(Measure m, List<Chord> c)
+        {
+            measure = m;
+            chords = c;
+        }
+
+        public void executeAction()
+        {
+            chords.First().breakMultiEffectsAtPosition(EffectPosition.Into);
+            chords.Last().breakMultiEffectsAtPosition(EffectPosition.After);
+
+            foreach (Chord chord in chords) { measure.Remove(chord); }
+            measure.ModelCollection.performActionOnSpecificItems(
+                c => c.Position.Index > chords.Last().Position.Index,
+                c => c.Position.Index -= chords.Count);
+        }
+    }
+
     public class ChangeChordLengthCom : IActionCommand
     {
+        private Measure measure;
         private Chord chord;
         private Length length;
 
-        public ChangeChordLengthCom(Chord c, Length l)
+        public ChangeChordLengthCom(Measure m, Chord c, Length l)
         {
+            measure = m;
             chord = c;
             length = l;
         }
 
-        public void executeAction() { chord.Length = length; }
+        public void executeAction()
+        {
+            measure.breakCrossMeasureEffectsAtPosition(EffectPosition.After);
+            chord.setLength(length);
+            measure.updateSpaceTaken();
+        }
     }
 
     public class ChangeChordPositionCom : IActionCommand
@@ -259,13 +322,38 @@ namespace GuitarTab
         {
             part.ModelCollection.performActionOnSpecificItems(
                 m => m.Position.Index == measure.Position.Index,
-                m => m.breakEffectsWithPrevMeasure());
+                m => m.breakCrossMeasureEffectsAtPosition(EffectPosition.Into));
 
             part.ModelCollection.performActionOnSpecificItems(
                 m => m.Position.Index >= measure.Position.Index,
                 m => m.Position.Index += 1);
 
             part.Add(measure);
+        }
+    }
+
+    public class AddMultipleMeasuresToPartCom : IActionCommand
+    {
+        private Part part;
+        private List<Measure> measures;
+
+        public AddMultipleMeasuresToPartCom(Part p, List<Measure> m)
+        {
+            part = p;
+            measures = m;
+        }
+
+        public void executeAction()
+        {
+            part.ModelCollection.performActionOnSpecificItems(
+                m => m.Position.Index == measures.First().Position.Index,
+                m => m.breakCrossMeasureEffectsAtPosition(EffectPosition.Into));
+
+            part.ModelCollection.performActionOnSpecificItems(
+                m => m.Position.Index >= measures.First().Position.Index,
+                m => m.Position.Index += measures.Count());
+
+            foreach (Measure measure in measures) { part.Add(measure); }
         }
     }
 
@@ -284,10 +372,33 @@ namespace GuitarTab
         {
             measure.breakCrossMeasureEffects();
 
+            part.Remove(measure);
             part.ModelCollection.performActionOnSpecificItems(
                 m => m.Position.Index > measure.Position.Index,
                 m => m.Position.Index -= 1);
-            part.Remove(measure);
+        }
+    }
+
+    public class RemoveMultipleMeasuresFromPartCom : IActionCommand
+    {
+        private Part part;
+        private List<Measure> measures;
+
+        public RemoveMultipleMeasuresFromPartCom(Part p, List<Measure> m)
+        {
+            part = p;
+            measures = m;
+        }
+
+        public void executeAction()
+        {
+            measures.First().breakCrossMeasureEffectsAtPosition(EffectPosition.Into);
+            measures.Last().breakCrossMeasureEffectsAtPosition(EffectPosition.After);
+
+            foreach (Measure measure in measures) { part.Remove(measure); }
+            part.ModelCollection.performActionOnSpecificItems(
+                m => m.Position.Index > measures.First().Position.Index,
+                m => m.Position.Index -= measures.Count);
         }
     }
 

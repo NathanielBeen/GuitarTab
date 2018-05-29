@@ -13,6 +13,13 @@
             Canvas.Left="{Binding Left}"
             Canvas.Top="{Binding Top}"
             Background="{Binding CurrentImage}"/>
+        <Rectangle x:Name="dragRect"
+            DataContext="{Binding DragView}"
+            Width="{Binding Width}"
+            Height="{Binding Height}"
+            Canvas.Left="{Binding Left}"
+            Canvas.Top="{Binding Top}"
+            Stroke="Blue"/>
         <ItemsControl ItemsSource="{Binding HoverView.Hovered}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>

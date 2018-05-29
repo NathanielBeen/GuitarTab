@@ -87,9 +87,9 @@ namespace GuitarTab
 
         public void handleMouseClick(MouseClick click)
         {
-            if (click.matchesClickType(ClickType.Position)) { performPositionCheck(click as PositionClick); }
-            else if (click.matchesClickType(ClickType.Select)) { checkSelectBounds(click as SelectClick); }
-            else if (click.matchesClickType(ClickType.Bounds)) { performBoundsCheck(click as BoundsClick); }
+            if (click.matchesClickType(ClickType.Position)) { handlePositionClick(click as PositionClick); }
+            else if (click.matchesClickType(ClickType.Select)) { handleSelectClick(click as SelectClick); }
+            else if (click.matchesClickType(ClickType.Bounds)) { handleBoundsClick(click as BoundsClick); }
 
             else if (ObjectBounds.hitTest(click.Point))
             {
@@ -98,14 +98,16 @@ namespace GuitarTab
             }
         }
 
-        public void checkSelectBounds(SelectClick click)
+        public void handleSelectClick(SelectClick click)
         {
+            if (!ObjectBounds.Bounds.containedInRectangle(click.Rectangle)) { return; }
+
             addToMouseClick(click);
             click?.setContainsRect(ObjectBounds.Bounds);
             if (click?.ContainsRect ?? false) { ObjectHandler?.invokeClickDelegate(click); }
         }
 
-        public void performBoundsCheck(BoundsClick click)
+        public void handleBoundsClick(BoundsClick click)
         {
             if (ObjectBounds.hitTest(click.Point))
             {
@@ -114,13 +116,15 @@ namespace GuitarTab
             }
         }
 
+        public virtual void handlePositionClick(PositionClick click) { }
+
         public virtual void addToMouseClick(NodeClick click) { }
 
         public virtual void removeFromMouseClick(NodeClick click) { }
 
-        public virtual void setToSelected(Selected selected) { }
+        public virtual void addToSelected(Selected selected) { }
 
-        public virtual void performPositionCheck(PositionClick click) { }
+        public virtual void removeFromSelected(Selected selected) { }
     }
 
     public class PartTreeNode : TreeNode
@@ -140,10 +144,15 @@ namespace GuitarTab
 
         public override void removeFromMouseClick(NodeClick click)
         {
-            if (click.PartNode.Equals(this)) { click.PartNode = null; }
+            if (click.PartNode != null && click.PartNode.Equals(this)) { click.PartNode = null; }
         }
 
-        public override void setToSelected(Selected selected) { selected.PartNode = this; }
+        public override void addToSelected(Selected selected) { selected.PartNode = this; }
+
+        public override void removeFromSelected(Selected selected)
+        {
+            if (selected.PartNode != null && selected.PartNode.Equals(this)) { selected.PartNode = null; }
+        }
 
         public MeasureTreeNode getMeasureNodeAtPosition(int pos)
         {
@@ -181,13 +190,14 @@ namespace GuitarTab
             if (click.MeasureNodes.Contains(this)) { click.MeasureNodes.Remove(this); }
         }
 
-        public override void setToSelected(Selected selected)
+        public override void addToSelected(Selected selected) { selected.MeasureNodes.Add(this); }
+
+        public override void removeFromSelected(Selected selected)
         {
-            selected.MeasureNodes.Clear();
-            selected.MeasureNodes.Add(this);
+            if (selected.MeasureNodes.Contains(this)) { selected.MeasureNodes.Remove(this); }
         }
 
-        public override void performPositionCheck(PositionClick click) { click?.checkItem(measure.Position.Index, ObjectBounds.Bounds); }
+        public override void handlePositionClick(PositionClick click) { click?.checkItem(measure.Position.Index, ObjectBounds.Bounds); }
     }
 
     public class ChordTreeNode : TreeNode
@@ -210,13 +220,14 @@ namespace GuitarTab
             if (click.ChordNodes.Contains(this)) { click.ChordNodes.Remove(this); }
         }
 
-        public override void setToSelected(Selected selected)
+        public override void addToSelected(Selected selected) { selected.ChordNodes.Add(this); }
+
+        public override void removeFromSelected(Selected selected)
         {
-            selected.ChordNodes.Clear();
-            selected.ChordNodes.Add(this);
+            if (selected.ChordNodes.Contains(this)) { selected.ChordNodes.Remove(this); }
         }
 
-        public override void performPositionCheck(PositionClick click) { click?.checkItem(chord.Position.Index, ObjectBounds.Bounds); }
+        public override void handlePositionClick(PositionClick click) { click?.checkItem(chord.Position.Index, ObjectBounds.Bounds); }
     }
 
     public class NoteTreeNode : TreeNode
@@ -239,10 +250,11 @@ namespace GuitarTab
             if (click.NoteNodes.Contains(this)) { click.NoteNodes.Remove(this); }
         }
 
-        public override void setToSelected(Selected selected)
+        public override void addToSelected(Selected selected) { selected.NoteNodes.Add(this); }
+
+        public override void removeFromSelected(Selected selected)
         {
-            selected.NoteNodes.Clear();
-            selected.NoteNodes.Add(this);
+            if (selected.NoteNodes.Contains(this)) { selected.NoteNodes.Remove(this); }
         }
     }
 
@@ -263,12 +275,7 @@ namespace GuitarTab
 
         public override void removeFromMouseClick(NodeClick click)
         {
-            if (click.EffectNode.Equals(this)) { click.EffectNode = null; }
-        }
-
-        public override void setToSelected(Selected selected)
-        {
-            selected.EffectNode = this;
+            if (click.EffectNode != null && click.EffectNode.Equals(this)) { click.EffectNode = null; }
         }
     }
 }

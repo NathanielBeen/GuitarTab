@@ -21,6 +21,7 @@ SingleBarLength_:_5
 BarSpacing_:_4
 FontSize_:_9
 LargeFontSize_:_15
+SmallFontSize_:_7
 <>//Length Numbers
 None_:_20
 Dotted Whole_:_210
@@ -76,6 +77,7 @@ Vibrato_:_AddVibrato.png
 Slide_:_AddSlide.png
 Hopo_:_AddHopo.png
 Tie_:_AddTie.png
+Length_:_ChangeLength.png
 <>//State
 0_:_None.png
 1_:_MeasureSelect.png
@@ -86,6 +88,8 @@ Tie_:_AddTie.png
 6_:_LengthSelect.png
 <>//Other Image
 deleteButton_:_DeleteButton.png
+incButton_:_IncrementButton.png
+decButton_:_DecrementButton.png
 <>//Other
 thickness_:_1
 barThickness: 3

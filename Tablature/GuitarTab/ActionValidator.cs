@@ -299,42 +299,39 @@ namespace GuitarTab
 
     public class ChangeMultipleChordPositionVal : IActionValidator
     {
-        private Dictionary<Chord, Measure> chord_dict;
+        private Measure home_measure;
         private Measure dest_measure;
+        private List<Chord> chords;
         private int? position;
 
-        public ChangeMultipleChordPositionVal(Dictionary<Chord, Measure> c, Measure d, int? p)
+        public ChangeMultipleChordPositionVal(Measure h, Measure d, List<Chord> c, int? p)
         {
-            chord_dict = c;
+            home_measure = h;
             dest_measure = d;
+            chords = c;
             position = p;
         }
 
         public bool validateAction()
         {
-            if (chord_dict is null || dest_measure is null || position is null) { return false; }
-            getLengthNumberChordsMovingToDest(out double total_length, out int num_chords);
-            int num_chords_staying = chord_dict.Count - num_chords;
+            if (home_measure is null || dest_measure is null || chords is null || !chords.Any() || position is null) { return false; }
+            foreach (Chord chord in chords)
+            {
+                if (!home_measure.ModelCollection.Contains(chord)){ return false; }
+            }
 
-            if (position > dest_measure.getLastChordPosition() + 1 - num_chords_staying) { return false; }
-            double new_space_taken = NoteLengthExtensions.roundIfWithinDoubleError(dest_measure.getSpaceTaken() + total_length);
+            if (position > dest_measure.getLastChordPosition() + 1) { return false; }
+            double new_space_taken = getNewSpaceTaken();
             if (new_space_taken > dest_measure.getTotalSpace()) { return false; }
 
             return true;
         }
 
-        public void getLengthNumberChordsMovingToDest(out double total_length, out int num_chords)
+        public double getNewSpaceTaken()
         {
-            total_length = 0;
-            num_chords = 0;
-            foreach (Chord chord in chord_dict.Keys)
-            {
-                if (!chord_dict[chord].Equals(dest_measure))
-                {
-                    total_length += chord.Length.getLength();
-                    num_chords++;
-                }
-            }
+            double length = dest_measure.getSpaceTaken();
+            foreach (Chord chord in chords) { length += chord.Length.getLength(); }
+            return NoteLengthExtensions.roundIfWithinDoubleError(length);
         }
     }
 
@@ -355,49 +352,45 @@ namespace GuitarTab
         {
             if (measure is null || chord is null || length is null) { return false; }
             if (measure.getSpaceTaken() - chord.Length.getLength() + length.getLength() 
-                >= measure.getTotalSpace()) { return false; }
+                > measure.getTotalSpace()) { return false; }
             return true;
         }
     }
 
     public class ChangeMultipleChordLengthVal : IActionValidator
     {
-        private Dictionary<Chord, Measure> chord_dict;
+        private Measure measure;
+        private List<Chord> chords;
         private Length length;
 
-        public ChangeMultipleChordLengthVal(Dictionary<Chord, Measure> c, Length l)
+        public ChangeMultipleChordLengthVal(Measure m, List<Chord> c, Length l)
         {
-            chord_dict = c;
+            measure = m;
+            chords = c;
             length = l;
         }
 
         public bool validateAction()
         {
-            if (chord_dict is null || length is null) { return false; }
-            Dictionary<Measure, double> length_dict = getSpaceTaken();
-
-            foreach (Measure measure in length_dict.Keys)
+            if (measure is null || chords is null || !chords.Any() || length is null) { return false; }
+            foreach (Chord chord in chords)
             {
-                double new_space_taken = NoteLengthExtensions.roundIfWithinDoubleError(length_dict[measure]);
-                if (new_space_taken > measure.getTotalSpace()) { return false; }
+                if (!measure.ModelCollection.Contains(chord)) { return false; }
             }
+            double new_space_taken = NoteLengthExtensions.roundIfWithinDoubleError(getSpaceTaken());
+            if (new_space_taken > measure.getTotalSpace()) { return false; }
+
             return true;
         }
 
-        public Dictionary<Measure, double> getSpaceTaken()
+        public double getSpaceTaken()
         {
-            var length_dict = new Dictionary<Measure, double>();
-            foreach (Measure measure in chord_dict.Values)
+            double curr_length = measure.getSpaceTaken();
+            foreach (Chord chord in chords)
             {
-                length_dict.Add(measure, measure.getSpaceTaken());
+                curr_length += length.getLength() - chord.Length.getLength();
             }
-
-            foreach (Chord chord in chord_dict.Keys)
-            {
-                length_dict[chord_dict[chord]] += (length.getLength() - chord.Length.getLength());
-            }
-
-            return length_dict;
+            return curr_length;
         }
     }
 
@@ -515,7 +508,9 @@ namespace GuitarTab
         public bool validateAction()
         {
             if (effect is null || first is null || second is null) { return false; }
-            return first.Position.occursBefore(second.Position);
+            if (first.Equals(second)) { return false; }
+            if (first.String != second.String) { return false; }
+            return first.Position.occursDirectlyBefore(second.Position);
         }
     }
 
@@ -574,6 +569,31 @@ namespace GuitarTab
             if (!part.ModelCollection.Contains(measure)) { return false; }
             if (measure.Position.Index == position) { return false; }
             if (position < 0 || position > part.getLastMeasurePosition()) { return false; }
+            return true;
+        }
+    }
+
+    public class ChangeMultipleMeasurePositionVal : IActionValidator
+    {
+        private Part part;
+        private List<Measure> measures;
+        private int? position;
+
+        public ChangeMultipleMeasurePositionVal(Part p, List<Measure> m, int? po)
+        {
+            part = p;
+            measures = m;
+            position = po;
+        }
+
+        public bool validateAction()
+        {
+            if (part == null || measures == null || !measures.Any() || position == null) { return false; }
+            foreach (Measure measure in measures)
+            {
+                if (!part.ModelCollection.Contains(measure)) { return false; }
+            }
+            if (position < 0 || position > part.ModelCollection.Count() - measures.Count()) { return false; }
             return true;
         }
     }

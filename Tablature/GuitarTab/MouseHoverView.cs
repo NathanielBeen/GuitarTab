@@ -28,7 +28,7 @@ namespace GuitarTab
             bounds = hover;
             List<VisualBounds> new_hover = createHoverList(hover);
             Hovered.Clear();
-            foreach (VisualBounds bound in new_hover) { Hovered.Add(bounds); }
+            foreach (VisualBounds bound in new_hover) { Hovered.Add(bound); }
         }
 
         public List<VisualBounds> createHoverList(VisualBounds hover)

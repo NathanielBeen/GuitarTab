@@ -219,6 +219,7 @@ namespace GuitarTab
             foreach (TreeNode node in removedNodes) { node.removeFromMouseClick(click); }
             foreach (TreeNode node in addedNodes) { node.addToMouseClick(click); }
             addedNodes.Clear();
+            removedNodes.Clear();
         }
     }
 

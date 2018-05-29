@@ -31,7 +31,31 @@ namespace GuitarTab
         }
     }
 
+    public class NoteSelectLaunchEventArgs : EventArgs
+    {
+        public NodeClick Click { get; }
+        public ContinueNoteSelectDelegate Command { get; }
+
+        public NoteSelectLaunchEventArgs(NodeClick click, Action<NodeClick> command)
+        {
+            Click = click;
+            Command = (c) => command(c);
+        }
+    }
+
+    public class NoteSelectEndEventArgs : EventArgs
+    {
+        public NodeClick Click { get; }
+
+        public NoteSelectEndEventArgs(NodeClick click)
+        {
+            Click = click;
+        }
+    }
+
     public delegate void ContinueCommandDelegate(NodeClick click, int fret);
+
+    public delegate void ContinueNoteSelectDelegate(NodeClick click);
 
     public delegate void CancelDialogueDelegate();
 }

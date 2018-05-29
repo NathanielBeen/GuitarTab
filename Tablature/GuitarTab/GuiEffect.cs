@@ -90,7 +90,9 @@ namespace GuitarTab
         public override void refreshDrawingContext(DrawingContext dc)
         {
             Rect bend_rect = new Rect(0, 0, Bounds.Width / 2, Bounds.Height);
-            dc.DrawArc(info.DrawingObjects.Pen, info.DrawingObjects.Brush, bend_rect, 0, 90);
+            dc.DrawLine(info.DrawingObjects.Pen, new Point(0, Bounds.Height), new Point(Bounds.Width / 4, Bounds.Height));
+            dc.DrawLine(info.DrawingObjects.Pen, new Point(Bounds.Width / 4, Bounds.Height), new Point(Bounds.Width / 2, 0));
+
 
             if (bend.BendReturns)
             {
@@ -99,8 +101,8 @@ namespace GuitarTab
             }
 
             var text = new FormattedText(bend.Amount.ToString(), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight,
-                                         info.DrawingObjects.TypeFace, info.Dimensions.FontSize, info.DrawingObjects.Brush);
-            dc.DrawText(text, new Point(Bounds.Width / 2, 0));
+                                         info.DrawingObjects.TypeFace, info.Dimensions.SmallFontSize, info.DrawingObjects.Brush);
+            dc.DrawText(text, new Point(Bounds.Width / 2+2, 2));
         }
     }
 
@@ -121,7 +123,7 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override void updateBounds() { GuiEffectBoundDrawing.updateAboveLineEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateBeforeNoteEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class PinchHarmonicDrawingVisual : TabDrawingVisual
@@ -159,7 +161,7 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override void updateBounds() { GuiEffectBoundDrawing.updateBeforeNoteEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateAboveLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class VibratoDrawingVisual : TabDrawingVisual
@@ -175,6 +177,7 @@ namespace GuitarTab
 
         public override void refreshDrawingContext(DrawingContext dc)
         {
+            if (Bounds.Width == 0 || Bounds.Height == 0) { return; }
             var image_code = vibrato.Wide ? TabImages.WIDE_VIBRATO : TabImages.VIBRATO;
             var image = new BitmapImage(info.Images.getEffectImagePath(image_code));
             var image_rect = new Int32Rect(0, 0, Bounds.Width, Bounds.Height);
@@ -200,7 +203,7 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateHalvedInLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class SlideDrawingVisual : TabDrawingVisual
@@ -266,7 +269,7 @@ namespace GuitarTab
         public override void refreshDrawingContext(DrawingContext dc)
         {
             var rect = new Rect(0, 0, Bounds.Width, Bounds.Height);
-            dc.DrawArc(info.DrawingObjects.Pen, info.DrawingObjects.Brush, rect, 45, -90);
+            dc.DrawArc(info.DrawingObjects.Pen, info.DrawingObjects.Brush, rect, 200, 140);
         }
     }
 
@@ -286,7 +289,7 @@ namespace GuitarTab
             info = v_info;
         }
 
-        public override void updateBounds() { GuiEffectBoundDrawing.updateInLineEffectBounds(Bounds, note_bounds, note, info); }
+        public override void updateBounds() { GuiEffectBoundDrawing.updateBelowLineEffectBounds(Bounds, note_bounds, note, info); }
     }
 
     public class TieDrawingVisual : TabDrawingVisual
@@ -303,7 +306,7 @@ namespace GuitarTab
         public override void refreshDrawingContext(DrawingContext dc)
         {
             var rect = new Rect(0, 0, Bounds.Width, Bounds.Height);
-            dc.DrawArc(info.DrawingObjects.Pen, info.DrawingObjects.Brush, rect, -45, 90);
+            dc.DrawArc(info.DrawingObjects.Pen, info.DrawingObjects.Brush, rect, 160, -140);
         }
     }
 
@@ -311,23 +314,22 @@ namespace GuitarTab
     {
         public static void updateAboveNoteEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
         {
-            int right = note_bounds.Left + info.Dimensions.getLength(note.Length.NoteType) + info.Dimensions.NoteWidth;
-            right = info.Position.truncateHorizontalLengthIfNeeded(right);
+            int right = Math.Min(note_bounds.Right + info.Dimensions.getLength(note.Length.NoteType) + info.Dimensions.NoteWidth / 2,
+                info.Dimensions.BarMargin + info.Dimensions.BarWidth);
 
-            effect_bounds.Left = note_bounds.Left;
-            effect_bounds.Top = note_bounds.Top - info.Dimensions.StringHeight;
-            effect_bounds.Width = right - note_bounds.Left;
+            effect_bounds.Left = note_bounds.Left + info.Dimensions.NoteWidth/2;
+            effect_bounds.Top = note_bounds.Top - info.Dimensions.StringHeight/3;
+            effect_bounds.Width = right - (note_bounds.Left + info.Dimensions.NoteWidth/2);
             effect_bounds.Height = info.Dimensions.StringHeight;
             effect_bounds.Bar = note_bounds.Bar;
         }
 
         public static void updateAboveLineEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
         {
-            int right = note_bounds.Left + note_bounds.Width;
-            right = info.Position.truncateHorizontalLengthIfNeeded(right);
+            int right = Math.Min(note_bounds.Left + note_bounds.Width, info.Dimensions.BarMargin + info.Dimensions.BarWidth);
 
             effect_bounds.Left = note_bounds.Left;
-            effect_bounds.Top = info.Dimensions.PageHeadHeight + info.Dimensions.LineHeight * note_bounds.Bar + info.Dimensions.EffectMargin;
+            effect_bounds.Top = info.Dimensions.PageHeadHeight + info.Dimensions.LineHeight * note_bounds.Bar + info.Dimensions.EffectMargin + info.Dimensions.EffectHeight/4;
             effect_bounds.Width = right - note_bounds.Left;
             effect_bounds.Height = info.Dimensions.EffectHeight - info.Dimensions.EffectMargin * 2;
             effect_bounds.Bar = note_bounds.Bar;
@@ -335,13 +337,35 @@ namespace GuitarTab
 
         public static void updateInLineEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
         {
-            int right = Math.Min(note_bounds.Left + note_bounds.Width + info.Dimensions.getLength(note.Length.NoteType),
+            int right = Math.Min(note_bounds.Right + info.Dimensions.getLength(note.Length.NoteType), info.Dimensions.BarMargin + info.Dimensions.BarWidth);
+
+            effect_bounds.Left = note_bounds.Right;
+            effect_bounds.Top = note_bounds.Top - info.Dimensions.StringHeight/2;
+            effect_bounds.Width = right - note_bounds.Right;
+            effect_bounds.Height = note_bounds.Height + info.Dimensions.StringHeight/2;
+            effect_bounds.Bar = note_bounds.Bar;
+        }
+
+        public static void updateHalvedInLineEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
+        {
+            int right = Math.Min(note_bounds.Right + info.Dimensions.getLength(note.Length.NoteType), info.Dimensions.BarMargin + info.Dimensions.BarWidth);
+
+            effect_bounds.Left = note_bounds.Right;
+            effect_bounds.Top = note_bounds.Top + note_bounds.Height/4;
+            effect_bounds.Width = right - note_bounds.Right;
+            effect_bounds.Height = note_bounds.Height/2;
+            effect_bounds.Bar = note_bounds.Bar;
+        }
+
+        public static void updateBelowLineEffectBounds(VisualBounds effect_bounds, VisualBounds note_bounds, Note note, VisualInfo info)
+        {
+            int right = Math.Min(note_bounds.Right + info.Dimensions.getLength(note.Length.NoteType) + info.Dimensions.NoteWidth / 2,
                 info.Dimensions.BarMargin + info.Dimensions.BarWidth);
 
-            effect_bounds.Left = note_bounds.Left + note_bounds.Height;
-            effect_bounds.Top = note_bounds.Top;
-            effect_bounds.Width = right - (note_bounds.Left + note_bounds.Height);
-            effect_bounds.Height = note_bounds.Height;
+            effect_bounds.Left = note_bounds.Left + info.Dimensions.NoteWidth / 2;
+            effect_bounds.Top = note_bounds.Bottom - info.Dimensions.StringHeight * 2 / 3;
+            effect_bounds.Width = right - (note_bounds.Left + info.Dimensions.NoteWidth / 2);
+            effect_bounds.Height = info.Dimensions.StringHeight;
             effect_bounds.Bar = note_bounds.Bar;
         }
 

@@ -23,7 +23,19 @@ namespace GuitarTab
         public void setSelectedObjects(List<TreeNode> selected)
         {
             Selected.Clear();
-            foreach (TreeNode node in selected) { Selected.Add(node.ObjectBounds.Bounds); }
+            foreach (TreeNode node in selected) { addBoundsToSelected(node.ObjectBounds.Bounds); }
+        }
+
+        public void addBoundsToSelected(VisualBounds bounds)
+        {
+            if (bounds is MultipleVisualBounds)
+            {
+                foreach (VisualBounds bound in (bounds as MultipleVisualBounds).AllBounds)
+                {
+                    Selected.Add(bound);
+                }
+            }
+            else { Selected.Add(bounds); }
         }
     }
 }

@@ -132,14 +132,14 @@ namespace GuitarTab
 
         public void updateInstance(List<VisualBounds> bounds)
         {
-            Left = bounds.LastOrDefault()?.Left ?? 0;
-            Width = bounds.LastOrDefault()?.Width ?? 0;
+            AllBounds = bounds;
+
+            Left = bounds.FirstOrDefault()?.Left ?? 0;
             Top = bounds.FirstOrDefault()?.Top ?? 0;
+            Width = bounds.LastOrDefault()?.Width ?? 0;
             Height = bounds.LastOrDefault()?.Top + bounds.LastOrDefault()?.Height - Top ?? 0;
             StartBar = bounds.FirstOrDefault()?.Bar ?? 0;
             Bar = bounds.LastOrDefault()?.Bar ?? 0;
-
-            AllBounds = bounds;
         }
 
         public override bool containsPoint(Point point)

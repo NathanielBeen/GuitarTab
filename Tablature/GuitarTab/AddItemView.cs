@@ -71,7 +71,8 @@ namespace GuitarTab
         Vibrato = 7,
         Slide = 8,
         Hopo = 9,
-        Tie = 10
+        Tie = 10,
+        Length = 11
     }
 
     public static class AddItemExtensions
@@ -125,6 +126,8 @@ namespace GuitarTab
                 case AddItem.Hopo:
                 case AddItem.Tie:
                     return Selection.Add_Multi_Effect;
+                case AddItem.Length:
+                    return Selection.Set_Length;
                 default:
                     return Selection.Standard;
             }

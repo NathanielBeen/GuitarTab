@@ -17,6 +17,27 @@ namespace GuitarTab
             set { SetProperty(ref selected_length, value); }
         }
 
+        private int bpm;
+        public int BPM
+        {
+            get { return bpm; }
+            set { SetProperty(ref bpm, value); }
+        }
+
+        private int num_beats;
+        public int NumBeats
+        {
+            get { return num_beats; }
+            set { SetProperty(ref num_beats, value); }
+        }
+
+        private NoteLength beat_type;
+        public NoteLength BeatType
+        {
+            get { return beat_type; }
+            set { SetProperty(ref beat_type, value); }
+        }
+
         public EffectType SelectedEffectType
         {
             get { return converter.SelectedEffectType; }
@@ -30,11 +51,6 @@ namespace GuitarTab
         public IEffect SelectedEffect { get; set; }
 
         public int? Position { get; set; }
-
-        public int? NumBeats { get; set; }
-        public NoteLength? BeatType { get; set; }
-        public int? BPM { get; set; }
-
         public int? String { get; set; }
         public int? Fret { get; set; }
 
@@ -57,8 +73,6 @@ namespace GuitarTab
             SelectedEffect = null;
 
             Position = null;
-            NumBeats = null;
-            BPM = null;
             String = null;
             Fret = null;
             BendAmount = null;
@@ -76,8 +90,6 @@ namespace GuitarTab
             SelectedEffect = null;
 
             Position = null;
-            NumBeats = null;
-            BPM = null;
             String = null;
             Fret = null;
             BendAmount = null;

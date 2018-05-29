@@ -11,7 +11,7 @@ namespace GuitarTab
 {
     public class MeasureBounds : BaseBounded
     {
-        public const int MIN_SPACE = 300;
+        public const int MIN_SPACE = 200;
 
         private VisualInfo info;
 
@@ -107,7 +107,7 @@ namespace GuitarTab
         {
             if (click.multipleChords() && !click.anyNote())
             {
-                int position = performMousePositionCheck(click) - 1;
+                int position = performMousePositionCheck(click);
                 executor.executeChangeMultipleChordPosition(click, position);
             }
             else if (click.anyChord() && !click.anyNote())
@@ -146,34 +146,71 @@ namespace GuitarTab
 
         public override void refreshDrawingContext(DrawingContext dc)
         {
-            dc.DrawLine(info.DrawingObjects.Pen, new Point(0, info.Dimensions.StringHeight/2), new Point(0, info.Dimensions.BarHeight - info.Dimensions.StringHeight/2));
-            dc.DrawLine(info.DrawingObjects.Pen, new Point(Bounds.Width, Bounds.Height - info.Dimensions.BarHeight + info.Dimensions.StringHeight/2), new Point(Bounds.Width, Bounds.Height - info.Dimensions.StringHeight/2));
+            drawMeasure(dc);
+            Delegate?.invokeDelegate();
+        }
+
+        public void refreshMeasure()
+        {
+            var dc = RenderOpen();
+            drawMeasure(dc);
+            dc.Close();
+        }
+
+        public void drawMeasure(DrawingContext dc)
+        {
+            int right = getLastRight();
+            dc.DrawLine(info.DrawingObjects.Pen, new Point(0, info.Dimensions.StringHeight / 2), new Point(0, info.Dimensions.BarHeight - info.Dimensions.StringHeight / 2));
+            dc.DrawLine(info.DrawingObjects.Pen, new Point(right, Bounds.Height - info.Dimensions.BarHeight + info.Dimensions.StringHeight / 2), new Point(right, Bounds.Height - info.Dimensions.StringHeight / 2));
 
             if (!measure.MatchesPart)
             {
                 drawMeasureBPM(measure.Bpm, dc);
                 drawMeasureTimeSig(measure.TimeSignature.NumberOfBeats, measure.TimeSignature.BeatType, dc);
             }
-
-            Delegate?.invokeDelegate();
         }
 
         public void drawMeasureBPM(int bpm, DrawingContext dc)
         {
             var text = new FormattedText("BPM = " + bpm.ToString(), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight,
                                          info.DrawingObjects.TypeFace, info.Dimensions.FontSize, info.DrawingObjects.Brush);
-            dc.DrawText(text, new Point(info.Dimensions.MeasureHeadMargin, 0));
+            dc.DrawText(text, new Point(0, -10));
         }
 
         public void drawMeasureTimeSig(int num_notes, NoteLength note_type, DrawingContext dc)
         {
             var text = new FormattedText(num_notes.ToString(), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight,
                                          info.DrawingObjects.TypeFace, info.Dimensions.LargeFontSize, info.DrawingObjects.Brush);
-            var second_text = new FormattedText(((int)note_type).ToString(), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight,
+            var second_text = new FormattedText((note_type.getVisualNoteLength()).ToString(), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight,
                                          info.DrawingObjects.TypeFace, info.Dimensions.LargeFontSize, info.DrawingObjects.Brush);
 
-            dc.DrawText(text, new Point(info.Dimensions.MeasureHeadMargin, info.Dimensions.StringHeight));
-            dc.DrawText(text, new Point(info.Dimensions.MeasureHeadMargin, info.Dimensions.StringHeight * 3));
+            dc.DrawText(text, new Point(5, info.Dimensions.StringHeight));
+            dc.DrawText(second_text, new Point(5, info.Dimensions.StringHeight * 3));
+        }
+
+        public int getLastRight()
+        {
+            var multi_bounds = Bounds as MultipleVisualBounds;
+            if (multi_bounds is null || multi_bounds.AllBounds.Count() <= 1) { return Bounds.Width; }
+            else { return multi_bounds.AllBounds.Last().Right - Bounds.Left; }
+        }
+
+        public override void boundsPropertyChange(object sender, BoundsPropertyChangedEventArgs args)
+        {
+            if (!sender.Equals(Bounds)) { return; }
+
+            if (args.RequiresVisualUpdate) { refreshVisual(); }
+            else
+            {
+                var transform = Transform as TranslateTransform;
+
+                if (args.PropertyName == nameof(VisualBounds.Left))
+                {
+                    transform.X = Bounds.Left;
+                    refreshMeasure();
+                }
+                else if (args.PropertyName == nameof(VisualBounds.Top)) { transform.Y = Bounds.Top; }
+            }
         }
     }
 }

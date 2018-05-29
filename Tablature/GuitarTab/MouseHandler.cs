@@ -21,12 +21,16 @@ namespace GuitarTab
         private MouseStateConverter converter;
 
         public event EventHandler<PropertyMenuEventArgs> PropertyMenuChanged;
+        public event EventHandler<NoteSelectLaunchEventArgs> NoteSelectLaunched;
+        public event EventHandler<NoteSelectEndEventArgs> NoteSelectEnd;
 
         public Selection SelectionState
         {
             get { return converter.SelectionState; }
             set { converter.SelectionState = value; }
         }
+
+        public bool NoteSelect { get; set; }
 
         private Point down_point;
         private bool double_click;
@@ -37,6 +41,7 @@ namespace GuitarTab
             selected = s;
             converter = conv;
 
+            NoteSelect = false;
             down_point = default(Point);
             double_click = false;
         }
@@ -45,7 +50,15 @@ namespace GuitarTab
 
         public void mouseUp(Point pos)
         {
-            if (mouseMoved(pos))
+            if (NoteSelect)
+            {
+                var click = new NoteSelectClick(pos);
+                tree.HandleMouseEvent(click);
+                populateSelected(click);
+                noteSelected(click);
+            }
+
+            else if (checkMouseMoved(pos))
             {
                 NodeClick click;
                 if (checkForDragRelease(pos))
@@ -58,10 +71,10 @@ namespace GuitarTab
                     click = new SelectClick(pos, new Rect(pos, down_point));
                 }
                 tree.HandleMouseEvent(click);
-                selected.populateFromClick(click);
+                if (!click.Handled) { populateSelected(click); }
             }
 
-            else if (double_click)
+            else if (double_click && selected.selectedContainsPoint(pos))
             {
                 var click = new NodeClick(pos);
                 selected.populateNodeClick(click);
@@ -73,10 +86,9 @@ namespace GuitarTab
             else
             {
                 var click = new StandardClick(SelectionState, pos);
-                if (SelectionState == Selection.Add_Multi_Effect) { selected.populateNodeClickForMultiEffect(click); }
 
                 tree.HandleMouseEvent(click);
-                selected.populateFromClick(click);
+                if (!click.Handled) { populateSelected(click); }
 
                 if (SelectionState == Selection.Standard) { TimeDoubleClick(); }
             }
@@ -89,7 +101,7 @@ namespace GuitarTab
             return click.DeepestBounds;
         }
 
-        public bool mouseMoved(Point up_point)
+        public bool checkMouseMoved(Point up_point)
         {
             if (down_point == null) { return false; }
             return (Math.Abs(up_point.X - down_point.X) > MOVE_THRESHOLD || Math.Abs(up_point.Y - down_point.Y) > MOVE_THRESHOLD);
@@ -107,11 +119,25 @@ namespace GuitarTab
             return false;
         }
 
+        public void populateSelected(NodeClick click) { selected.populateFromClick(click); }
+
         public async Task TimeDoubleClick()
         {
             double_click = true;
             await Task.Delay(DOUBLE_CLICK_TIMER);
             double_click = false;
+        }
+
+        public void handleNoteSelect(object sender, NoteSelectLaunchEventArgs args)
+        {
+            NoteSelect = true;
+            NoteSelectLaunched?.Invoke(this, args);
+        }
+
+        public void noteSelected(NodeClick click)
+        {
+            NoteSelect = false;
+            NoteSelectEnd?.Invoke(this, new NoteSelectEndEventArgs(click));
         }
     }
 }

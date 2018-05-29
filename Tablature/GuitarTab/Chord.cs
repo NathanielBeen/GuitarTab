@@ -10,7 +10,7 @@ namespace GuitarTab
     {
         public Position Position { get; set; }
 
-        public Length Length { get; set; }
+        public Length Length { get; private set; }
 
         public static Chord createInstance(int? pos, Position measure_position, Length length)
         {
@@ -26,8 +26,10 @@ namespace GuitarTab
             Length = length;
         }
 
+        public virtual void setLength(Length new_length) { Length = new_length;  }
         public virtual void breakEffectsAtPosition(EffectPosition position) { }
         public virtual void breakMultiEffects() { }
+        public virtual void breakMultiEffectsAtPosition(EffectPosition position) { }
     }
 
     public class NoteChord : Chord, IContainModels
@@ -55,6 +57,15 @@ namespace GuitarTab
             return new List<object>(ModelCollection.Items());
         }
 
+        public override void setLength(Length new_length)
+        {
+            base.setLength(new_length);
+            foreach (Note note in ModelCollection.Items())
+            {
+                note.Length = new_length;
+            }
+        }
+
         public override void breakEffectsAtPosition(EffectPosition position)
         {
             ModelCollection.performActionOnAllItems(n => n.removeEffectAtPosition(position));
@@ -63,6 +74,11 @@ namespace GuitarTab
         public override void breakMultiEffects()
         {
            ModelCollection.performActionOnAllItems(n => n.removeMultiEffects());
+        }
+
+        public override void breakMultiEffectsAtPosition(EffectPosition position)
+        {
+            ModelCollection.performActionOnAllItems(n => n.removeMultiEffectsAtPosition(position));
         }
 
         public void Add(Note note)

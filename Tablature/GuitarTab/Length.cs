@@ -283,10 +283,12 @@ namespace GuitarTab
         /*
         * update methods
         */
+        
         public void updateSpaceTaken(IEnumerable<Chord> chords)
         {
             SpaceTaken = NoteLengthExtensions.roundIfWithinDoubleError(calcNonGroupedLength(chords) + calcGroupedLength(chords));
         }
+        
 
         /*
         * Helper Methods

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace GuitarTab
 {
@@ -16,7 +17,7 @@ namespace GuitarTab
         public List<NoteTreeNode> NoteNodes;
         public EffectTreeNode EffectNode;
 
-        private IEnumerable<TreeNode> selected;
+        private List<TreeNode> selected;
 
         public Selected()
         {
@@ -60,33 +61,32 @@ namespace GuitarTab
 
         private void setSelected(NodeClick click)
         {
-            if (click.EffectNode != null) { selected = new List<TreeNode>() { click.EffectNode }; }
-            else if (click.NoteNodes.Any()) { selected = click.NoteNodes; }
-            else if (click.ChordNodes.Any()) { selected = click.ChordNodes; }
-            else if (click.MeasureNodes.Any()) { selected = click.MeasureNodes; }
-            else if (click.PartNode != null) { selected = new List<TreeNode>() { click.PartNode }; }
+            selected = new List<TreeNode>();
+            if (click.NoteNodes.Any()) { selected.AddRange(click.NoteNodes); }
+            else if (click.ChordNodes.Any()) { selected.AddRange(click.ChordNodes); }
+            else if (click.MeasureNodes.Any()) { selected.AddRange(click.MeasureNodes); }
         }
 
         private void refreshSelectedTree()
         {
-            TreeNode curr_node = selected.FirstOrDefault();
+            foreach (TreeNode node in selected) { node.addToSelected(this); }
+            TreeNode curr_node = selected.FirstOrDefault()?.Parent;
             while (curr_node != null)
             {
-                curr_node.setToSelected(this);
+                curr_node.addToSelected(this);
                 curr_node = curr_node.Parent;
             }
         }
 
         public List<VisualBounds> getSelected() { return SelectedView.Selected.ToList(); }
 
-        public TreeNode getFirstSelected()
+        public bool selectedContainsPoint(Point point)
         {
-            if (EffectNode != null) { return EffectNode; }
-            else if (NoteNodes.Any()) { return NoteNodes.First(); }
-            else if (ChordNodes.Any()) { return ChordNodes.First(); }
-            else if (MeasureNodes.Any()) { return MeasureNodes.First(); }
-            else if (PartNode != null) { return PartNode; }
-            return null;
+            foreach (var item in selected)
+            {
+                if (item.ObjectBounds.hitTest(point)) { return true; }
+            }
+            return false;
         }
     }
 
@@ -117,6 +117,8 @@ namespace GuitarTab
                     return AddItem.Measure;
                 case Selection.Add_Effect:
                     return AddItem.Bend;
+                case Selection.Set_Length:
+                    return AddItem.Length;
                 default:
                     return AddItem.None;
             }

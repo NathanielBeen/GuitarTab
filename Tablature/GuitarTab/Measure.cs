@@ -68,6 +68,11 @@ namespace GuitarTab
             return (ModelCollection as ChordCollection)?.MeasureLength.SpaceTaken ?? 0;
         }
 
+        public void updateSpaceTaken()
+        {
+            (ModelCollection as ChordCollection)?.MeasureLength.updateSpaceTaken(ModelCollection.Items());
+        }
+
         public Chord getChordAtPosition(int pos)
         {
             return (ModelCollection.getItemMatchingCondition(x => x.Position.Index == pos));
@@ -78,15 +83,16 @@ namespace GuitarTab
             return ModelCollection.Last()?.Position.Index ?? 0;
         }
 
-        public void breakEffectsWithPrevMeasure()
+        public void breakCrossMeasureEffectsAtPosition(EffectPosition position)
         {
-            ModelCollection.First()?.breakEffectsAtPosition(EffectPosition.Into);
+            if (position == EffectPosition.Into) { ModelCollection.First()?.breakMultiEffectsAtPosition(position); }
+            else { ModelCollection.Last()?.breakMultiEffectsAtPosition(position); }
         }
 
         public void breakCrossMeasureEffects()
         {
-            ModelCollection.First()?.breakEffectsAtPosition(EffectPosition.Into);
-            ModelCollection.Last()?.breakEffectsAtPosition(EffectPosition.After);
+            ModelCollection.First()?.breakMultiEffectsAtPosition(EffectPosition.Into);
+            ModelCollection.Last()?.breakMultiEffectsAtPosition(EffectPosition.After);
         }
     }
 }

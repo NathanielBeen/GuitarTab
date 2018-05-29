@@ -14,7 +14,8 @@ namespace GuitarTab
         Select,
         Release,
         Position,
-        Bounds
+        Bounds,
+        NoteSelect
     }
 
     public class MouseClick
@@ -35,7 +36,7 @@ namespace GuitarTab
         public EffectTreeNode EffectNode { get; set; }
 
         public VisualBounds Selected { get; set; }
-        protected bool handled;
+        public bool Handled { get; private set; }
 
         public NodeClick(Point p)
             : base(p)
@@ -47,7 +48,7 @@ namespace GuitarTab
             EffectNode = null;
 
             Selected = null;
-            handled = false;
+            Handled = false;
         }
 
         public void populateCommandSelections(CommandSelections selections)
@@ -75,7 +76,14 @@ namespace GuitarTab
             return null;
         }
 
-        public void Handled() { handled = true; }
+        public void setHandled() { Handled = true; }
+    }
+
+    public class NoteSelectClick : NodeClick
+    {
+        public NoteSelectClick(Point p) : base(p) { }
+
+        public override bool matchesClickType(ClickType desired) { return (desired == ClickType.NoteSelect); }
     }
 
     public class StandardClick : NodeClick
@@ -88,9 +96,9 @@ namespace GuitarTab
             add_type = add;
         }
 
-        public bool multipleNotes() { return NoteNodes.Count() > 1 && !handled; }
+        public bool multipleNotes() { return NoteNodes.Count() > 1 && !Handled; }
 
-        public bool matchesSelectionType(Selection wanted) { return (wanted == add_type && !handled); }
+        public bool matchesSelectionType(Selection wanted) { return (wanted == add_type && !Handled); }
 
         public override bool matchesClickType(ClickType desired) { return (desired == ClickType.Click); }
     }
@@ -99,21 +107,21 @@ namespace GuitarTab
     {
         public ReleaseClick(Point p) :base(p) { }
 
-        public bool anyPart() { return PartNode != null && !handled; }
+        public bool anyPart() { return PartNode != null && !Handled; }
 
-        public bool anyMeasure() { return MeasureNodes.Any() && !handled; }
+        public bool anyMeasure() { return MeasureNodes.Any() && !Handled; }
 
-        public bool multipleMeasures() { return MeasureNodes.Count() > 1 && !handled; }
+        public bool multipleMeasures() { return MeasureNodes.Count() > 1 && !Handled; }
 
-        public bool anyChord() { return ChordNodes.Any() && !handled; }
+        public bool anyChord() { return ChordNodes.Any() && !Handled; }
 
-        public bool multipleChords() { return ChordNodes.Count > 1 && !handled; }
+        public bool multipleChords() { return ChordNodes.Count > 1 && !Handled; }
 
-        public bool anyNote() { return NoteNodes.Any() && !handled; }
+        public bool anyNote() { return NoteNodes.Any() && !Handled; }
 
-        public bool multipleNotes() { return NoteNodes.Count > 1 && !handled; }
+        public bool multipleNotes() { return NoteNodes.Count > 1 && !Handled; }
 
-        public bool anyEffect() { return EffectNode != null && !handled; }
+        public bool anyEffect() { return EffectNode != null && !Handled; }
 
         public override bool matchesClickType(ClickType desired) { return (desired == ClickType.Release); }
 
@@ -127,18 +135,18 @@ namespace GuitarTab
     public class SelectClick : NodeClick
     {
         public bool ContainsRect { get; private set; }
-        private Rect rectangle;
+        public Rect Rectangle { get; }
 
         public SelectClick(Point p, Rect rect)
             :base(p)
         {
-            rectangle = rect;
+            Rectangle = rect;
             ContainsRect = false;
         }
 
         public void setContainsRect(VisualBounds bounds)
         {
-            ContainsRect = bounds.containsRectangle(rectangle);
+            ContainsRect = bounds.containsRectangle(Rectangle);
         }
 
         public override bool matchesClickType(ClickType desired) { return (desired == ClickType.Select); }
@@ -198,7 +206,7 @@ namespace GuitarTab
         private bool checkSameBar(VisualBounds bounds)
         {
             if (current_closest is null) { return true; }
-            return (current_closest.Right <= bounds.Right);
+            return (current_closest.Bar < bounds.Bar || current_closest.Right <= bounds.Right);
         }
 
         private bool checkPrevBar(VisualBounds bounds)

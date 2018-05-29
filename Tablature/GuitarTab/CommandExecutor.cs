@@ -43,6 +43,7 @@ namespace GuitarTab
         ChangeChordPositionNewMeasure,
         ChangeMultipleChordPosition,
         ChangeMultipleChordPositionNewMeasure,
+        AddPalmMuteEffect,
         AddSingleNoteEffect,
         RemoveNoteEffect,
         AddMultiNoteEffect,
@@ -100,6 +101,8 @@ namespace GuitarTab
                     return new ChangeMultipleChordPositionBld(selections);
                 case CommandType.ChangeMultipleChordPositionNewMeasure:
                     return new ChangeMultipleChordPositionNewMeasureBld(selections);
+                case CommandType.AddPalmMuteEffect:
+                    return new AddPalmMuteEffectBld(selections);
                 case CommandType.AddSingleNoteEffect:
                     return new AddSingleNoteEffectBld(selections);
                 case CommandType.RemoveNoteEffect:

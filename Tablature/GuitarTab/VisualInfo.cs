@@ -33,6 +33,7 @@ namespace GuitarTab
         public const string BAR_SPACING = "BarSpacing";
         public const string FONT_SIZE = "FontSize";
         public const string LARGE_FONT_SIZE = "LargeFontSize";
+        public const string SMALL_FONT_SIZE = "SmallFontSize";
 
         public int PageHeight { get; set; }
         public int PageWidth { get; set; }
@@ -57,6 +58,7 @@ namespace GuitarTab
         public int BarSpacing { get; set; }
         public int FontSize { get; set; }
         public int LargeFontSize { get; set; }
+        public int SmallFontSize { get; set; }
 
         private Dictionary<NoteLength, int> note_lengths;
 
@@ -92,6 +94,7 @@ namespace GuitarTab
             BarSpacing = int.Parse(parsed_file[BAR_SPACING]);
             FontSize = int.Parse(parsed_file[FONT_SIZE]);
             LargeFontSize = int.Parse(parsed_file[LARGE_FONT_SIZE]);
+            SmallFontSize = int.Parse(parsed_file[SMALL_FONT_SIZE]);
         }
 
         public void readNoteLengthsFromFile(Dictionary<string, string> parsed_file)

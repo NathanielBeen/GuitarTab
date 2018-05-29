@@ -44,16 +44,18 @@ namespace GuitarTab
             if (prev != null) { Remove(prev); }
 
             ModelCollection.Add(effect);
+            if (effect is IMultiEffect && effect.getPosition(this) == EffectPosition.Into) { return; }
             ModelAdded?.Invoke(this, new ObjectAddedArgs(effect, this));
         }
 
         public void Remove(IEffect effect)
         {
             if (effect == null) { return; }
+            bool remove = !(effect is IMultiEffect && effect.getPosition(this) == EffectPosition.Into);
             effect.breakEffect(this);
 
             ModelCollection.Remove(effect);
-            ModelRemoved?.Invoke(this, new ObjectRemovedArgs(effect));
+            if (remove) { ModelRemoved?.Invoke(this, new ObjectRemovedArgs(effect)); }
         }
 
         public List<object> getGenericModelList()
@@ -77,6 +79,12 @@ namespace GuitarTab
         {
             List<IEffect> effects = getMultiEffects();
             foreach (IEffect effect in effects) { Remove(effect); }
+        }
+
+        public void removeMultiEffectsAtPosition(EffectPosition position)
+        {
+            IEffect effect = ModelCollection.getItemMatchingCondition(e => e is IMultiEffect && e.getPosition(this) == position);
+            Remove(effect);
         }
 
         public int CompareTo(Note other)

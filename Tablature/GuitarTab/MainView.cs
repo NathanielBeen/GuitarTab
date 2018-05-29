@@ -36,9 +36,11 @@ namespace GuitarTab
         public MouseCanvasView CanvasView { get; }
         public PropertyMenuView PropertyMenuView { get; }
         public FretMenuView FretMenuView { get; }
+        public NoteSelectView NoteSelectView { get; }
+        public BPMTimeSigView BPMTimeSigView { get; }
 
-        public MainView(LengthView length, DeleteView delete, AddItemView add_item, MouseCanvasView canvas_view, PropertyMenuView property, FretMenuView fret, 
-            GuiCommandExecutor executor, MouseHandler handler)
+        public MainView(LengthView length, DeleteView delete, AddItemView add_item, MouseCanvasView canvas_view, PropertyMenuView property, FretMenuView fret, NoteSelectView select,
+            BPMTimeSigView bpm, GuiCommandExecutor executor, MouseHandler handler)
         {
             LengthView = length;
             DeleteView = delete;
@@ -46,18 +48,33 @@ namespace GuitarTab
             CanvasView = canvas_view;
             PropertyMenuView = property;
             FretMenuView = fret;
+            BPMTimeSigView = bpm;
+            NoteSelectView = select;
 
             setHandlers(executor, handler);
         }
 
         public void setHandlers(GuiCommandExecutor executor, MouseHandler handler)
         {
+            executor.NoteSelectMenuLaunched += handler.handleNoteSelect;
             executor.FretMenuLaunched += launchNewFretMenu;
             handler.PropertyMenuChanged += launchNewPropertyMenu;
+            handler.NoteSelectLaunched += launchNoteSelectMenu;
+            handler.NoteSelectEnd += endNoteSelect;
         }
 
         public void launchNewPropertyMenu(object sender, PropertyMenuEventArgs args) { PropertyMenuView.launchMenu(args.Click); }
 
         public void launchNewFretMenu(object sender, FretMenuEventArgs args) { FretMenuView.launchMenu(args.Command, args.Click); }
+
+        public void launchNoteSelectMenu(object sender, NoteSelectLaunchEventArgs args)
+        {
+            NoteSelectView.launchNoteSelect(args);
+        }
+
+        public void endNoteSelect(object sender, NoteSelectEndEventArgs args)
+        {
+            NoteSelectView.noteSelected(args.Click);
+        }
     }
 }

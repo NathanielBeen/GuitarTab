@@ -21,17 +21,23 @@ namespace GuitarTab
 
         public void setTreePart(Part part) { tree.buildTree(part); }
 
-        public void updatePartBounds(PartTreeNode node) { node?.ObjectBounds.updateBounds(); }
+        public void updatePartBounds(PartTreeNode node)
+        {
+            position.resetPositionToPartBeginning(node.ObjectBounds.Bounds);
+            node?.ObjectBounds.updateBounds();
+        }
 
         public void updateMeasureBoundsAtAndAfter(MeasureTreeNode prev_measure_node, List<MeasureTreeNode> to_update)
         {
-            position.resetPositionToMeasureEnd(prev_measure_node?.ObjectBounds.Bounds);
+            var bounds = prev_measure_node?.ObjectBounds.Bounds as MultipleVisualBounds;
+            position.resetPositionToMeasureEnd(bounds?.AllBounds.Last());
             foreach (MeasureTreeNode measure in to_update) { measure.ObjectBounds.updateBounds(); }
         }
 
         public void updateMeasureBounds(MeasureTreeNode measure_node)
         {
-            position.resetPositionToMeasureBeginning(measure_node.ObjectBounds.Bounds);
+            var bounds = measure_node.ObjectBounds.Bounds as MultipleVisualBounds;
+            position.resetPositionToMeasureBeginning(bounds.AllBounds.First());
             measure_node.ObjectBounds.updateBounds();
         }
 

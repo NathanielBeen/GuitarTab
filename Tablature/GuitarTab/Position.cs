@@ -23,10 +23,13 @@ namespace GuitarTab
             IsLast = is_last;
         }
 
-        public virtual bool occursBefore(Position other) { return (Index - other.Index == -1); }
-        public virtual bool occursAfter(Position other) { return (Index - other.Index == 1); }
-        public virtual bool indexMatches(Position other) { return (Index == other.Index && !(other is MultiPosition)); }
+        
+        public virtual bool occursDirectlyBefore(Position other) { return (Index - other.Index == -1); }
 
+        public virtual bool occursBefore(Position other) { return (Index < other.Index); }
+        public virtual bool occursAfter(Position other) { return (Index > other.Index); }
+        //public virtual bool indexMatches(Position other) { return (Index == other.Index && !(other is MultiPosition)); }
+        
         public int getPreviousPosition(int val_if_first)
         {
             if (IsFirst) { return val_if_first; }
@@ -60,7 +63,7 @@ namespace GuitarTab
             if (m_pos != null) { measure_position = m_pos; }
         }
 
-        public override bool occursBefore(Position other)
+        public override bool occursDirectlyBefore(Position other)
         {
             var m_other = other as MultiPosition;
             if (m_other is null) { return false; }
@@ -69,21 +72,30 @@ namespace GuitarTab
             return false;
         }
 
+        public override bool occursBefore(Position other)
+        {
+            var m_other = other as MultiPosition;   
+            if (m_other is null) { return false; }
+            if (MeasureIndex == m_other.MeasureIndex) { return (Index < m_other.Index); }
+            else { return (MeasureIndex < m_other.MeasureIndex); }
+        }
+
         public override bool occursAfter(Position other)
         {
             var m_other = other as MultiPosition;
             if (m_other is null) { return false; }
-            if (MeasureIndex == m_other.MeasureIndex && Index == m_other.Index + 1) { return true; }
-            if (MeasureIndex == m_other.MeasureIndex + 1 && IsFirst && m_other.IsLast) { return true; }
-            return false;
+            if (MeasureIndex == m_other.MeasureIndex) { return (Index > m_other.Index); }
+            else { return (MeasureIndex > m_other.MeasureIndex); }
         }
-
+        
+        /*
         public override bool indexMatches(Position other)
         {
             var m_other = other as MultiPosition;
             if (m_other is null) { return false; }
             return (Index == m_other.Index && MeasureIndex == m_other.MeasureIndex);
         }
+        */
 
         public int getPreviousMeasurePosition()
         {

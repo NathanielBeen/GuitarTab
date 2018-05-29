@@ -427,24 +427,22 @@ namespace GuitarTab
 
         public IActionValidator buildValidator()
         {
-            return new ChangeMultipleChordPositionVal(attributes.ChordDict, attributes.SecondMeasure, attributes.Position);
+            return new ChangeMultipleChordPositionVal(attributes.FirstMeasure, attributes.SecondMeasure, attributes.Chords, attributes.Position);
         }
 
         public IActionCommand buildCommand()
         {
             var command = new MultipleActionCommand();
-            foreach (Chord chord in attributes.ChordDict.Keys)
-            {
-                command.AddCommand(new RemoveChordFromMeasureCom(attributes.ChordDict[chord], chord));
-            }
+            command.AddCommand(new RemoveMultipleChordsFromMeasureCom(attributes.FirstMeasure, attributes.Chords));
 
             int curr_position = (int)attributes.Position;
-            foreach (Chord chord in attributes.ChordDict.Keys)
+            foreach (Chord chord in attributes.Chords)
             {
                 command.AddCommand(new ChangeChordPositionCom(chord, curr_position));
-                command.AddCommand(new AddChordToMeasureCom(attributes.SecondMeasure, chord));
                 curr_position++;
             }
+
+            command.AddCommand(new AddMultipleChordsToMeasureCom(attributes.SecondMeasure, attributes.Chords));
             return command;
         }
     }
@@ -460,25 +458,23 @@ namespace GuitarTab
 
         public IActionValidator buildValidator()
         {
-            return new ChangeMultipleChordPositionVal(attributes.ChordDict, attributes.SecondMeasure, attributes.Position);
+            return new ChangeMultipleChordPositionVal(attributes.FirstMeasure, attributes.SecondMeasure, attributes.Chords, attributes.Position);
         }
 
         public IActionCommand buildCommand()
         {
             var command = new MultipleActionCommand();
             command.AddCommand(new AddMeasureToPartCom(attributes.Part, attributes.SecondMeasure));
-            foreach (Chord chord in attributes.ChordDict.Keys)
-            {
-                command.AddCommand(new RemoveChordFromMeasureCom(attributes.ChordDict[chord], chord));
-            }
+            command.AddCommand(new RemoveMultipleChordsFromMeasureCom(attributes.FirstMeasure, attributes.Chords));
 
             int curr_position = attributes.Position;
-            foreach (Chord chord in attributes.ChordDict.Keys)
+            foreach (Chord chord in attributes.Chords)
             {
                 command.AddCommand(new ChangeChordPositionCom(chord, curr_position));
-                command.AddCommand(new AddChordToMeasureCom(attributes.SecondMeasure, chord));
                 curr_position++;
             }
+
+            command.AddCommand(new AddMultipleChordsToMeasureCom(attributes.SecondMeasure, attributes.Chords));
             return command;
         }
     }
@@ -499,7 +495,7 @@ namespace GuitarTab
 
         public IActionCommand buildCommand()
         {
-            return new ChangeChordLengthCom(attributes.Chord, attributes.Length);
+            return new ChangeChordLengthCom(attributes.Measure, attributes.Chord, attributes.Length);
         }
     }
 
@@ -514,15 +510,15 @@ namespace GuitarTab
 
         public IActionValidator buildValidator()
         {
-            return new ChangeMultipleChordLengthVal(attributes.ChordDict, attributes.Length);
+            return new ChangeMultipleChordLengthVal(attributes.Measure, attributes.Chords, attributes.Length);
         }
 
         public IActionCommand buildCommand()
         {
             var command = new MultipleActionCommand();
-            foreach (Chord chord in attributes.ChordDict.Keys)
+            foreach (Chord chord in attributes.Chords)
             {
-                command.AddCommand(new ChangeChordLengthCom(chord, attributes.Length));
+                command.AddCommand(new ChangeChordLengthCom(attributes.Measure, chord, attributes.Length));
             }
             return command;
         }
@@ -753,29 +749,22 @@ namespace GuitarTab
 
         public IActionValidator buildValidator()
         {
-            var validator = new MultipleActionValidator();
-            foreach (Measure measure in attributes.Measures)
-            {
-                validator.AddValidator(new ChangeMeasurePositionVal(attributes.Part, measure, attributes.Position));
-            }
-            return validator;
+            return new ChangeMultipleMeasurePositionVal(attributes.Part, attributes.Measures, attributes.Position);
         }
 
         public IActionCommand buildCommand()
         {
             var command = new MultipleActionCommand();
-            foreach (Measure measure in attributes.Measures)
-            {
-                command.AddCommand(new RemoveMeasureFromPartCom(attributes.Part, measure));
-            }
+            command.AddCommand(new RemoveMultipleMeasuresFromPartCom(attributes.Part, attributes.Measures));
 
             int curr_position = (int)attributes.Position;
             foreach (Measure measure in attributes.Measures)
             {
                 command.AddCommand(new ChangeMeasurePositionCom(measure, curr_position));
-                command.AddCommand(new AddMeasureToPartCom(attributes.Part, measure));
                 curr_position++;
             }
+
+            command.AddCommand(new AddMultipleMeasuresToPartCom(attributes.Part, attributes.Measures));
             return command;
         }
     }

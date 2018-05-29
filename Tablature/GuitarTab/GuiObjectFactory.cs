@@ -93,7 +93,7 @@ namespace GuitarTab
         {
             var bounded = new PinchHarmonicBounds(pinch_harmonic, note, bounds, info, new UnorderedDelegate());
             var handler = new EffectMouseHandler(executor, new UnorderedMouseDelegate());
-            var drawing = new PinchHarmonicDrawingVisual(pinch_harmonic, bounds, info, new UnorderedDelegate());
+            var drawing = new PinchHarmonicDrawingVisual(pinch_harmonic, bounded.Bounds, info, new UnorderedDelegate());
 
             return new EffectTreeNode(pinch_harmonic, bounded, handler, drawing);
         }
@@ -102,7 +102,7 @@ namespace GuitarTab
         {
             var bounded = new VibratoBounds(vibrato, note, bounds, info, new UnorderedDelegate());
             var handler = new EffectMouseHandler(executor, new UnorderedMouseDelegate());
-            var drawing = new VibratoDrawingVisual(vibrato, bounds, info, new UnorderedDelegate());
+            var drawing = new VibratoDrawingVisual(vibrato, bounded.Bounds, info, new UnorderedDelegate());
 
             return new EffectTreeNode(vibrato, bounded, handler, drawing);
         }
@@ -111,7 +111,7 @@ namespace GuitarTab
         {
             var bounded = new SlideBounds(slide, note, bounds, info, new UnorderedDelegate());
             var handler = new EffectMouseHandler(executor, new UnorderedMouseDelegate());
-            var drawing = new SlideDrawingVisual(slide, bounds, info, new UnorderedDelegate());
+            var drawing = new SlideDrawingVisual(slide, bounded.Bounds, info, new UnorderedDelegate());
 
             return new EffectTreeNode(slide, bounded, handler, drawing);
         }
@@ -120,7 +120,7 @@ namespace GuitarTab
         {
             var bounded = new HOPOBounds(hopo, note, bounds, info, new UnorderedDelegate());
             var handler = new EffectMouseHandler(executor, new UnorderedMouseDelegate());
-            var drawing = new HOPODrawingVisual(hopo, bounds, info, new UnorderedDelegate());
+            var drawing = new HOPODrawingVisual(hopo, bounded.Bounds, info, new UnorderedDelegate());
 
             return new EffectTreeNode(hopo, bounded, handler, drawing);
         }
@@ -129,7 +129,7 @@ namespace GuitarTab
         {
             var bounded = new TieBounds(tie, note, bounds, info, new UnorderedDelegate());
             var handler = new EffectMouseHandler(executor, new UnorderedMouseDelegate());
-            var drawing = new TieDrawingVisual(tie, bounds, info, new UnorderedDelegate());
+            var drawing = new TieDrawingVisual(tie, bounded.Bounds, info, new UnorderedDelegate());
 
             return new EffectTreeNode(tie, bounded, handler, drawing);
         }

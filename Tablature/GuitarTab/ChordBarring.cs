@@ -43,8 +43,9 @@ namespace GuitarTab
             }
         }
 
-        public void resetBars()
+        public void resetBars(NoteLength length)
         {
+            updateNoteLength(length);
             RightConnected = 0;
             LeftConnected = 0;
             RightSingle = 0;
@@ -116,7 +117,10 @@ namespace GuitarTab
 
         public void barBeat()
         {
-            foreach (ChordBounds chord in Chords) { chord.ChordBar.resetBars(); }
+            foreach (ChordBounds chord in Chords)
+            {
+                chord.ChordBar.resetBars(chord.getChord().Length.NoteType);
+            }
             bool connected = (beat_length == space_taken);
             if (connected)
             {

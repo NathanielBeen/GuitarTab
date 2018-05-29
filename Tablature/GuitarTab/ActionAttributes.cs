@@ -82,7 +82,7 @@ namespace GuitarTab
 
         public Chord genChord(CommandSelections selection)
         {
-            return Chord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
+            return Chord.createInstance(0, Measure?.Position, selection.SelectedLength);
         }
     }
 
@@ -149,7 +149,7 @@ namespace GuitarTab
 
         public NoteChord genChord(CommandSelections selection)
         {
-            return NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
+            return NoteChord.createInstance(0, Measure?.Position, selection.SelectedLength);
         }
 
         public Note genNote(CommandSelections selection)
@@ -326,65 +326,45 @@ namespace GuitarTab
 
     public class ChangeMultipleChordPositionAtr : IActionAttributes
     {
-        public Dictionary<Chord, Measure> ChordDict { get; }
+        public Measure FirstMeasure { get; }
         public Measure SecondMeasure { get; }
+        public List<Chord> Chords { get; }
         public int? Position { get; }
 
         public ChangeMultipleChordPositionAtr(CommandSelections selection)
         {
-            ChordDict = genChordDict(selection);
+            FirstMeasure = selection.SelectedMeasure.FirstOrDefault();
             SecondMeasure = selection.SelectedMeasure.LastOrDefault();
-            Position = selection.Position;
+            Chords = selection.SelectedChord;
+            Position = genCorrectedPosition(selection);
         }
 
-        public Dictionary<Chord, Measure> genChordDict(CommandSelections selection)
+        public int genCorrectedPosition(CommandSelections selection)
         {
-            var dict = new Dictionary<Chord, Measure>();
-            foreach (Chord chord in selection.SelectedChord)
+            int init = (int)selection.Position;
+            foreach (Chord chord in Chords)
             {
-                foreach (Measure measure in selection.SelectedMeasure)
-                {
-                    if (measure.ModelCollection.Contains(chord))
-                    {
-                        dict.Add(chord, measure);
-                        break;
-                    }
-                }
+                if (SecondMeasure.ModelCollection.Contains(chord)) { init -= 1; }
             }
-            return dict;
+            return init;
         }
     }
 
     public class ChangeMultipleChordPositionNewMeasureAtr : IActionAttributes
     {
         public Part Part { get; }
-        public Dictionary<Chord, Measure> ChordDict { get; }
+        public Measure FirstMeasure { get; }
         public Measure SecondMeasure { get; }
+        public List<Chord> Chords { get; }
         public int Position { get; }
 
         public ChangeMultipleChordPositionNewMeasureAtr(CommandSelections selection)
         {
             Part = selection.SelectedPart;
-            ChordDict = genChordDict(selection);
+            FirstMeasure = selection.SelectedMeasure.FirstOrDefault();
             SecondMeasure = genSecondMeasure(selection);
+            Chords = selection.SelectedChord;
             Position = 0;
-        }
-
-        public Dictionary<Chord, Measure> genChordDict(CommandSelections selection)
-        {
-            var dict = new Dictionary<Chord, Measure>();
-            foreach (Chord chord in selection.SelectedChord)
-            {
-                foreach (Measure measure in selection.SelectedMeasure)
-                {
-                    if (measure.ModelCollection.Contains(chord))
-                    {
-                        dict.Add(chord, measure);
-                        break;
-                    }
-                }
-            }
-            return dict;
         }
 
         public Measure genSecondMeasure(CommandSelections selection)
@@ -409,30 +389,15 @@ namespace GuitarTab
 
     public class ChangeMultipleChordLengthAtr : IActionAttributes
     {
-        public Dictionary<Chord, Measure> ChordDict { get; }
+        public Measure Measure { get; }
+        public List<Chord> Chords { get; }
         public Length Length { get; }
 
         public ChangeMultipleChordLengthAtr(CommandSelections selection)
         {
-            ChordDict = genChordDict(selection);
+            Measure = selection.SelectedMeasure.FirstOrDefault();
+            Chords = selection.SelectedChord;
             Length = selection.SelectedLength;
-        }
-
-        public Dictionary<Chord, Measure> genChordDict(CommandSelections selection)
-        {
-            var dict = new Dictionary<Chord, Measure>();
-            foreach (Chord chord in selection.SelectedChord)
-            {
-                foreach (Measure measure in selection.SelectedMeasure)
-                {
-                    if (measure.ModelCollection.Contains(chord))
-                    {
-                        dict.Add(chord, measure);
-                        break;
-                    }
-                }
-            }
-            return dict;
         }
     }
 
@@ -620,7 +585,14 @@ namespace GuitarTab
         {
             Part = selection.SelectedPart;
             Measures = selection.SelectedMeasure;
-            Position = selection.Position;
+            Position = genCorrectedPosition(selection);
+        }
+
+        public int genCorrectedPosition(CommandSelections selection)
+        {
+            int init = (int)selection.Position;
+            init -= (Measures.Count() - 1);
+            return init;
         }
     }
 

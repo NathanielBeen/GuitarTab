@@ -42,7 +42,7 @@ namespace GuitarTab
             var click = new ReleaseClick(default(Point));
             selected.populateNodeClick(click);
 
-            if(click.multipleNotes())
+            if (click.multipleNotes())
             {
                 executor.executeRemoveMultipleNotes(click);
             }
@@ -66,6 +66,8 @@ namespace GuitarTab
             {
                 executor.executeRemoveMeasure(click);
             }
+
+            selected.populateFromClick(click);
         }
     }
 }

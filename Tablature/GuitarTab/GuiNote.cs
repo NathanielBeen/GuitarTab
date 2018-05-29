@@ -41,9 +41,9 @@ namespace GuitarTab
 
         public override void mouseClick(StandardClick click)
         {
-            if (click.matchesSelectionType(Selection.Add_Multi_Effect) && click.multipleNotes())
+            if (click.matchesSelectionType(Selection.Add_Multi_Effect))
             {
-                executor.executeAddMultiEffectToNotes(click);
+                executor.executeAddMultiEffectToNotesMenu(click);
             }
             else if (click.matchesSelectionType(Selection.Add_Effect))
             {

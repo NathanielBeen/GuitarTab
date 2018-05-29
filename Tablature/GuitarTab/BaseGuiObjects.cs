@@ -23,13 +23,18 @@ namespace GuitarTab
         {
             if (click.matchesClickType(ClickType.Click)) { mouseClick(click as StandardClick); }
             else if (click.matchesClickType(ClickType.Release)) { mouseDragRelease(click as ReleaseClick); }
+            else if (click.matchesClickType(ClickType.NoteSelect)) { Delegate?.invokeDelegate(click); }
         }
 
         public abstract void mouseClick(StandardClick click);
 
         public abstract void mouseDragRelease(ReleaseClick click);
 
-        public void invokeClickDelegate(MouseClick click) { Delegate?.invokeDelegate(click); }
+        public void invokeClickDelegate(MouseClick click)
+        {
+            bool handled = (click as NodeClick)?.Handled ?? false;
+            if (!handled) { Delegate?.invokeDelegate(click); }
+        }
     }
 
     public abstract class BaseBounded
@@ -78,7 +83,7 @@ namespace GuitarTab
             dc.Close();
         }
 
-        public void boundsPropertyChange(object sender, BoundsPropertyChangedEventArgs args)
+        public virtual void boundsPropertyChange(object sender, BoundsPropertyChangedEventArgs args)
         {
             if (!sender.Equals(Bounds)) { return; }
 
