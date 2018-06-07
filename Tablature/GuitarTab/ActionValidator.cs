@@ -222,8 +222,7 @@ namespace GuitarTab
             if (second_chord.Position.Index < 0 || second_chord.Position.Index > second_measure.getLastChordPosition()+1) { return false; }
             if (first_chord.ModelCollection.Count() > 1 || !(first_measure.Equals(second_measure)))
             {
-                double new_space_taken = NoteLengthExtensions.roundIfWithinDoubleError(second_measure.getSpaceTaken() + second_chord.Length.getLength());
-                if (new_space_taken > second_measure.getTotalSpace()) { return false; }
+                if (second_measure.getSpaceTaken() + second_chord.Length.getLength() > second_measure.getTotalSpace()) { return false; }
             }
 
             return true;
@@ -255,9 +254,7 @@ namespace GuitarTab
             if (!first_measure.ModelCollection.Contains(first_chord)) { return false; }
             if (!first_chord.ModelCollection.Contains(note)) { return false; }
             if (second_chord.Position.Index < 0 || second_chord.Position.Index > second_measure.getLastChordPosition()) { return false; }
-
-            double new_space_taken = NoteLengthExtensions.roundIfWithinDoubleError(second_measure.getSpaceTaken() + second_chord.Length.getLength());
-            if (new_space_taken > second_measure.getTotalSpace()) { return false; }
+            if (second_measure.getSpaceTaken() + second_chord.Length.getLength() > second_measure.getTotalSpace()) { return false; }
 
             return true;
         }
@@ -289,8 +286,7 @@ namespace GuitarTab
             else
             {
                 if (position > second_measure.getLastChordPosition() + 1) { return false; }
-                double new_space_taken = NoteLengthExtensions.roundIfWithinDoubleError(second_measure.getSpaceTaken() + chord.Length.getLength());
-                if (new_space_taken > second_measure.getTotalSpace()) { return false; }
+                if (second_measure.getSpaceTaken() + chord.Length.getLength() > second_measure.getTotalSpace()) { return false; }
 
             }
             return true;
@@ -321,17 +317,16 @@ namespace GuitarTab
             }
 
             if (position > dest_measure.getLastChordPosition() + 1) { return false; }
-            double new_space_taken = getNewSpaceTaken();
-            if (new_space_taken > dest_measure.getTotalSpace()) { return false; }
+            if (getNewSpaceTaken() > dest_measure.getTotalSpace()) { return false; }
 
             return true;
         }
 
-        public double getNewSpaceTaken()
+        public int getNewSpaceTaken()
         {
-            double length = dest_measure.getSpaceTaken();
+            int length = dest_measure.getSpaceTaken();
             foreach (Chord chord in chords) { length += chord.Length.getLength(); }
-            return NoteLengthExtensions.roundIfWithinDoubleError(length);
+            return length;
         }
     }
 
@@ -351,9 +346,15 @@ namespace GuitarTab
         public bool validateAction()
         {
             if (measure is null || chord is null || length is null) { return false; }
-            if (measure.getSpaceTaken() - chord.Length.getLength() + length.getLength() 
-                > measure.getTotalSpace()) { return false; }
+            if (length is TupleLength && !validateTuple(length as TupleLength)) { return false; }
+
+            if (measure.getSpaceTaken() - chord.Length.getLength() + length.getLength() > measure.getTotalSpace()) { return false; }
             return true;
+        }
+
+        public bool validateTuple(TupleLength length)
+        {
+            return (length.TupleType != TupletType.None && length.NoteType != NoteLength.None);
         }
     }
 
@@ -373,24 +374,30 @@ namespace GuitarTab
         public bool validateAction()
         {
             if (measure is null || chords is null || !chords.Any() || length is null) { return false; }
+            if (length is TupleLength && !validateTuple(length as TupleLength)) { return false; }
             foreach (Chord chord in chords)
             {
                 if (!measure.ModelCollection.Contains(chord)) { return false; }
             }
-            double new_space_taken = NoteLengthExtensions.roundIfWithinDoubleError(getSpaceTaken());
-            if (new_space_taken > measure.getTotalSpace()) { return false; }
+   
+            if (getSpaceTaken() > measure.getTotalSpace()) { return false; }
 
             return true;
         }
 
-        public double getSpaceTaken()
+        public int getSpaceTaken()
         {
-            double curr_length = measure.getSpaceTaken();
+            int curr_length = measure.getSpaceTaken();
             foreach (Chord chord in chords)
             {
                 curr_length += length.getLength() - chord.Length.getLength();
             }
             return curr_length;
+        }
+
+        public bool validateTuple(TupleLength length)
+        {
+            return (length.TupleType != TupletType.None && length.NoteType != NoteLength.None);
         }
     }
 
@@ -616,6 +623,7 @@ namespace GuitarTab
         public bool validateAction()
         {
             if (part == null || measure == null || num_beats == null || beat_type == null) { return false; }
+            if (!part.ModelCollection.Contains(measure)) { return false; }
             return (TimeSignature.canSetTimeSignature((int)num_beats, (NoteLength)beat_type));
         }
     }
@@ -636,8 +644,90 @@ namespace GuitarTab
         public bool validateAction()
         {
             if (part == null || measure == null || bpm == null) { return false; }
+            if (!part.ModelCollection.Contains(measure)) { return false; }
             if (bpm < 1) { return false; }
             return true;
+        }
+    }
+
+    public class CreateTupletFromNotesVal : IActionValidator
+    {
+        private Measure measure;
+        private List<Chord> chords;
+        private TupletType type;
+        private List<Length> new_lengths;
+
+        public CreateTupletFromNotesVal(Measure m, List<Chord> c, TupletType t, List<Length> n)
+        {
+            measure = m;
+            chords = c;
+            type = t;
+            new_lengths = n;
+        }
+
+        public bool validateAction()
+        {
+            if (measure == null || chords == null || chords.Count <= 1 || new_lengths == null || !new_lengths.Any() || type == TupletType.None ) { return false; }
+            if (chords.Count != new_lengths.Count) { return false; }
+            foreach (Chord chord in chords)
+            {
+                if (!measure.ModelCollection.Contains(chord)) { return false; }
+            }
+            if (!canCreateTuple()) { return false; }
+            if (measure.getSpaceTaken() - getPreivousLength() + getNextLength() > measure.getTotalSpace()) { return false; }
+            return true;
+        }
+
+        public bool canCreateTuple()
+        {
+            NoteLength base_length = NoteLength.None;
+            foreach (Chord chord in chords)
+            {
+                NoteLength prop = getHighestValidTupleBaseLength(chord.Length.NoteType);
+                if (base_length == NoteLength.None || prop < base_length) { base_length = prop; }
+            }
+
+            int weight = 0;
+            foreach (Chord chord in chords)
+            {
+                weight += getWeightFromBaseLength(chord.Length.NoteType, base_length);
+            }
+            return (weight == (int)type && base_length != NoteLength.None);
+        }
+
+        public NoteLength getHighestValidTupleBaseLength(NoteLength length)
+        {
+            switch (length)
+            {
+                case NoteLength.DottedWhole:
+                    return NoteLength.Half;
+                case NoteLength.DottedHalf:
+                    return NoteLength.Quarter;
+                case NoteLength.DottedQuarter:
+                    return NoteLength.Eighth;
+                case NoteLength.DottedEighth:
+                    return NoteLength.Sixeteenth;
+                case NoteLength.DottedSixeteenth:
+                    return NoteLength.ThirtySecond;
+                default:
+                    return length;
+            }
+        }
+
+        public int getWeightFromBaseLength(NoteLength note_length, NoteLength base_length) { return (int)note_length / (int)base_length; }
+
+        private int getPreivousLength()
+        {
+            int length = 0;
+            foreach (Chord chord in chords) { length += chord.Length.getLength(); }
+            return length;
+        }
+
+        private int getNextLength()
+        {
+            int length = 0;
+            foreach (Length l in new_lengths) { length += l.getLength(); }
+            return length;
         }
     }
 }

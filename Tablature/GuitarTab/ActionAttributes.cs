@@ -41,7 +41,8 @@ namespace GuitarTab
 
         public Chord genNoteChord(CommandSelections selection)
         {
-            return NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
+            var length = Length.createInstance(selection.SelectedLength, selection.TupletType);
+            return NoteChord.createInstance(selection.Position, Measure?.Position, length);
         }
     }
 
@@ -58,7 +59,8 @@ namespace GuitarTab
 
         public Chord genChord(CommandSelections selection)
         {
-            return Chord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
+            var length = Length.createInstance(selection.SelectedLength, selection.TupletType);
+            return Chord.createInstance(selection.Position, Measure?.Position, length);
         }
     }
 
@@ -77,12 +79,13 @@ namespace GuitarTab
 
         public Measure genMeasure(CommandSelections selection)
         {
-            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, selection.Position);
         }
 
         public Chord genChord(CommandSelections selection)
         {
-            return Chord.createInstance(0, Measure?.Position, selection.SelectedLength);
+            var length = Length.createInstance(selection.SelectedLength, selection.TupletType);
+            return Chord.createInstance(0, Measure?.Position, length);
         }
     }
 
@@ -118,7 +121,8 @@ namespace GuitarTab
 
         public NoteChord genChord(CommandSelections selection)
         {
-            return NoteChord.createInstance(selection.Position, Measure?.Position, selection.SelectedLength);
+            var length = Length.createInstance(selection.SelectedLength, selection.TupletType);
+            return NoteChord.createInstance(selection.Position, Measure?.Position, length);
         }
 
         public Note genNote(CommandSelections selection)
@@ -144,12 +148,13 @@ namespace GuitarTab
 
         public Measure genMeasure(CommandSelections selection)
         {
-            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, selection.Position);
         }
 
         public NoteChord genChord(CommandSelections selection)
         {
-            return NoteChord.createInstance(0, Measure?.Position, selection.SelectedLength);
+            var length = Length.createInstance(selection.SelectedLength, selection.TupletType);
+            return NoteChord.createInstance(0, Measure?.Position, length);
         }
 
         public Note genNote(CommandSelections selection)
@@ -276,7 +281,7 @@ namespace GuitarTab
 
         public Measure genMeasure(CommandSelections selection)
         {
-            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, selection.Position);
         }
 
         public NoteChord genChord(CommandSelections selection)
@@ -320,7 +325,7 @@ namespace GuitarTab
 
         public Measure genSecondMeasure(CommandSelections selection)
         {
-            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, selection.Position);
         }
     }
 
@@ -339,12 +344,21 @@ namespace GuitarTab
             Position = genCorrectedPosition(selection);
         }
 
-        public int genCorrectedPosition(CommandSelections selection)
+        public int? genCorrectedPosition(CommandSelections selection)
         {
             int init = (int)selection.Position;
             foreach (Chord chord in Chords)
             {
-                if (SecondMeasure.ModelCollection.Contains(chord)) { init -= 1; }
+                if (chord.Position.Index == init || chord.Position.Index + 1 == init) { return null; }
+            }
+
+            int first_position = (from chord in Chords select chord.Position.Index).Min();
+            if (init > first_position)
+            {
+                foreach (Chord chord in Chords)
+                {
+                    if (SecondMeasure.ModelCollection.Contains(chord)) { init -= 1; }
+                }
             }
             return init;
         }
@@ -369,7 +383,7 @@ namespace GuitarTab
 
         public Measure genSecondMeasure(CommandSelections selection)
         {
-            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part.TimeSignature, Part.DefaultBPM, selection.Position);
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, selection.Position);
         }
     }
 
@@ -383,7 +397,12 @@ namespace GuitarTab
         {
             Measure = selection.SelectedMeasure.FirstOrDefault();
             Chord = selection.SelectedChord.FirstOrDefault();
-            Length = selection.SelectedLength;
+            Length = genLength(selection);
+        }
+
+        public Length genLength(CommandSelections selection)
+        {
+            return Length.createInstance(selection.SelectedLength, selection.TupletType);
         }
     }
 
@@ -397,7 +416,12 @@ namespace GuitarTab
         {
             Measure = selection.SelectedMeasure.FirstOrDefault();
             Chords = selection.SelectedChord;
-            Length = selection.SelectedLength;
+            Length = genLength(selection);
+        }
+
+        public Length genLength(CommandSelections selection)
+        {
+            return Length.createInstance(selection.SelectedLength, selection.TupletType);
         }
     }
 
@@ -533,7 +557,7 @@ namespace GuitarTab
 
         public Measure genMeasure(CommandSelections selection)
         {
-            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, Part?.TimeSignature, Part?.DefaultBPM, selection.Position);
+            return Measure.createInstance(selection.BPM, selection.NumBeats, selection.BeatType, selection.Position);
         }
     }
 
@@ -623,6 +647,31 @@ namespace GuitarTab
             Part = selection.SelectedPart;
             Measure = selection.SelectedMeasure.FirstOrDefault();
             Bpm = selection.BPM;
+        }
+    }
+
+    public class CreateTupletFromNotesAtr : IActionAttributes
+    {
+        public Measure Measure { get; }
+        public List<Chord> Chords { get; }
+        public TupletType Type { get; }
+        public List<Length> NewLengths { get; }
+
+        public CreateTupletFromNotesAtr(CommandSelections selections)
+        {
+            Measure = selections.SelectedMeasure.FirstOrDefault();
+            Chords = selections.SelectedChord;
+            Type = selections.TupletType;
+        }
+
+        public List<Length> genTupletLengths(CommandSelections selections)
+        {
+            var lengths = new List<Length>();
+            foreach (Chord chord in Chords)
+            {
+                lengths.Add(TupleLength.createInstance(chord.Length.NoteType, Type));
+            }
+            return lengths;
         }
     }
 }

@@ -19,12 +19,12 @@ namespace GuitarTab
         }
     }
 
-    public class FretMenuEventArgs : EventArgs
+    public class IntMenuEventArgs : EventArgs
     {
         public NodeClick Click { get; }
         public ContinueCommandDelegate Command { get; }
 
-        public FretMenuEventArgs(NodeClick click, Action<NodeClick, int> command)
+        public IntMenuEventArgs(NodeClick click, Action<NodeClick, int> command)
         {
             Click = click;
             Command = (c,p) => command(c,p);
@@ -53,9 +53,27 @@ namespace GuitarTab
         }
     }
 
-    public delegate void ContinueCommandDelegate(NodeClick click, int fret);
+    public class TupletSelectEventArgs : EventArgs
+    {
+        public NodeClick Click { get; }
+        public ContinueTupletSelectDelegate Delegate { get; }
+        public TupletType Type { get; }
+        public NoteLength Length { get; }
+
+        public TupletSelectEventArgs(NodeClick click, Action<NodeClick, NoteLength> command, TupletType type, NoteLength length)
+        {
+            Click = click;
+            Delegate = (c, l) => command(c, l);
+            Type = type;
+            Length = length;
+        }
+    }
+
+    public delegate void ContinueCommandDelegate(NodeClick click, int value);
 
     public delegate void ContinueNoteSelectDelegate(NodeClick click);
 
     public delegate void CancelDialogueDelegate();
+
+    public delegate void ContinueTupletSelectDelegate(NodeClick click, NoteLength value);
 }

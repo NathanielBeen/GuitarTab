@@ -117,6 +117,7 @@
     <Compile Include="StateUpdateEvents.cs" />
     <Compile Include="TimeSignature.cs" />
     <Compile Include="TreeNode.cs" />
+    <Compile Include="Tuplet.cs" />
     <Compile Include="ViewModelFactory.cs" />
     <Compile Include="CommandExecutor.cs" />
     <Compile Include="DeleteButton.xaml.cs">

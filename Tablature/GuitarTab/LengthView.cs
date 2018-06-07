@@ -17,21 +17,31 @@ namespace GuitarTab
 
         public NoteLength Length
         {
-            get { return selections.SelectedLength?.NoteType ?? NoteLength.None; }
-            set { selections.SelectedLength = new Length(value); }
+            get { return selections.SelectedLength; }
+            set { selections.SelectedLength = value; }
         }
 
-        public Dictionary<NoteLength, ImageBrush> Images { get; set; }
+        public TupletType TupletType
+        {
+            get { return selections.TupletType; }
+            set { selections.TupletType = value; }
+        }
 
-        public LengthView(CommandSelections sel, Dictionary<string, string> image_uri)
+        public Dictionary<NoteLength, ImageBrush> LengthImages { get; set; }
+        public Dictionary<TupletType, ImageBrush> TupletImages { get; set; }
+
+        public LengthView(CommandSelections sel, Dictionary<string, string> length_image_uri, Dictionary<string, string> tuplet_image_uri)
         {
             selections = sel;
             selections.PropertyChanged += handleLengthChanged;
-            Images = getImages(image_uri);
+            LengthImages = getLengthImages(length_image_uri);
+            TupletImages = genTupletImages(tuplet_image_uri);
+
             Length = NoteLength.None;
+            TupletType = TupletType.None;
         }
 
-        public Dictionary<NoteLength, ImageBrush> getImages(Dictionary<string, string> uri_dict)
+        public Dictionary<NoteLength, ImageBrush> getLengthImages(Dictionary<string, string> uri_dict)
         {
             var image_dict = new Dictionary<NoteLength, ImageBrush>();
             foreach (var entry in uri_dict)
@@ -46,11 +56,30 @@ namespace GuitarTab
             return image_dict;
         }
 
+        public Dictionary<TupletType, ImageBrush> genTupletImages(Dictionary<string, string> uri_dict)
+        {
+            var image_dict = new Dictionary<TupletType, ImageBrush>();
+            foreach (var entry in uri_dict)
+            {
+                TupletType type = TupletTypeExtensions.getTupletTypeFromString(entry.Key);
+                var brush = new ImageBrush();
+                brush.ImageSource = new BitmapImage(new Uri(entry.Value, UriKind.Relative));
+
+                image_dict[type] = brush;
+            }
+
+            return image_dict;
+        }
+
         public void handleLengthChanged(object sender, PropertyChangedEventArgs args)
         {
             if (args.PropertyName == nameof(CommandSelections.SelectedLength))
             {
                 onPropertyChanged(nameof(Length));
+            }
+            else if (args.PropertyName == nameof(CommandSelections.TupletType))
+            {
+                onPropertyChanged(nameof(TupletType));
             }
         }
     }

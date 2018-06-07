@@ -14,7 +14,6 @@ namespace GuitarTab
         public const int MAX_FRET = 26;
 
         public ContinueCommandDelegate ContinueDelegate { get; set; }
-        public CancelDialogueDelegate CancelDelegate { get; set; }
 
         private string fret;
         public string Fret
@@ -89,7 +88,6 @@ namespace GuitarTab
 
         public void handleClose()
         {
-            CancelDelegate?.Invoke();
             resetFields();
         }
 

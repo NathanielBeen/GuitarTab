@@ -231,7 +231,7 @@ namespace GuitarTab
             int num_beats = Convert.ToInt32(Attributes[2]);
             NoteLength beat_length = NoteLengthExtensions.getNoteLengthFromVisualLength(Convert.ToInt32(Attributes[3]));
 
-            Measure measure = Measure.createInstance(bpm, num_beats, beat_length, attributes.CurrentPart.TimeSignature, attributes.CurrentPart.DefaultBPM, pos);
+            Measure measure = Measure.createInstance(bpm, num_beats, beat_length, pos);
 
             attributes.CurrentMeasure = measure;
             attributes.CurrentPart.Add(measure);
@@ -293,23 +293,16 @@ namespace GuitarTab
             {
                 case "L":
                     int note_type = Convert.ToInt32(length_attributes[1]);
-                    if (NoteLengthExtensions.intIsValidNoteLength(note_type)) { return new Length((NoteLength)note_type); }
+                    if (NoteLengthExtensions.intIsValidNoteLength(note_type)) { return Length.createInstance((NoteLength)note_type); }
                     return null;
                 case "N":
-                    double non_standard_length = Convert.ToDouble(length_attributes[1]);
+                    int non_standard_length = Convert.ToInt32(length_attributes[1]);
                     return new NonStandardLength(non_standard_length);
-                case "G":
-                    int weight = Convert.ToInt32(length_attributes[1]);
-                    int split_into = Convert.ToInt32(length_attributes[2]);
-                    int replacing = Convert.ToInt32(length_attributes[3]);
-                    int this_length = Convert.ToInt32(length_attributes[4]);
-
-                    if (NoteLengthExtensions.intIsValidNoteLength(replacing) && NoteLengthExtensions.intIsValidNoteLength(this_length))
-                    {
-                        GroupFraction frac = new GroupFraction(weight, split_into, (NoteLength)replacing);
-                        return new GroupedLength((NoteLength)this_length, frac);
-                    }
-                    return null;
+                case "T":
+                    int note_length = Convert.ToInt32(length_attributes[0]);
+                    int type = Convert.ToInt32(length_attributes[1]);
+                    int base_length = Convert.ToInt32(length_attributes[2]);
+                    return TupleLength.createInstance(note_length, type);
                 default:
                     return null;
             }

@@ -40,8 +40,8 @@ namespace GuitarTab
             var bounded = new ChordBounds(chord, info, new UnorderedDelegate());
             var handler = new ChordMouseHandler(chord, executor, new UnorderedMouseDelegate());
             ChordDrawingVisual drawing;
-            if (chord is NoteChord) { drawing = new ChordDrawingVisual(chord, bounded.ChordBar, bounded.Bounds, info, new UnorderedDelegate()); }
-            else { drawing = new RestChordDrawingVisual(chord, bounded.ChordBar, bounded.Bounds, info, new UnorderedDelegate()); }
+            if (chord is NoteChord) { drawing = new ChordDrawingVisual(chord, bounded.ChordBar, bounded.ChordTuple, bounded.Bounds, info, new UnorderedDelegate()); }
+            else { drawing = new RestChordDrawingVisual(chord, bounded.ChordBar, bounded.ChordTuple, bounded.Bounds, info, new UnorderedDelegate()); }
 
             return new ChordTreeNode(chord, bounded, handler, drawing);
         }

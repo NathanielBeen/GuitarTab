@@ -84,7 +84,7 @@ namespace GuitarTab
     public class BarredBeat
     {
         private int beat_length;
-        private double space_taken;
+        private int space_taken;
 
         public List<ChordBounds> Chords;
 
@@ -106,7 +106,7 @@ namespace GuitarTab
                 if (to_add is null) { return chords; }
 
                 chords.Add(to_add);
-                space_taken = NoteLengthExtensions.roundIfWithinDoubleError(space_taken + to_add.getChord().Length.getLength());
+                space_taken += to_add.getChord().Length.getLength();
                 measure_chords.Remove(to_add);
             }
 
@@ -121,6 +121,7 @@ namespace GuitarTab
             {
                 chord.ChordBar.resetBars(chord.getChord().Length.NoteType);
             }
+
             bool connected = (beat_length == space_taken);
             if (connected)
             {

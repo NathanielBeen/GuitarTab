@@ -212,11 +212,11 @@ namespace GuitarTab
         public string genLengthString()
         {
             string length_string = "[";
-            if (chord.Length is GroupedLength)
+            if (chord.Length is TupleLength)
             {
-                var frac = ((GroupedLength)chord.Length).GroupFraction;
-                length_string += "G," + frac.Weight.ToString() + "," + frac.SplitInto.ToString() +
-                                 "," + frac.Replacing.ToString() + ","+ chord.Length.NoteType.ToString();
+                //var frac = ((TupleLength)chord.Length);
+                //length_string += "G," + frac.Weight.ToString() + "," + frac.SplitInto.ToString() +
+                //                "," + frac.Replacing.ToString() + ","+ chord.Length.NoteType.ToString();
             }
             else if (chord.Length is NonStandardLength)
             {

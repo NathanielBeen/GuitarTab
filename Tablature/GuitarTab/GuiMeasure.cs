@@ -50,7 +50,7 @@ namespace GuitarTab
 
             first_left = info.Position.X;
             lowest_bar = info.Position.CurrentBar;
-            if (!measure.MatchesPart)
+            if (!measure.MatchesPrevMeasure)
             {
                 info.Position.incrementXPosition(info.Dimensions.MeasureHeadWidth);
             }
@@ -112,7 +112,7 @@ namespace GuitarTab
             }
             else if (click.anyChord() && !click.anyNote())
             {
-                int position = performMousePositionCheck(click) - 1;
+                int position = Math.Max(performMousePositionCheck(click) - 1,0);
                 executor.executeChangeChordPosition(click, position);
             }
 
@@ -163,7 +163,7 @@ namespace GuitarTab
             dc.DrawLine(info.DrawingObjects.Pen, new Point(0, info.Dimensions.StringHeight / 2), new Point(0, info.Dimensions.BarHeight - info.Dimensions.StringHeight / 2));
             dc.DrawLine(info.DrawingObjects.Pen, new Point(right, Bounds.Height - info.Dimensions.BarHeight + info.Dimensions.StringHeight / 2), new Point(right, Bounds.Height - info.Dimensions.StringHeight / 2));
 
-            if (!measure.MatchesPart)
+            if (!measure.MatchesPrevMeasure)
             {
                 drawMeasureBPM(measure.Bpm, dc);
                 drawMeasureTimeSig(measure.TimeSignature.NumberOfBeats, measure.TimeSignature.BeatType, dc);

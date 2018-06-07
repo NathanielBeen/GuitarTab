@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GuitarTab"
              mc:Ignorable="d" 
-             d:DesignHeight="180" d:DesignWidth="60">
+             d:DesignHeight="390" d:DesignWidth="60">
     <Grid Name="buttonGrid">
         <Grid.Resources>
             <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}" />
@@ -18,45 +18,81 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height ="*"/>
+            <RowDefinition Height="6*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <RadioButton Grid.Row="0" Grid.Column="0" Name="wholeToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)Whole]}"
+        <RadioButton Grid.Row="0" Grid.Column="0" Name="wholeToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Whole]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.Whole}}"/>
         
-        <RadioButton Grid.Row="0" Grid.Column="1" Name="dottedWholeToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)DottedWhole]}"
+        <RadioButton Grid.Row="0" Grid.Column="1" Name="dottedWholeToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)DottedWhole]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.DottedWhole}}"/>
         
-        <RadioButton Grid.Row="1" Grid.Column="0" Name="halfToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)Half]}"
+        <RadioButton Grid.Row="1" Grid.Column="0" Name="halfToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Half]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.Half}}"/>
         
-        <RadioButton Grid.Row="1" Grid.Column="1" Name="dottedHalfToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)DottedHalf]}"
+        <RadioButton Grid.Row="1" Grid.Column="1" Name="dottedHalfToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)DottedHalf]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.DottedHalf}}"/>
         
-        <RadioButton Grid.Row="2" Grid.Column="0" Name="quarterToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)Quarter]}"
+        <RadioButton Grid.Row="2" Grid.Column="0" Name="quarterToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Quarter]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.Quarter}}"/>
         
-        <RadioButton Grid.Row="2" Grid.Column="1" Name="dottedQuarterToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)DottedQuarter]}"
+        <RadioButton Grid.Row="2" Grid.Column="1" Name="dottedQuarterToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)DottedQuarter]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.DottedQuarter}}"/>
         
-        <RadioButton Grid.Row="3" Grid.Column="0" Name="eighthToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)Eighth]}"
+        <RadioButton Grid.Row="3" Grid.Column="0" Name="eighthToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Eighth]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.Eighth}}"/>
         
-        <RadioButton Grid.Row="3" Grid.Column="1" Name="dottedEighthToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)DottedEighth]}"
+        <RadioButton Grid.Row="3" Grid.Column="1" Name="dottedEighthToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)DottedEighth]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.DottedEighth}}"/>
         
-        <RadioButton Grid.Row="4" Grid.Column="0" Name="sixeteenthToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)Sixeteenth]}"
+        <RadioButton Grid.Row="4" Grid.Column="0" Name="sixeteenthToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Sixeteenth]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.Sixeteenth}}"/>
         
-        <RadioButton Grid.Row="4" Grid.Column="1" Name="dottedSixeteenthToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)DottedSixeteenth]}"
+        <RadioButton Grid.Row="4" Grid.Column="1" Name="dottedSixeteenthToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)DottedSixeteenth]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.DottedSixeteenth}}"/>
         
-        <RadioButton Grid.Row="5" Grid.Column="0" Name="thirtySecondToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)ThirtySecond]}"
+        <RadioButton Grid.Row="5" Grid.Column="0" Name="thirtySecondToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)ThirtySecond]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.ThirtySecond}}"/>
         
-        <RadioButton Grid.Row="5" Grid.Column="1" Name="noneToggle" GroupName="length" Background="{Binding Path=Images[(local:NoteLength)None]}"
+        <RadioButton Grid.Row="5" Grid.Column="1" Name="noneToggle" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)None]}"
                      IsChecked="{Binding Path=Length, Converter={StaticResource Converter}, ConverterParameter={x:Static local:NoteLength.None}}"/>
+
+        <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="6*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <RadioButton Grid.Row="0" Grid.Column="1" GroupName="tuple" Background="{Binding Path=TupletImages[(local:TupletType)None]}"
+                         IsChecked="{Binding Path=TupletType, Converter={StaticResource Converter}, ConverterParameter={x:Static local:TupletType.None}}"/>
+            
+            <RadioButton Grid.Row="1" Grid.Column="1" GroupName="tuple" Background="{Binding Path=TupletImages[(local:TupletType)Triplet]}"
+                         IsChecked="{Binding Path=TupletType, Converter={StaticResource Converter}, ConverterParameter={x:Static local:TupletType.Triplet}}"/>
+            
+            <RadioButton Grid.Row="2" Grid.Column="1" GroupName="tuple" Background="{Binding Path=TupletImages[(local:TupletType)Quintuplet]}"
+                         IsChecked="{Binding Path=TupletType, Converter={StaticResource Converter}, ConverterParameter={x:Static local:TupletType.Quintuplet}}"/>
+            
+            <RadioButton Grid.Row="3" Grid.Column="1" GroupName="tuple" Background="{Binding Path=TupletImages[(local:TupletType)Sextuplet]}"
+                         IsChecked="{Binding Path=TupletType, Converter={StaticResource Converter}, ConverterParameter={x:Static local:TupletType.Sextuplet}}"/>
+            
+            <RadioButton Grid.Row="4" Grid.Column="1" GroupName="tuple" Background="{Binding Path=TupletImages[(local:TupletType)Septuplet]}"
+                         IsChecked="{Binding Path=TupletType, Converter={StaticResource Converter}, ConverterParameter={x:Static local:TupletType.Septuplet}}"/>
+            
+            <RadioButton Grid.Row="5" Grid.Column="1" GroupName="tuple" Background="{Binding Path=TupletImages[(local:TupletType)Nonuplet]}"
+                         IsChecked="{Binding Path=TupletType, Converter={StaticResource Converter}, ConverterParameter={x:Static local:TupletType.Nonuplet}}"/>
+        </Grid>
     </Grid>
 </UserControl>

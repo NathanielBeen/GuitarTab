@@ -35,6 +35,13 @@ namespace GuitarTab
             get { return selected_object; }
             set
             {
+                if (value == null)
+                {
+                    SetProperty(ref selected_object, value);
+                    Menu = null;
+                    return;
+                }
+
                 var menu = factory.createPropertyMenu(value.BaseObject, click);
                 if (menu != null)
                 {
@@ -65,7 +72,9 @@ namespace GuitarTab
         public PropertyMenuView(PropertyMenuFactory fac)
         {
             factory = fac;
+            Menu = null;
             Visible = Visibility.Collapsed;
+            Selected = null;
             click = null;
         }
 

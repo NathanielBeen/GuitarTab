@@ -135,7 +135,7 @@ namespace GuitarTab
 
         public LengthView createLengthView()
         {
-            return new LengthView(selections, reader.getDictionary(SettingsReader.LENGTH_IMG));
+            return new LengthView(selections, reader.getDictionary(SettingsReader.LENGTH_IMG), reader.getDictionary(SettingsReader.TUPLE));
         }
 
         public DeleteView createDeleteView()
@@ -208,15 +208,17 @@ namespace GuitarTab
         public const int EFFECT = 4;
         public const int ADDITEM = 5;
         public const int MOUSESTATE = 6;
-        public const int OTHER_IMG = 7;
-        public const int OTHER = 8;
-        public const int LOCATIONS = 9;
+        public const int TUPLE = 7;
+        public const int OTHER_IMG = 8;
+        public const int OTHER = 9;
+        public const int LOCATIONS = 10;
 
         public const string LENGTH_LOC = "LengthLoc";
         public const string REST_LOC = "RestLoc";
         public const string EFFECT_LOC = "EffectLoc";
         public const string ADD_LOC = "AddItemLoc";
         public const string STATE_LOC = "MouseStateLoc";
+        public const string TUPLE_LOC = "TupleLoc";
         public const string OTHER_LOC = "OtherImageLoc";
         public const string LOC = "ResourceLoc";
 
@@ -286,7 +288,7 @@ namespace GuitarTab
 
         public bool isImageDict(int type)
         {
-            return (type == LENGTH_IMG || type == REST || type == EFFECT || type == ADDITEM || type == MOUSESTATE || type == OTHER_IMG);
+            return (type == LENGTH_IMG || type == REST || type == EFFECT || type == ADDITEM || type == MOUSESTATE || type == TUPLE || type == OTHER_IMG);
         }
 
         public string getLocationPrefix(int type)
@@ -309,6 +311,9 @@ namespace GuitarTab
                     break;
                 case MOUSESTATE:
                     prefix += dict[STATE_LOC];
+                    break;
+                case TUPLE:
+                    prefix += dict[TUPLE_LOC];
                     break;
                 case OTHER_IMG:
                     prefix += dict[OTHER_LOC];

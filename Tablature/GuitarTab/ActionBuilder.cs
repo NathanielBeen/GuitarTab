@@ -809,5 +809,23 @@ namespace GuitarTab
         }
     }
 
-    //change part bpm, change part time_sig
+    public class CreateTupletFromNotesBld : IActionBuilder
+    {
+        private CreateTupletFromNotesAtr attributes;
+
+        public CreateTupletFromNotesBld(CommandSelections selections)
+        {
+            attributes = new CreateTupletFromNotesAtr(selections);
+        }
+
+        public IActionValidator buildValidator()
+        {
+            return new CreateTupletFromNotesVal(attributes.Measure, attributes.Chords, attributes.Type, attributes.NewLengths);
+        }
+
+        public IActionCommand buildCommand()
+        {
+            return new CreateTupletFromNotesCom(attributes.Measure, attributes.Chords, attributes.NewLengths);
+        }
+    }
 }

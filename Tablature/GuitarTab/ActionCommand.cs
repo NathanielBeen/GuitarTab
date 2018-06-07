@@ -376,6 +376,9 @@ namespace GuitarTab
             part.ModelCollection.performActionOnSpecificItems(
                 m => m.Position.Index > measure.Position.Index,
                 m => m.Position.Index -= 1);
+
+            Measure prev_measure = part.ModelCollection.getItemMatchingCondition(
+                m => m.Position.Index == measure.Position.Index - 1);
         }
     }
 
@@ -399,6 +402,9 @@ namespace GuitarTab
             part.ModelCollection.performActionOnSpecificItems(
                 m => m.Position.Index > measures.First().Position.Index,
                 m => m.Position.Index -= measures.Count);
+
+            Measure prev_measure = part.ModelCollection.getItemMatchingCondition(
+                m => m.Position.Index == measures.First().Position.Index - 1);
         }
     }
 
@@ -420,7 +426,6 @@ namespace GuitarTab
         public void executeAction()
         {
             measure.TimeSignature.setTimeSignature(num_beats, beat_type);
-            measure.MatchesPart = (part.TimeSignature.matchesSignature(measure.TimeSignature) && part.DefaultBPM == measure.Bpm);
         }
     }
 
@@ -440,7 +445,6 @@ namespace GuitarTab
         public void executeAction()
         {
             measure.Bpm = bpm;
-            measure.MatchesPart = (part.TimeSignature.matchesSignature(measure.TimeSignature) && part.DefaultBPM == measure.Bpm);
         }
     }
 
@@ -458,6 +462,30 @@ namespace GuitarTab
         public void executeAction()
         {
             measure.Position.Index = position;
+        }
+    }
+
+    public class CreateTupletFromNotesCom : IActionCommand
+    {
+        private Measure measure;
+        private List<Chord> chords;
+        private List<Length> new_lengths;
+
+        public CreateTupletFromNotesCom(Measure m, List<Chord> c, List<Length> n)
+        {
+            measure = m;
+            chords = c;
+            new_lengths = n;
+        }
+
+        public void executeAction()
+        {
+            measure.breakCrossMeasureEffectsAtPosition(EffectPosition.After);
+            for (int index = 0; index < chords.Count; index++)
+            {
+                chords[index].setLength(new_lengths[index]);
+            }
+            measure.updateSpaceTaken();
         }
     }
 }

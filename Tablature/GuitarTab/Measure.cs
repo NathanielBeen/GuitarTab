@@ -10,8 +10,8 @@ namespace GuitarTab
     {
         public int Bpm { get; set; }
         public TimeSignature TimeSignature { get; }
-        //replace with a method instead of a property
-        public bool MatchesPart { get; set; }
+        public bool MatchesPrevMeasure { get; set; }
+        public bool MatchUpdated { get; set; }
 
         public Position Position { get; set; }
 
@@ -19,23 +19,24 @@ namespace GuitarTab
         public event EventHandler<ObjectAddedArgs> ModelAdded;
         public event EventHandler<ObjectRemovedArgs> ModelRemoved;
 
-        public static Measure createInstance(int? bpm, int? num_beats, NoteLength? beat_type, TimeSignature part_sig, int? part_bpm, int? pos)
+        public static Measure createInstance(int? bpm, int? num_beats, NoteLength? beat_type, int? pos)
         {
-            if (bpm == null || num_beats == null || beat_type == null || part_sig == null || part_bpm == null || pos == null) { return null; }
+            if (bpm == null || num_beats == null || beat_type == null || pos == null) { return null; }
 
             var this_sig = TimeSignature.createInstance((int)num_beats, (NoteLength)beat_type);
-            bool matches_part = this_sig.matchesSignature(part_sig) && bpm == part_bpm;
+            bool matches_prev_measure = false;
             var position = new Position((int)pos, false);
             var collection = new ChordCollection(this_sig);
 
-            return new Measure((int)bpm, this_sig, matches_part, position, collection);
+            return new Measure((int)bpm, this_sig, matches_prev_measure, position, collection);
         }
 
-        private Measure(int bpm, TimeSignature time_sig, bool matches_part, Position position, ChordCollection collection)
+        private Measure(int bpm, TimeSignature time_sig, bool matches_prev_measure, Position position, ChordCollection collection)
         {
             Bpm = bpm;
             TimeSignature = time_sig;
-            MatchesPart = matches_part;
+            MatchesPrevMeasure = matches_prev_measure;
+            MatchUpdated = false;
 
             Position = position;
             ModelCollection = collection;
@@ -63,7 +64,7 @@ namespace GuitarTab
             return (ModelCollection as ChordCollection)?.MeasureLength.TotalSpace ?? 0;
         }
 
-        public double getSpaceTaken()
+        public int getSpaceTaken()
         {
             return (ModelCollection as ChordCollection)?.MeasureLength.SpaceTaken ?? 0;
         }
@@ -93,6 +94,16 @@ namespace GuitarTab
         {
             ModelCollection.First()?.breakMultiEffectsAtPosition(EffectPosition.Into);
             ModelCollection.Last()?.breakMultiEffectsAtPosition(EffectPosition.After);
+        }
+
+        public void SetmatchesPrevMeasure(Measure other)
+        {
+            bool new_matches = (other != null && other.Bpm == Bpm && other.TimeSignature.matchesSignature(TimeSignature));
+            if (new_matches != MatchesPrevMeasure)
+            {
+                MatchesPrevMeasure = new_matches;
+                MatchUpdated = true;
+            }
         }
     }
 }

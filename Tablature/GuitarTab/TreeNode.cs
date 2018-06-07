@@ -168,6 +168,10 @@ namespace GuitarTab
                     orderby (node as MeasureTreeNode).getMeasure().Position.Index
                     select node as MeasureTreeNode).ToList();
         }
+
+        public void beginRedrawMeasureHeads() { part.updateMeasureMatching(); }
+
+        public void endRedrawMeasureheads() { foreach (MeasureTreeNode node in Children) { node.redrawMeasureHead(); } }
     }
 
     public class MeasureTreeNode : TreeNode
@@ -198,6 +202,15 @@ namespace GuitarTab
         }
 
         public override void handlePositionClick(PositionClick click) { click?.checkItem(measure.Position.Index, ObjectBounds.Bounds); }
+
+        public void redrawMeasureHead()
+        {
+            if (measure.MatchUpdated)
+            {
+                measure.MatchUpdated = false;
+                (ObjectDrawer as MeasureDrawingVisual).refreshMeasure();
+            }
+        }
     }
 
     public class ChordTreeNode : TreeNode

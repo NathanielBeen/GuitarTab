@@ -10,8 +10,8 @@ namespace GuitarTab
     {
         private MouseStateConverter converter;
 
-        private Length selected_length;
-        public Length SelectedLength
+        private NoteLength selected_length;
+        public NoteLength SelectedLength
         {
             get { return selected_length; }
             set { SetProperty(ref selected_length, value); }
@@ -44,6 +44,13 @@ namespace GuitarTab
             set { converter.SelectedEffectType = value; }
         }
 
+        private TupletType tuplet_type;
+        public TupletType TupletType
+        {
+            get { return tuplet_type; }
+            set { SetProperty(ref tuplet_type, value); }
+        }
+
         public Part SelectedPart { get; set; }
         public List<Measure> SelectedMeasure { get; private set; }
         public List<Chord> SelectedChord { get; private set; }
@@ -63,7 +70,7 @@ namespace GuitarTab
         public CommandSelections(MouseStateConverter conv)
         {
             converter = conv;
-            SelectedLength = null;
+            SelectedLength = NoteLength.None;
             SelectedEffectType = EffectType.No_Type;
 
             SelectedPart = null;
@@ -96,7 +103,6 @@ namespace GuitarTab
             Returns = null;
             Wide = null;
             Legato = null;
-            SelectedLength = null;
         }
 
         public void ClearModel()

@@ -52,6 +52,7 @@ namespace GuitarTab
         public void rebarMeasure(MeasureTreeNode measure_node)
         {
             MeasureBarrer.barMeasure(measure_node);
+            TupletBarrer.barMeasure(measure_node);
             measure_node?.ObjectDrawer.refreshVisual();
         }
 

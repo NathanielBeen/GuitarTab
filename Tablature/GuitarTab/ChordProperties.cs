@@ -39,7 +39,7 @@ namespace GuitarTab
 
         public void submitChanges()
         {
-            if (current_length != chord.Length.NoteType) { executor.executeChangeChordLengthFromMenu(click, new Length(current_length)); }
+            if (current_length != chord.Length.NoteType) { executor.executeChangeChordLengthFromMenu(click, Length.createInstance(current_length)); }
         }
     }
 }

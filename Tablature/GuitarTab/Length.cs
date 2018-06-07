@@ -9,17 +9,17 @@ namespace GuitarTab
     public enum NoteLength
     {
         None = 0,
-        DottedWhole = 48,
-        Whole = 32,
-        DottedHalf = 24,
-        Half = 16,
-        DottedQuarter = 12,
-        Quarter = 8,
-        DottedEighth = 6,
-        Eighth = 4,
-        DottedSixeteenth = 3,
-        Sixeteenth = 2,
-        ThirtySecond = 1
+        DottedWhole = 60480,
+        Whole = 40320,
+        DottedHalf = 30240,
+        Half = 20160,
+        DottedQuarter = 15120,
+        Quarter = 10080,
+        DottedEighth = 7560,
+        Eighth = 5040,
+        DottedSixeteenth = 3780,
+        Sixeteenth = 2520,
+        ThirtySecond = 1260
     }
 
     //create an extension method that converts the length into a string for menus
@@ -41,13 +41,6 @@ namespace GuitarTab
                 default:
                     return false;
             }
-        }
-
-        public static double roundIfWithinDoubleError(double length)
-        {
-            int target = (int)Math.Round(length);
-            if (length <= target + .01 && length >= target - .01) { return target; }
-            return length;
         }
 
         public static int getVisualNoteLength(this NoteLength length)
@@ -135,6 +128,10 @@ namespace GuitarTab
                     return "Dotted Quarter";
                 case NoteLength.Quarter:
                     return "Quarter";
+                case NoteLength.DottedEighth:
+                    return "Dotted Eighth";
+                case NoteLength.Eighth:
+                    return "Egihth";
                 case NoteLength.DottedSixeteenth:
                     return "Dotted Sixteenth";
                 case NoteLength.Sixeteenth:
@@ -158,100 +155,76 @@ namespace GuitarTab
     {
         public NoteLength NoteType { get; set; }
 
-        public Length(NoteLength note_type)
+        public static Length createInstance(NoteLength length)
+        {
+            if (length == NoteLength.None) { return null; }
+            else { return new Length(length); }
+        }
+
+        public static Length createInstance(NoteLength length, TupletType type)
+        {
+            if (type != TupletType.None) { return TupleLength.createInstance(length, type); }
+            else { return createInstance(length); }
+        }
+
+        protected Length(NoteLength note_type)
         {
             NoteType = note_type;
         }
 
-        public virtual double getLength()
+        public virtual int getLength()
         {
-            return (double)NoteType;
+            return (int)NoteType;
         }
     }
 
     public class NonStandardLength : Length
     {
-        private double non_standard_length;
-        public NonStandardLength(double ns_length)
+        private int non_standard_length;
+        public NonStandardLength(int ns_length)
             :base(NoteLength.None)
         {
             non_standard_length = ns_length;
         }
 
-        public override double getLength()
+        public override int getLength()
         {
             return non_standard_length;
         }
     }
 
-    public class GroupedLength : Length
+    public class TupleLength : Length
     {
-        public GroupFraction GroupFraction { get; }
+        public TupletType TupleType { get; }
 
-        public GroupedLength(NoteLength length, GroupFraction fraction)
-            :base(length)
+        public static TupleLength createInstance(int note_length, int type)
         {
-            GroupFraction = fraction;
-        }
-
-        public override double getLength()
-        {
-            return GroupFraction.getLength();
-        }
-    }
-
-    public struct GroupFraction
-    {
-        public int Weight { get; }
-        public int SplitInto { get; }
-        public NoteLength Replacing { get; }
-
-        public GroupFraction(int weight, int split, NoteLength replacing)
-        {
-            Weight = weight;
-            SplitInto = split;
-            Replacing = replacing;
-        }
-
-        public bool mayAddFraction(GroupFraction other)
-        {
-            return (Replacing == other.Replacing && SplitInto == other.SplitInto);
-        }
-
-        public GroupFraction addFraction(GroupFraction other)
-        {
-            return new GroupFraction(Weight + other.Weight, SplitInto, Replacing);
-        }
-
-        public double getLength()
-        {
-            return (int)Replacing / SplitInto * Weight;
-        }
-    }
-
-    public static class GroupFractionCalulator
-    {
-        public static List<GroupFraction> simplifyFractionList(List<GroupFraction> to_simplify)
-        {
-            var simplified_list = new List<GroupFraction>();
-            foreach (GroupFraction fraction in to_simplify) { addFractionToList(simplified_list, fraction); }
-            return simplified_list;
-        }
-
-        public static void addFractionToList(List<GroupFraction> list, GroupFraction fraction)
-        {
-            foreach (GroupFraction other_fraction in list)
+            if (NoteLengthExtensions.intIsValidNoteLength(note_length) && 
+                TupletTypeExtensions.intIsValidTupletType(type))
             {
-                if (fraction.mayAddFraction(other_fraction))
-                {
-                    GroupFraction new_fraction = fraction.addFraction(other_fraction);
-                    list.Remove(other_fraction);
-                    list.Add(new_fraction);
-                    return;
-                }
+                return new TupleLength((NoteLength)note_length, (TupletType)type);
             }
+            else { return null; }
+        }
 
-            list.Add(fraction);
+        public static TupleLength createInstance(NoteLength note_length, TupletType type)
+        {
+            if (note_length != NoteLength.None && type != TupletType.None)
+            {
+                return new TupleLength(note_length, type);
+            }
+            else { return null; }
+        }
+
+        private TupleLength(NoteLength note_length, TupletType type)
+            :base(note_length)
+        {
+            TupleType = type;
+        }
+
+        public override int getLength()
+        {
+            return (int)NoteType * TupleType.getNumReplacing() / (int)TupleType;
         }
     }
 
@@ -269,7 +242,7 @@ namespace GuitarTab
             get { return time_signature.MeasureLength; }
         }
 
-        public double SpaceTaken { get; set; }
+        public int SpaceTaken { get; set; }
 
         /*
         * Constructor
@@ -286,33 +259,12 @@ namespace GuitarTab
         
         public void updateSpaceTaken(IEnumerable<Chord> chords)
         {
-            SpaceTaken = NoteLengthExtensions.roundIfWithinDoubleError(calcNonGroupedLength(chords) + calcGroupedLength(chords));
-        }
-        
-
-        /*
-        * Helper Methods
-        */
-        public double calcNonGroupedLength(IEnumerable<Chord> chords)
-        {
-            double total = 0;
+            int total = 0;
             foreach (Chord chord in chords)
             {
-                if (!(chord.Length is GroupedLength)) { total += chord.Length.getLength(); }
+                total += chord.Length.getLength();
             }
-            return total;
-        }
-
-        public double calcGroupedLength(IEnumerable<Chord> chords)
-        {
-            List<GroupFraction> grouped_chords = (from chord in chords
-                                                  where chord.Length is GroupedLength
-                                                  select ((GroupedLength)chord.Length).GroupFraction).ToList();
-            List<GroupFraction> simplified_list = GroupFractionCalulator.simplifyFractionList(grouped_chords);
-
-            double total = 0;
-            foreach (GroupFraction frac in simplified_list){ total += frac.getLength(); }
-            return total;
+            SpaceTaken = total;
         }
     }
 }

@@ -40,8 +40,8 @@ namespace GuitarTab
         {
             if (click.matchesSelectionType(Selection.Add_Measure))
             {
-                int position = performMousePositionCheck(click);
-                executor.executeAddMeasureToPart(click, position);
+                MeasurePositionClick pos_click = performMousePositionCheck(click);
+                executor.executeAddMeasureToPart(click, pos_click);
             }
 
             invokeClickDelegate(click);
@@ -60,13 +60,13 @@ namespace GuitarTab
         {
             if (click.multipleMeasures() && !click.anyChord())
             {
-                int position = performMousePositionCheck(click);
-                executor.executeChangeMultipleMeasurePosition(click, position);
+                MeasurePositionClick pos_click = performMousePositionCheck(click);
+                executor.executeChangeMultipleMeasurePosition(click, pos_click);
             }
             else if (click.anyMeasure() && !click.anyChord())
             {
-                int position = performMousePositionCheck(click);
-                executor.executeChangeMeasurePosition(click, position);
+                MeasurePositionClick pos_click = performMousePositionCheck(click);
+                executor.executeChangeMeasurePosition(click, pos_click);
             }
 
             invokeClickDelegate(click);
@@ -85,11 +85,11 @@ namespace GuitarTab
             }
         }
 
-        public int performMousePositionCheck(MouseClick click)
+        public MeasurePositionClick performMousePositionCheck(MouseClick click)
         {
             var n_click = new MeasurePositionClick(click.Point);
             invokeClickDelegate(n_click);
-            return n_click.Position;
+            return n_click;
         }
     }
 

@@ -86,6 +86,13 @@ Length_:_ChangeLength.png
 4_:_EffectSelect.png
 5_:_MultiEffectSelect.png
 6_:_LengthSelect.png
+<>//Tuple
+None_:_NoTuple.png
+Triplet_:_Triplet.png
+Quintuplet_:_Quintuplet.png
+Sextuplet_:_Sextuplet.png
+Septuplet_:_Septuplet.png
+Nonuplet_:_Nonuplet.png
 <>//Other Image
 deleteButton_:_DeleteButton.png
 incButton_:_IncrementButton.png
@@ -103,4 +110,5 @@ RestLoc_:_RestImages/
 EffectLoc_:_EffectImages/
 AddItemLoc_:_AddItemImages/
 MouseStateLoc_:_MouseStateImages/
+TupleLoc_:_TupleImages/
 ResourceLoc_:_../../Resources/

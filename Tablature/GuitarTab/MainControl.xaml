@@ -18,7 +18,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="2*"/>
-            <RowDefinition Height="180"/>
+            <RowDefinition Height="390"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <local:DeleteButton Grid.Column="1" Grid.Row="0" DataContext="{Binding DeleteView}"/>

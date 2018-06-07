@@ -88,5 +88,17 @@ namespace GuitarTab
 
             return chord.ModelCollection.getItemMatchingCondition(n => n.String == note.String);
         }
+
+        public void updateMeasureMatching()
+        {
+            Measure prev_measure = null;
+            Measure curr_measure = null;
+            foreach (Measure measure in ModelCollection.Items())
+            {
+                prev_measure = curr_measure;
+                curr_measure = measure;
+                curr_measure?.SetmatchesPrevMeasure(prev_measure);
+            }
+        }
     }
 }

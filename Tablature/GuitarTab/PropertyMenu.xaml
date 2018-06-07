@@ -18,8 +18,12 @@
         <DataTemplate x:Key="NoteMenu">
             <local:NotePropertyMenu/>
         </DataTemplate>
+        <DataTemplate x:Key="NullMenu">
+            <Label/>
+        </DataTemplate>
 
         <Style x:Key="MenuType" TargetType="{x:Type ContentControl}">
+            <Setter Property="ContentTemplate" Value="{StaticResource NullMenu}"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Menu, Converter={StaticResource TypeConverter}}"
                              Value="{x:Type local:MeasureProperties}">
@@ -46,6 +50,8 @@
             <RowDefinition Height="5*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+        <ContentControl Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Content="{Binding}" Style="{StaticResource MenuType}"/>
         <Button Grid.Column="0" Grid.Row="1" Name="resetBtn" Content="Reset Selection" Command="{Binding ResetCommand}"/>
         <Button Grid.Column="1" Grid.Row="1" Name="submitBtn" Content="Submit Selection" Command="{Binding SubmitCommand}"/>
         <Button Grid.Column="2" Grid.Row="1" Name="closeBtn" Content="Close Menu" Command="{Binding CloseCommand}"/>

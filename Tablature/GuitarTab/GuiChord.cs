@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace GuitarTab
     public class ChordBounds : BaseBounded
     {
         public ChordBar ChordBar { get; set; }
+        public ChordTuple ChordTuple { get; set; }
 
         private Chord chord;
         private VisualInfo info;
@@ -20,6 +22,7 @@ namespace GuitarTab
             :base(del)
         {
             ChordBar = new ChordBar(c.Length.NoteType);
+            ChordTuple = new ChordTuple(c.Length);
 
             chord = c;
             info = v_info;
@@ -84,12 +87,14 @@ namespace GuitarTab
     {
         protected Chord chord;
         protected ChordBar bar;
+        protected ChordTuple tuple;
         
-        public ChordDrawingVisual(Chord c, ChordBar b, VisualBounds bounds, VisualInfo v_info, IDelegate del)
+        public ChordDrawingVisual(Chord c, ChordBar b, ChordTuple t, VisualBounds bounds, VisualInfo v_info, IDelegate del)
             :base(bounds, v_info, del)
         {
             chord = c;
             bar = b;
+            tuple = t;
             refreshVisual();
         }
 
@@ -97,12 +102,14 @@ namespace GuitarTab
         {
             int center_x = Bounds.Width / 2;
             int top_y = Bounds.Height + info.Dimensions.BarringMargin;
-            int curr_y = top_y + info.Dimensions.BarringHeight - 2 * info.Dimensions.BarringMargin;
+            int bot_y = top_y + info.Dimensions.BarringHeight - 2 * info.Dimensions.BarringMargin;
             int note_width = info.Dimensions.getLength(chord.Length.NoteType);
+            int curr_y = bot_y;
 
             drawChordVerticalLine(dc, center_x, top_y, curr_y);
             drawAllChordBars(dc, center_x, note_width, ref curr_y);
             drawChordDot(dc, center_x, curr_y);
+            drawTuple(dc, center_x, bot_y, note_width);
         }
         public void drawChordVerticalLine(DrawingContext dc, int center_x, int top_y, int bottom_y)
         {
@@ -151,11 +158,45 @@ namespace GuitarTab
 
             dc.DrawEllipse(info.DrawingObjects.Brush, info.DrawingObjects.Pen, new Point(x, y), info.Dimensions.DotSize, info.Dimensions.DotSize);
         }
+
+        public void drawTuple(DrawingContext dc, int center_x, int top_y, int note_width)
+        {
+            if (tuple.HasTuple)
+            {
+                if (!tuple.Right || !tuple.Left) { drawTupleVerticalLine(dc, center_x, top_y); }
+                top_y += 2 * info.Dimensions.BarSpacing;
+                if (tuple.Right) { drawTupleHorizontalBar(dc, center_x, note_width, top_y); }
+                top_y += info.Dimensions.BarSpacing;
+                if (tuple.DrawNumber) { drawTupleText(dc, center_x, note_width, top_y); }
+            }
+        }
+
+        public void drawTupleVerticalLine(DrawingContext dc, int center_x, int curr_y)
+        {
+            Point top_point = new Point(center_x, curr_y + info.Dimensions.BarSpacing);
+            Point bottom_point = new Point(center_x, curr_y + 2 * info.Dimensions.BarSpacing);
+            dc.DrawLine(info.DrawingObjects.Pen, top_point, bottom_point);
+        }
+
+        public void drawTupleHorizontalBar(DrawingContext dc, int center_x, int note_width, int curr_y)
+        {
+            Point left_point = new Point(center_x, curr_y);
+            Point right_point = new Point(center_x + note_width + info.Dimensions.NoteWidth, curr_y);
+            dc.DrawLine(info.DrawingObjects.Pen, left_point, right_point);
+        }
+
+        public void drawTupleText(DrawingContext dc, int center_x, int note_width, int curr_y)
+        {
+            int text_x = (tuple.NumberRightOffset) ? (note_width + info.Dimensions.NoteWidth) / 2 + center_x - 2 : center_x - 2;
+            var text = new FormattedText(((int)tuple.Type).ToString(), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight,
+                                         info.DrawingObjects.TypeFace, info.Dimensions.SmallFontSize, info.DrawingObjects.Brush);
+            dc.DrawText(text, new Point(text_x, curr_y));
+        }
     }
 
     public class RestChordDrawingVisual : ChordDrawingVisual
     {
-        public RestChordDrawingVisual(Chord c, ChordBar b, VisualBounds bounds, VisualInfo v_info, IDelegate del) : base(c, b, bounds, v_info, del) { }
+        public RestChordDrawingVisual(Chord c, ChordBar b, ChordTuple t, VisualBounds bounds, VisualInfo v_info, IDelegate del) : base(c, b, t, bounds, v_info, del) { }
 
         public override void refreshDrawingContext(DrawingContext dc)
         {

@@ -65,7 +65,7 @@ namespace GuitarTab
 
         public void launchNewPropertyMenu(object sender, PropertyMenuEventArgs args) { PropertyMenuView.launchMenu(args.Click); }
 
-        public void launchNewFretMenu(object sender, FretMenuEventArgs args) { FretMenuView.launchMenu(args.Command, args.Click); }
+        public void launchNewFretMenu(object sender, IntMenuEventArgs args) { FretMenuView.launchMenu(args.Command, args.Click); }
 
         public void launchNoteSelectMenu(object sender, NoteSelectLaunchEventArgs args)
         {

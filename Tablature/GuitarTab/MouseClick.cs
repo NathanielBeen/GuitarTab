@@ -169,11 +169,20 @@ namespace GuitarTab
 
     public class MeasurePositionClick : PositionClick
     {
-        public MeasurePositionClick(Point p) : base(p) { }
+        public bool MeasureSet { get; private set; }
+
+        public MeasurePositionClick(Point p) : base(p)
+        {
+            MeasureSet = false;
+        }
 
         public override void checkItem(int pos, VisualBounds bounds)
         {
-            if (bounds.containsPoint(Point)) { Position = pos; }
+            if (bounds.containsPoint(Point))
+            {
+                MeasureSet = true;
+                Position = pos;
+            }
         }
     }
 
