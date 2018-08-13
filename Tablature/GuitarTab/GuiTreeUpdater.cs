@@ -9,59 +9,63 @@ namespace GuitarTab
     public class GuiTreeUpdater
     {
         private GuiObjectTree tree;
-        private GuiObjectFactory factory;
         private CurrentPosition position;
 
-        public GuiTreeUpdater(GuiObjectTree t, GuiObjectFactory fac, CurrentPosition curr)
+        public GuiTreeUpdater(GuiObjectTree t, CurrentPosition curr)
         {
             tree = t;
-            factory = fac;
             position = curr;
         }
 
-        public void setTreePart(Part part) { tree.buildTree(part); }
+        public void setTreePart(Part part) { tree.buildObject(null, part); }
 
         public void updatePartBounds(PartTreeNode node)
         {
-            position.resetPositionToPartBeginning(node.ObjectBounds.Bounds);
-            node?.ObjectBounds.updateBounds();
+            position.resetPositionToPartBeginning(node.Bounds);
+            node?.updateBounds();
         }
 
         public void updateMeasureBoundsAtAndAfter(MeasureTreeNode prev_measure_node, List<MeasureTreeNode> to_update)
         {
-            var bounds = prev_measure_node?.ObjectBounds.Bounds as MultipleVisualBounds;
-            position.resetPositionToMeasureEnd(bounds?.AllBounds.Last());
-            foreach (MeasureTreeNode measure in to_update) { measure.ObjectBounds.updateBounds(); }
+            IBounds bounds = prev_measure_node?.Bounds.getBoundsList().LastOrDefault();
+            position.resetPositionToMeasureEnd(bounds);
+            foreach (MeasureTreeNode measure in to_update) { measure.updateBounds(); }
         }
 
         public void updateMeasureBounds(MeasureTreeNode measure_node)
         {
-            var bounds = measure_node.ObjectBounds.Bounds as MultipleVisualBounds;
-            position.resetPositionToMeasureBeginning(bounds.AllBounds.First());
-            measure_node.ObjectBounds.updateBounds();
+            IBounds bounds = measure_node?.Bounds.getBoundsList().FirstOrDefault();
+            position.resetPositionToMeasureBeginning(bounds);
+            measure_node.updateBounds();
         }
 
         public void updateChordBounds(ChordTreeNode chord_node)
         {
-            position.resetPositionToChordBeginning(chord_node.ObjectBounds.Bounds);
-            chord_node.ObjectBounds.updateBounds();
+            position.resetPositionToChordBeginning(chord_node.Bounds);
+            chord_node.updateBounds();
         }
 
-        public void updateDrawing(TreeNode node) { node?.ObjectDrawer.refreshVisual(); }
+        public void updateDrawing(TreeNode node) { node?.refreshVisual(); }
 
-        public void rebarMeasure(MeasureTreeNode measure_node)
+        public void updateRootDrawing() { tree.Root?.refreshVisual(); }
+
+        public static void rebarPart(TreeNode node)
+        {
+            if (node == null) { return; }
+            foreach (MeasureTreeNode measure in node.Children) { rebarMeasure(measure); }
+        }
+
+        public static void rebarMeasure(MeasureTreeNode measure_node)
         {
             MeasureBarrer.barMeasure(measure_node);
             TupletBarrer.barMeasure(measure_node);
-            measure_node?.ObjectDrawer.refreshVisual();
+            measure_node?.refreshVisual();
         }
 
-        public void rebarMeasures(PartTreeNode part_node, List<MeasureTreeNode> measure_nodes)
+        public void rebarMeasures(List<MeasureTreeNode> measure_nodes)
         {
             foreach (MeasureTreeNode measure in measure_nodes) { rebarMeasure(measure); }
         }
-
-        public void handleItemAdded(object sender, ObjectAddedArgs args) { tree.handleItemAdded(args.Parent, args); }
 
         public void populateMouseClick(NodeClick click) { tree.populateMouseClick(click); }
     }

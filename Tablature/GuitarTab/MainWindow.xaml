@@ -5,6 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GuitarTab"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="900">
-    <local:MainControl x:Name="main"/>
+        Title="MainWindow" Height="520" Width="1200">
+    <Window.Resources>
+        <DataTemplate x:Key="viewTemplate">
+            <local:ViewingControl DataContext="{Binding ControlView}" />
+        </DataTemplate>
+        <DataTemplate x:Key="editTemplate">
+            <local:EditingControl DataContext="{Binding ControlView}"/>
+        </DataTemplate>
+        
+        <Style x:Key="mainStyle" TargetType="{x:Type ContentControl}">
+            <Setter Property="ContentTemplate" Value="{StaticResource viewTemplate}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=ViewType}" Value="{x:Static local:ViewType.Editing}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource editTemplate}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <local:ViewSwitch Grid.Column="0" Grid.Row="0"/>
+        <ContentControl Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Content="{Binding}" Style="{StaticResource mainStyle}" x:Name="main"/>
+    </Grid>
 </Window>

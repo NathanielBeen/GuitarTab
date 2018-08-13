@@ -48,7 +48,7 @@ namespace GuitarTab
             {
                 NoteLength length = NoteLengthExtensions.getNoteLengthFromString(entry.Key);
                 var brush = new ImageBrush();
-                brush.ImageSource = new BitmapImage(new Uri(entry.Value, UriKind.Relative));
+                brush.ImageSource = SettingsReader.getImageFromLocation(entry.Value);
 
                 image_dict[length] = brush;
             }
@@ -63,7 +63,7 @@ namespace GuitarTab
             {
                 TupletType type = TupletTypeExtensions.getTupletTypeFromString(entry.Key);
                 var brush = new ImageBrush();
-                brush.ImageSource = new BitmapImage(new Uri(entry.Value, UriKind.Relative));
+                brush.ImageSource = SettingsReader.getImageFromLocation(entry.Value);
 
                 image_dict[type] = brush;
             }

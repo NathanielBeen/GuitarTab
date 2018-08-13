@@ -52,11 +52,6 @@ namespace GuitarTab
             ModelCollection = collection;
         }
 
-        public List<object> getGenericModelList()
-        {
-            return new List<object>(ModelCollection.Items());
-        }
-
         public override void setLength(Length new_length)
         {
             base.setLength(new_length);
@@ -91,6 +86,11 @@ namespace GuitarTab
         {
             ModelCollection.Remove(note);
             ModelRemoved?.Invoke(this, new ObjectRemovedArgs(note));
+        }
+
+        public List<object> getChildrenToBuild()
+        {
+            return new List<object>(ModelCollection.Items());
         }
     }
 }

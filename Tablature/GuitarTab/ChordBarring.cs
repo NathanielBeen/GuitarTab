@@ -86,9 +86,9 @@ namespace GuitarTab
         private int beat_length;
         private int space_taken;
 
-        public List<ChordBounds> Chords;
+        public List<IChordBounds> Chords;
 
-        public BarredBeat(int length, List<ChordBounds> measure_chords)
+        public BarredBeat(int length, List<IChordBounds> measure_chords)
         {
             beat_length = length;
             space_taken = 0;
@@ -96,13 +96,13 @@ namespace GuitarTab
             Chords = getBeat(measure_chords);
         }
 
-        public List<ChordBounds> getBeat(List<ChordBounds> measure_chords)
+        public List<IChordBounds> getBeat(List<IChordBounds> measure_chords)
         {
-            var chords = new List<ChordBounds>();
+            var chords = new List<IChordBounds>();
 
             while (needsToAddChord())
             {
-                ChordBounds to_add = measure_chords.FirstOrDefault();
+                IChordBounds to_add = measure_chords.FirstOrDefault();
                 if (to_add is null) { return chords; }
 
                 chords.Add(to_add);
@@ -117,7 +117,7 @@ namespace GuitarTab
 
         public void barBeat()
         {
-            foreach (ChordBounds chord in Chords)
+            foreach (IChordBounds chord in Chords)
             {
                 chord.ChordBar.resetBars(chord.getChord().Length.NoteType);
             }
@@ -127,7 +127,7 @@ namespace GuitarTab
             {
                 setConnectedBars();
             }
-            foreach (ChordBounds chord in Chords)
+            foreach (IChordBounds chord in Chords)
             {
                 bool last = chord.Equals(Chords.Last());
                 chord.ChordBar.barChord(connected, last);
@@ -136,8 +136,8 @@ namespace GuitarTab
 
         public void setConnectedBars()
         {
-            ChordBounds prev_chord = null;
-            foreach (ChordBounds chord in Chords)
+            IChordBounds prev_chord = null;
+            foreach (IChordBounds chord in Chords)
             {
                 if (prev_chord != null && prev_chord.Bounds.Bar == chord.Bounds.Bar)
                 {
@@ -160,9 +160,9 @@ namespace GuitarTab
 
         public static List<BarredBeat> genBeats(MeasureTreeNode measure_node)
         {
-            List<ChordBounds> chords = (from node in measure_node.Children
+            List<IChordBounds> chords = (from node in measure_node.Children
                                         orderby (node as ChordTreeNode).getChord().Position.Index
-                                        select node.ObjectBounds as ChordBounds).ToList();
+                                        select (node as ChordTreeNode).getBounds()).ToList();
             int beat_length = (int)measure_node.getMeasure().TimeSignature.BeatType;
             var beats = new List<BarredBeat>();
             while (chords.Any())

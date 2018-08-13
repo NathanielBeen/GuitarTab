@@ -54,7 +54,7 @@ namespace GuitarTab
             ModelRemoved?.Invoke(this, new ObjectRemovedArgs(chord));
         }
 
-        public List<object> getGenericModelList()
+        public List<object> getChildrenToBuild()
         {
             return new List<object>(ModelCollection.Items());
         }

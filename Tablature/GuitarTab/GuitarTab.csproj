@@ -13,6 +13,21 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,6 +55,9 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.6\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,7 +85,17 @@
       <DependentUpon>AddItemButtons.xaml</DependentUpon>
     </Compile>
     <Compile Include="AddItemView.cs" />
-    <Compile Include="BaseValidator.cs" />
+    <Compile Include="BaseGuiDrawer.cs" />
+    <Compile Include="BaseGuiMouseHandler.cs" />
+    <Compile Include="BaseInputViewModel.cs" />
+    <Compile Include="BasePropertyMenu.cs" />
+    <Compile Include="CenteredMenus.xaml.cs">
+      <DependentUpon>CenteredMenus.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CenteredTabVisuals.xaml.cs">
+      <DependentUpon>CenteredTabVisuals.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DimensionUpdater.cs" />
     <Compile Include="BPMTimeSigButtons.xaml.cs">
       <DependentUpon>BPMTimeSigButtons.xaml</DependentUpon>
     </Compile>
@@ -90,9 +118,23 @@
     <Compile Include="FretMenuView.cs" />
     <Compile Include="GuiTimeSig.cs" />
     <Compile Include="GuiTreeUpdater.cs" />
+    <Compile Include="InstrumentProperties.cs" />
+    <Compile Include="InstrumentPropertyMenu.xaml.cs">
+      <DependentUpon>InstrumentPropertyMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainView.cs" />
+    <Compile Include="PartPropertyMenu.xaml.cs">
+      <DependentUpon>PartPropertyMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PartSettingsMenuView.cs" />
+    <Compile Include="PartProperties.cs" />
+    <Compile Include="PartSettingsMenu.xaml.cs">
+      <DependentUpon>PartSettingsMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Song.cs" />
     <Compile Include="LengthView.cs" />
-    <Compile Include="MainControl.xaml.cs">
-      <DependentUpon>MainControl.xaml</DependentUpon>
+    <Compile Include="EditingControl.xaml.cs">
+      <DependentUpon>EditingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MeasurePropertyMenu.xaml.cs">
       <DependentUpon>MeasurePropertyMenu.xaml</DependentUpon>
@@ -117,31 +159,58 @@
     <Compile Include="PropertyMenuView.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="Selected.cs" />
+    <Compile Include="SimplifiedModels.cs" />
     <Compile Include="StateUpdateEvents.cs" />
+    <Compile Include="StaticGuiChord.cs" />
+    <Compile Include="StaticGuiEffect.cs" />
+    <Compile Include="StaticGuiMeasure.cs" />
+    <Compile Include="StaticGuiNote.cs" />
+    <Compile Include="StaticGuiObjectFactory.cs" />
+    <Compile Include="StaticGuiPart.cs" />
+    <Compile Include="TabScrollView.cs" />
+    <Compile Include="TabScrollViewer.cs" />
     <Compile Include="TimeSignature.cs" />
+    <Compile Include="TopControl.xaml.cs">
+      <DependentUpon>TopControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TreeNode.cs" />
     <Compile Include="Tuplet.cs" />
-    <Compile Include="ViewModelFactory.cs" />
+    <Compile Include="UpdatingVisualBounds.cs" />
+    <Compile Include="ViewingControl.xaml.cs">
+      <DependentUpon>ViewingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewingMouseCanvas.xaml.cs">
+      <DependentUpon>ViewingMouseCanvas.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewingView.cs" />
+    <Compile Include="EditingViewModelFactory.cs" />
     <Compile Include="CommandExecutor.cs" />
     <Compile Include="DeleteButton.xaml.cs">
       <DependentUpon>DeleteButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="EffectProperties.cs" />
-    <Compile Include="GuiChord.cs" />
+    <Compile Include="DynamicGuiChord.cs" />
     <Compile Include="GuiDelegates.cs" />
-    <Compile Include="GuiEffect.cs" />
-    <Compile Include="GuiMeasure.cs" />
-    <Compile Include="GuiNote.cs" />
-    <Compile Include="BaseGuiObjects.cs" />
+    <Compile Include="DynamicGuiEffect.cs" />
+    <Compile Include="DynamicGuiMeasure.cs" />
+    <Compile Include="DynamicGuiNote.cs" />
+    <Compile Include="BaseGuiBounded.cs" />
     <Compile Include="GuiObjectTree.cs" />
-    <Compile Include="GuiObjectFactory.cs" />
-    <Compile Include="GuiPart.cs" />
+    <Compile Include="DynamicGuiObjectFactory.cs" />
+    <Compile Include="DynamicGuiPart.cs" />
+    <Compile Include="ViewingVIewModelFactory.cs" />
+    <Compile Include="ViewSwitch.xaml.cs">
+      <DependentUpon>ViewSwitch.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewSwitchControl.xaml.cs">
+      <DependentUpon>ViewSwitchControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VisualInfo.cs" />
     <Compile Include="GuiCommandExecutor.cs" />
     <Compile Include="LengthButtons.xaml.cs">
       <DependentUpon>LengthButtons.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainView.cs" />
+    <Compile Include="EditingView.cs" />
     <Compile Include="MeasureProperties.cs" />
     <Compile Include="ModelCollectionEvents.cs" />
     <Compile Include="NoteProperties.cs" />
@@ -149,7 +218,6 @@
       <DependentUpon>PropertyMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="MenuEvents.cs" />
-    <Compile Include="PropertyMenuItem.cs" />
     <Compile Include="TabVisuals.cs" />
     <Compile Include="Tester.cs" />
     <Compile Include="VisualBounds.cs" />
@@ -159,11 +227,20 @@
     <Compile Include="SymbolCollection.cs" />
     <Compile Include="TabReader.cs" />
     <Compile Include="TabWriter.cs" />
+    <Compile Include="VisualsView.cs" />
     <Page Include="AddItemButtons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BPMTimeSigButtons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CenteredMenus.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CenteredTabVisuals.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -183,11 +260,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="InstrumentPropertyMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LengthButtons.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainControl.xaml">
+    <Page Include="EditingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -221,7 +302,35 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PartPropertyMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PartSettingsMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PropertyMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TopControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewingMouseCanvas.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewSwitch.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewSwitchControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -254,6 +363,171 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AddItemImages\AddBend.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddHopo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddMeasure.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddNone.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddNote.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddPalmMute.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddPinchHarmonic.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddRest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddSlide.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddTie.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\AddVibrato.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\AddItemImages\ChangeLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EffectImages\PinchHarmonic.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EffectImages\Vibrato.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EffectImages\WideVibrato.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\DottedEighthLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\DottedHalfLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\DottedQuarterLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\DottedSixeteenthLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\DottedWholeLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\EighthLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\HalfLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\NoneLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\QuarterLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\SixeteenthLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\ThirtySecondLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LengthImages\WholeLength.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MouseStateImages\EffectSelect.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MouseStateImages\LengthSelect.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MouseStateImages\MeasureSelect.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MouseStateImages\MultiEffectSelect.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MouseStateImages\None.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MouseStateImages\NoteSelect.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MouseStateImages\RestSelect.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\OtherImages\DecrementButton.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\OtherImages\DeleteButton.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\OtherImages\IncrementButton.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\ResourceDocument.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\RestImages\EighthRest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\RestImages\HalfRest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\RestImages\NoRest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\RestImages\QuarterRest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\RestImages\SixeteenthRest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\RestImages\ThirtySecondRest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Resource Include="Resources\textinput.txt" />
+    <EmbeddedResource Include="Resources\TupleImages\Nonuplet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\TupleImages\NoTuple.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\TupleImages\Quintuplet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\TupleImages\Septuplet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\TupleImages\Sextuplet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\TupleImages\Triplet.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

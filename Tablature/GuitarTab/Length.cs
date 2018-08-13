@@ -34,6 +34,7 @@ namespace GuitarTab
         {
             switch (length)
             {
+                case NoteLength.DottedQuarter:
                 case NoteLength.DottedHalf:
                 case NoteLength.DottedEighth:
                 case NoteLength.DottedSixeteenth:
@@ -131,7 +132,7 @@ namespace GuitarTab
                 case NoteLength.DottedEighth:
                     return "Dotted Eighth";
                 case NoteLength.Eighth:
-                    return "Egihth";
+                    return "Eighth";
                 case NoteLength.DottedSixeteenth:
                     return "Dotted Sixteenth";
                 case NoteLength.Sixeteenth:

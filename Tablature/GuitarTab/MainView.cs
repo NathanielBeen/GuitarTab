@@ -1,80 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace GuitarTab
 {
-    public class BaseViewModel : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = "")
-        {
-            if (EqualityComparer<T>.Default.Equals(storage, value))
-                return false;
-            storage = value;
-            onPropertyChanged(propertyName);
-            return true;
-        }
-
-        protected void onPropertyChanged(string name)
-        {
-            var handler = PropertyChanged;
-            handler?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-    }
-
     public class MainView : BaseViewModel
     {
-        public LengthView LengthView { get; }
-        public DeleteView DeleteView { get; }
-        public AddItemView AddItemView { get; }
-        public MouseCanvasView CanvasView { get; }
-        public PropertyMenuView PropertyMenuView { get; }
-        public FretMenuView FretMenuView { get; }
-        public NoteSelectView NoteSelectView { get; }
-        public BPMTimeSigView BPMTimeSigView { get; }
-
-        public MainView(LengthView length, DeleteView delete, AddItemView add_item, MouseCanvasView canvas_view, PropertyMenuView property, FretMenuView fret, NoteSelectView select,
-            BPMTimeSigView bpm, GuiCommandExecutor executor, MouseHandler handler)
+        private ViewType view_type;
+        public ViewType ViewType
         {
-            LengthView = length;
-            DeleteView = delete;
-            AddItemView = add_item;
-            CanvasView = canvas_view;
-            PropertyMenuView = property;
-            FretMenuView = fret;
-            BPMTimeSigView = bpm;
-            NoteSelectView = select;
-
-            setHandlers(executor, handler);
+            get { return view_type; }
+            set { SetProperty(ref view_type, value); }
         }
 
-        public void setHandlers(GuiCommandExecutor executor, MouseHandler handler)
+        public BaseViewModel ControlView { get; set; }
+        public Part Part { get; set; }
+
+        private StartingFactory starting_factory;
+        private IViewModelFactory view_factory;
+
+        public ICommand ChangeToEditingViewCommand { get; set; }
+        public ICommand ChangeToViewingViewCommand { get; set; }
+        public event EventHandler<ViewModeChangedEventArgs> ViewModeChanged;
+
+        public MainView( Part part)
         {
-            executor.NoteSelectMenuLaunched += handler.handleNoteSelect;
-            executor.FretMenuLaunched += launchNewFretMenu;
-            handler.PropertyMenuChanged += launchNewPropertyMenu;
-            handler.NoteSelectLaunched += launchNoteSelectMenu;
-            handler.NoteSelectEnd += endNoteSelect;
+            ViewType = ViewType.Viewing;
+            Part = part;
+            starting_factory = new StartingFactory();
+
+            initCommands();
         }
 
-        public void launchNewPropertyMenu(object sender, PropertyMenuEventArgs args) { PropertyMenuView.launchMenu(args.Click); }
-
-        public void launchNewFretMenu(object sender, IntMenuEventArgs args) { FretMenuView.launchMenu(args.Command, args.Click); }
-
-        public void launchNoteSelectMenu(object sender, NoteSelectLaunchEventArgs args)
+        public void initCommands()
         {
-            NoteSelectView.launchNoteSelect(args);
+            ChangeToEditingViewCommand = new RelayCommand(handleChangeToEditView);
+            ChangeToViewingViewCommand = new RelayCommand(handleChangeToViewingView);
         }
 
-        public void endNoteSelect(object sender, NoteSelectEndEventArgs args)
+        public void handleChangeToEditView()
         {
-            NoteSelectView.noteSelected(args.Click);
+            ViewType = ViewType.Editing;
+            runEditingFactory();
+            refreshPart();
         }
+
+        public void handleChangeToViewingView()
+        {
+            ViewType = ViewType.Viewing;
+            runViewingFactory();
+            refreshPart();
+        }
+
+        public void runEditingFactory()
+        {
+            view_factory = new EditingViewModelFactory();
+            view_factory.runFactory(starting_factory, Part);
+            ControlView = view_factory.getMainView();
+            ViewModeChanged?.Invoke(this, new ViewModeChangedEventArgs(ViewType.Editing));
+        }
+
+        public void runViewingFactory()
+        {
+            view_factory = new ViewingViewModelFactory();
+            view_factory.runFactory(starting_factory, Part);
+            ControlView = view_factory.getMainView();
+            ViewModeChanged?.Invoke(this, new ViewModeChangedEventArgs(ViewType.Viewing));
+        }
+
+        public void refreshPart() { Part = view_factory?.getPart(); }
+    }
+
+    public class ViewModeChangedEventArgs : EventArgs
+    {
+        public ViewType Type { get; }
+
+        public ViewModeChangedEventArgs(ViewType type) { Type = type; }
+    }
+
+    public enum ViewType
+    {
+        Editing,
+        Viewing
     }
 }

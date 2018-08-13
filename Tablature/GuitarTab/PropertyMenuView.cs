@@ -12,11 +12,16 @@ namespace GuitarTab
 {
     public class PropertyMenuView : BaseViewModel
     {
+        public const int HEIGHT = 70;
+        public const int WIDTH = 300;
+
         private PropertyMenuFactory factory;
-        private NodeClick click;
+        private VisualInfo info;
+        private NodeClick ref_click;
+        private bool instrument_menu;
         
-        private IPropertyMenu menu;
-        public IPropertyMenu Menu
+        private BasePropertyMenu menu;
+        public BasePropertyMenu Menu
         {
             get { return menu; }
             set { SetProperty(ref menu, value); }
@@ -27,6 +32,20 @@ namespace GuitarTab
         {
             get { return visible; }
             set { SetProperty(ref visible, value); }
+        }
+
+        private int left;
+        public int Left
+        {
+            get { return left; }
+            set { SetProperty(ref left, value); }
+        }
+
+        private int top;
+        public int Top
+        {
+            get { return top; }
+            set { SetProperty(ref top, value); }
         }
 
         private TreeNode selected_object;
@@ -42,7 +61,7 @@ namespace GuitarTab
                     return;
                 }
 
-                var menu = factory.createPropertyMenu(value.BaseObject, click);
+                var menu = factory.createPropertyMenu(value, instrument_menu, ref_click);
                 if (menu != null)
                 {
                     SetProperty(ref selected_object, value);
@@ -69,25 +88,46 @@ namespace GuitarTab
             get { return closeCommand ?? (closeCommand = new RelayCommand(() => handleClose())); }
         }
 
-        public PropertyMenuView(PropertyMenuFactory fac)
+        public PropertyMenuView(PropertyMenuFactory fac, VisualInfo v_info)
         {
             factory = fac;
             Menu = null;
             Visible = Visibility.Collapsed;
             Selected = null;
-            click = null;
+            ref_click = null;
+            Left = 0;
+            Top = 0;
+
+            info = v_info;
         }
 
         public void launchMenu(NodeClick new_click)
         {
-            click = new_click;
-            Selected = click.getFirstSelected();
+            ref_click = new_click;
+            Selected = new_click.getFirstSelected();
             Visible = Visibility.Visible;
+            Left = Math.Max(0, (int)new_click.Point.X - WIDTH/2);
+            Top = (int)new_click.Point.Y + HEIGHT/2;
+        }
+
+        public void launchPartMenu(NodeClick node, int width, int height, bool instrument)
+        {
+            ref_click = node;
+            instrument_menu = instrument;
+
+            Selected = node.PartNode;
+            Visible = Visibility.Visible;
+            Left = info.Dimensions.PageWidth / 2 - WIDTH / 2;
+            Top = HEIGHT;
         }
 
         public void handleReset() { Menu?.resetToDefault(); }
 
-        public void handleSubmit() { Menu?.submitChanges(); }
+        public void handleSubmit()
+        {
+            Menu?.submitChanges();
+            Visible = Visibility.Collapsed;
+        }
 
         public void handleClose() { Visible = Visibility.Collapsed; }
     }
@@ -104,11 +144,13 @@ namespace GuitarTab
             executor = ex;
         }
 
-        public IPropertyMenu createPropertyMenu(object obj, NodeClick click)
+        public BasePropertyMenu createPropertyMenu(object obj, bool instrument, NodeClick click)
         {
-            if (obj is Measure) { return new MeasureProperties((Measure)obj, executor, click); }
-            else if (obj is Chord) { return new ChordProperties((Chord)obj, executor, click); }
-            else if (obj is Note) { return new NoteProperties((Note)obj, executor, click); }
+            if (obj is PartTreeNode && !instrument) { return new PartProperties((PartTreeNode)obj, executor, click); }
+            else if (obj is PartTreeNode && instrument) { return new InstrumentProperties((PartTreeNode)obj, executor, click); }
+            else if (obj is MeasureTreeNode) { return new MeasureProperties((MeasureTreeNode)obj, executor, click); }
+            else if (obj is ChordTreeNode) { return new ChordProperties((ChordTreeNode)obj, executor, click); }
+            else if (obj is NoteTreeNode) { return new NoteProperties((NoteTreeNode)obj, executor, click); }
             else { return null; }
         }
     }

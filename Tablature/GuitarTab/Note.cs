@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace GuitarTab
 {
+    //make IContainModels only about the collection, add IAddModels and IRemoveModels as well>
     public class Note : IPosition, IContainModels<IEffect>, IComparable<Note>
     {
         public int Fret { get; set; }
@@ -58,9 +59,9 @@ namespace GuitarTab
             if (remove) { ModelRemoved?.Invoke(this, new ObjectRemovedArgs(effect)); }
         }
 
-        public List<object> getGenericModelList()
+        public List<object> getChildrenToBuild()
         {
-            return new List<object>(ModelCollection.Items());
+            return new List<object>(ModelCollection.getItemsMatchingCondition(e => !(e is IMultiEffect && e.getPosition(this) == EffectPosition.Into)));
         }
 
         public MultiPosition getPosition() { return Position as MultiPosition; }

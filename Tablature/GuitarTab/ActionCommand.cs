@@ -488,4 +488,47 @@ namespace GuitarTab
             measure.updateSpaceTaken();
         }
     }
+
+    public class ChangeSongInfoCom : IActionCommand
+    {
+        private Part part;
+        private string name;
+        private string artist;
+        private string album;
+
+        public ChangeSongInfoCom(Part p, string n, string ar, string al)
+        {
+            part = p;
+            name = n;
+            artist = ar;
+            album = al;
+        }
+
+        public void executeAction()
+        {
+            part.SongInfo.SongName = name;
+            part.SongInfo.ArtistName = artist;
+            part.SongInfo.AlbumName = album;
+        }
+    }
+
+    public class ChangeInstrumentInfoCom : IActionCommand
+    {
+        private Part part;
+        private InstrumentType instrument;
+        private int string_num;
+
+        public ChangeInstrumentInfoCom(Part p, InstrumentType i, int s)
+        {
+            part = p;
+            instrument = i;
+            string_num = s;
+        }
+
+        public void executeAction()
+        {
+            part.InstrumentInfo.Type = instrument;
+            part.InstrumentInfo.Strings = string_num;
+        }
+    }
 }

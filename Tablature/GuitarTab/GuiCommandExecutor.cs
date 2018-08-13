@@ -11,7 +11,8 @@ namespace GuitarTab
         UpdatePart,
         UpdateMeasuresAtAndAfter,
         UpdateMeasure,
-        UpdateChord
+        UpdateChord,
+        RedrawPart
     }
 
     //when a note is selected with a multieffect, instead of trying to save wierd stuff, have a menu pop up like when choosing a fret that
@@ -19,7 +20,6 @@ namespace GuitarTab
     public class GuiCommandExecutor
     {
         public GuiTreeUpdater Updater { get; set; }
-        public MouseHandler Handler { get; set; }
         private CommandExecutor executor;
         private CommandSelections selections;
         private VisualInfo info;
@@ -46,13 +46,12 @@ namespace GuitarTab
                 Updater.populateMouseClick(click);
                 if (update_measure_heads) { click.PartNode.beginRedrawMeasureHeads(); }
                 runUpdate(click, update);
-                if (rebar) { Updater.rebarMeasures(click.PartNode, click.MeasureNodes); }
+                if (rebar) { Updater.rebarMeasures(click.MeasureNodes); }
                 if (update_measure_heads) { click.PartNode.endRedrawMeasureheads(); }
             }
 
             click.setHandled();
             selections.Clear();
-            Handler.populateSelected(click);
         }
 
         public void executeFretMenuBase(Action<NodeClick, int> action, NodeClick click)
@@ -89,6 +88,10 @@ namespace GuitarTab
                     break;
                 case UpdateType.UpdateChord:
                     Updater.updateChordBounds(click.ChordNodes.FirstOrDefault());
+                    Updater.updateDrawing(click.ChordNodes.FirstOrDefault());
+                    break;
+                case UpdateType.RedrawPart:
+                    Updater.updateRootDrawing();
                     break;
             }
         }
@@ -196,8 +199,9 @@ namespace GuitarTab
             executeCommandBase(click, CommandType.RemoveMultipleChordsFromMeasure, UpdateType.UpdateMeasuresAtAndAfter, true, false);
         }
 
-        public void executeChangeChordLengthFromMenu(NodeClick click, Length new_length)
+        public void executeChangeChordLengthFromMenu(NodeClick click, NoteLength new_length)
         {
+            selections.SelectedLength = new_length;
             executeChangeChordLength(click);
         }
 
@@ -310,12 +314,14 @@ namespace GuitarTab
         {
             selections.BendAmount = amount;
             selections.Returns = returns;
+            selections.SelectedEffectType = EffectType.Bend;
             executeAddEffectToNote(click);
         }
 
         public void executeAddVibratoToNoteProp(NodeClick click, bool wide)
         {
             selections.Wide = wide;
+            selections.SelectedEffectType = EffectType.Vibrato;
             executeAddEffectToNote(click);
         }
 
@@ -327,7 +333,8 @@ namespace GuitarTab
 
         public void executeRemoveEffectFromNote(NodeClick click, IEffect effect)
         {
-            selections.SelectedEffect = effect;
+            EffectTreeNode node = click.NoteNodes.First()?.findChild(effect) as EffectTreeNode;
+            click.EffectNode = node;
 
             executeCommandBase(click, CommandType.RemoveNoteEffect, UpdateType.UpdateMeasure, false, false);
         }
@@ -338,18 +345,15 @@ namespace GuitarTab
             executeNoteSelectMenuBase(executeAddMultiEffectToNotes, click);
         }
 
-        public void executeAddSlideToNoteProp(NodeClick click, Note first, Note second, bool legato)
+        public void executeAddSlideToNoteProp(NodeClick click, bool legato)
         {
             selections.Legato = legato;
 
-            executeAddMultiEffectToNoteProp(click, first, second, EffectType.Slide);
+            executeAddMultiEffectToNoteProp(click, EffectType.Slide);
         }
 
-        public void executeAddMultiEffectToNoteProp(NodeClick click, Note first, Note second, EffectType type)
+        public void executeAddMultiEffectToNoteProp(NodeClick click, EffectType type)
         {
-            selections.SelectedNote.Clear();
-            selections.SelectedNote.Add(first);
-            selections.SelectedNote.Add(second);
             selections.SelectedEffectType = type;
 
             executeAddMultiEffectToNotes(click);
@@ -380,21 +384,21 @@ namespace GuitarTab
 
         public void executeRemoveMultipleMeasures(NodeClick click)
         {
-            executeCommandBase(click, CommandType.RemoveMultipleMeasuresFromPart, UpdateType.UpdateMeasuresAtAndAfter, false, true);
+            executeCommandBase(click, CommandType.RemoveMultipleMeasuresFromPart, UpdateType.UpdatePart, false, true);
         }
 
         public void executeChangeMeasurePosition(NodeClick click, MeasurePositionClick pos_click)
         {
             selections.Position = (pos_click.MeasureSet) ? pos_click.Position : click.PartNode.getPart().ModelCollection.Count() - 1;
 
-            executeCommandBase(click, CommandType.ChangeMeasurePosition, UpdateType.UpdatePart, false, true);
+            executeCommandBase(click, CommandType.ChangeMeasurePosition, UpdateType.UpdatePart, true, true);
         }
 
         public void executeChangeMultipleMeasurePosition(NodeClick click, MeasurePositionClick pos_click)
         {
             selections.Position = (pos_click.MeasureSet) ? pos_click.Position : click.PartNode.getPart().ModelCollection.Count();
 
-            executeCommandBase(click, CommandType.ChangeMultipleMeasurePosition, UpdateType.UpdatePart, false, true);
+            executeCommandBase(click, CommandType.ChangeMultipleMeasurePosition, UpdateType.UpdatePart, true, true);
         }
 
         public void executeChangeMeasureTimeSigFromMenu(NodeClick click, int beats, NoteLength type)
@@ -424,6 +428,23 @@ namespace GuitarTab
         public void executeCreateTupletFromNotes(NodeClick click, NoteLength base_length)
         {
             executeCommandBase(click, CommandType.CreateTupletFromNotes, UpdateType.UpdateMeasuresAtAndAfter, true, false);
+        }
+
+        public void executeChangeSongInfoFromProp(NodeClick click, string name, string artist, string album)
+        {
+            selections.Name = name;
+            selections.Artist = artist;
+            selections.Album = album;
+
+            executeCommandBase(click, CommandType.ChangeSongInfo, UpdateType.RedrawPart, false, false);
+        }
+
+        public void executeChangeInstrumentInfoFromProp(NodeClick click, InstrumentType type, int string_num)
+        {
+            selections.Instrument = type;
+            selections.StringNum = string_num;
+
+            executeCommandBase(click, CommandType.ChangeInstrumentInfo, UpdateType.RedrawPart, false, false);
         }
     }
 }

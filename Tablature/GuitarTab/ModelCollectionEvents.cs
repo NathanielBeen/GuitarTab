@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace GuitarTab
 {
@@ -31,9 +32,9 @@ namespace GuitarTab
 
     public class VisualsAddedArgs : EventArgs
     {
-        public List<TabDrawingVisual> Added { get; }
+        public List<DrawingVisual> Added { get; }
 
-        public VisualsAddedArgs(List<TabDrawingVisual> visuals)
+        public VisualsAddedArgs(List<DrawingVisual> visuals)
         {
             Added = visuals;
         }
@@ -41,9 +42,9 @@ namespace GuitarTab
 
     public class VisualsRemovedArgs : EventArgs
     {
-        public List<TabDrawingVisual> Removed { get; }
+        public List<DrawingVisual> Removed { get; }
 
-        public VisualsRemovedArgs(List<TabDrawingVisual> visuals)
+        public VisualsRemovedArgs(List<DrawingVisual> visuals)
         {
             Removed = visuals;
         }

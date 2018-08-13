@@ -43,7 +43,7 @@ namespace GuitarTab
                 AddItem item = AddItemExtensions.getAddItemFromString(entry.Key);
 
                 var brush = new ImageBrush();
-                brush.ImageSource = new BitmapImage(new Uri(entry.Value, UriKind.Relative));
+                brush.ImageSource = SettingsReader.getImageFromLocation(entry.Value);
                 image_dict[item] = brush;
             }
 

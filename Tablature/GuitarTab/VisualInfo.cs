@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace GuitarTab
 {
@@ -198,6 +200,13 @@ namespace GuitarTab
         public Uri getRestImagePath(NoteLength length) { return new Uri(rest_image_paths[length], UriKind.Relative); }
 
         public Uri getEffectImagePath(int code) { return new Uri(effect_image_paths[code], UriKind.Relative); }
+
+        public static BitmapImage loadImage(string loc)
+        {
+            return new BitmapImage(new Uri(@"pack://application:,,,/" +
+                Assembly.GetExecutingAssembly().GetName().Name + ";component/" +
+                loc, UriKind.Absolute));
+        }
     }
 
     //this class does not fit in the visualinfo master class. it needs to be moved.
@@ -206,8 +215,9 @@ namespace GuitarTab
         public const int NUM_STRINGS = 6;
         public int X { get; set; }
         public int Y { get; set; }
-        public int CurrentBar { get; set; }
-        public int MaxBar { get; set; }
+        public int CurrentBar { get; private set; }
+
+        public int CurrentLeft { get; set; }
 
         private VisualDimensions dimensions;
 
@@ -218,74 +228,88 @@ namespace GuitarTab
             X = dimensions.BarMargin;
             Y = dimensions.PageHeadHeight;
             CurrentBar = 0;
+            CurrentLeft = 0;
+        }
+
+        public void reset()
+        {
+            X = dimensions.BarMargin;
+            Y = dimensions.PageHeadHeight;
+            CurrentBar = 0;
+            CurrentLeft = 0;
         }
 
         public void incrementXPosition(int length)
         {
             X += length;
-            if (X > dimensions.BarringMargin + dimensions.BarWidth - dimensions.NoteWidth * 2)
+            if (X > CurrentLeft + dimensions.BarringMargin + dimensions.BarWidth - dimensions.NoteWidth * 2)
             {
                 Y += dimensions.LineHeight;
-                X = dimensions.BarMargin;
+                X = dimensions.BarMargin + CurrentLeft;
                 CurrentBar++;
-                if (CurrentBar > MaxBar) { MaxBar = CurrentBar; }
             }
         }
 
         public void incrementXPositionForMeasure(int length)
         {
             X += length;
-            if (X > dimensions.BarringMargin + dimensions.BarWidth)
+            if (X > dimensions.BarringMargin + dimensions.BarWidth + CurrentLeft)
             {
-                int remaining = X - dimensions.BarringMargin - dimensions.BarWidth;
+                int remaining = X - dimensions.BarringMargin - dimensions.BarWidth - CurrentLeft;
                 Y += dimensions.LineHeight;
-                X = dimensions.BarMargin + remaining;
+                X = dimensions.BarMargin + remaining + CurrentLeft;
                 CurrentBar++;
-                if (CurrentBar > MaxBar) { MaxBar = CurrentBar; }
             }
         }
 
         public void jumpToNextBar()
         {
             Y += dimensions.LineHeight;
-            X = dimensions.BarMargin;
+            X = dimensions.BarMargin + CurrentLeft;
             CurrentBar++;
-            if (CurrentBar > MaxBar) { MaxBar = CurrentBar; }
         }
 
         public int truncateHorizontalLengthIfNeeded(int prop_length)
         {
-            int available = dimensions.BarMargin + dimensions.BarWidth - X;
+            int available = dimensions.BarMargin + dimensions.BarWidth + CurrentLeft - X;
             if (prop_length > available) { return available; }
             else { return prop_length; }
         }
 
-        public void resetPositionToPartBeginning(VisualBounds part_bounds)
+        public void resetPositionToPartBeginning(IBounds part_bounds)
         {
             X = part_bounds.Left + dimensions.BarMargin;
             Y = part_bounds.Top + dimensions.PageHeadHeight;
             CurrentBar = 0;
         }
 
-        public void resetPositionToMeasureBeginning(VisualBounds measure_bounds)
+        public void resetPositionToMeasureBeginning(IBounds measure_bounds)
         {
-            X = measure_bounds?.Left ?? dimensions.BarMargin;
+            X = measure_bounds?.Left ?? dimensions.BarMargin + CurrentLeft;
             Y = (measure_bounds != null) ? measure_bounds.Bottom - dimensions.BarHeight - dimensions.EffectHeight : dimensions.PageHeadHeight;
             CurrentBar = measure_bounds?.Bar ?? 0;
         }
 
-        public void resetPositionToMeasureEnd(VisualBounds measure_bounds)
+        public void resetPositionToMeasureEnd(IBounds measure_bounds)
         {
-            X = measure_bounds?.Right ?? dimensions.BarMargin;
+            X = measure_bounds?.Right ?? dimensions.BarMargin + CurrentLeft;
             Y = (measure_bounds != null) ? measure_bounds.Bottom - dimensions.BarHeight - dimensions.EffectHeight : dimensions.PageHeadHeight;
             CurrentBar = measure_bounds?.Bar ?? 0;
         }
 
-        public void resetPositionToChordBeginning(VisualBounds chord_bounds)
+        public void resetPositionToChordBeginning(IBounds chord_bounds)
         {
             X = chord_bounds.Left;
             Y = chord_bounds.Top - dimensions.EffectHeight;
             CurrentBar = chord_bounds.Bar;
+        }
+
+        public void setCurrentLeftAndResetPosition(int new_left)
+        {
+            CurrentLeft = new_left;
+            X = CurrentLeft + dimensions.BarMargin;
+            Y = dimensions.PageHeadHeight;
+            CurrentBar = 0;
         }
 
         public int getStringFromYPosition(int y_val)
@@ -295,6 +319,13 @@ namespace GuitarTab
 
             return (int)Math.Floor((decimal)adj_y_pos / dimensions.StringHeight);
         }
+        
+        public void heightChanged(int height)
+        {
+            HeightChanged?.Invoke(this, new DimensionChangedEventArgs(height, DimensionType.PageHeight));
+        }
+
+        public event EventHandler<DimensionChangedEventArgs> HeightChanged;
     }
 
     public class VisualInfo

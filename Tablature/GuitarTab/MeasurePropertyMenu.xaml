@@ -12,17 +12,23 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="Measure Properties" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <Label Grid.Column="0" Grid.Row="1" Content="Number of Beats" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding NumBeats, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label Grid.Column="0" Grid.Row="2" Content="Beat Type" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding BeatType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label Grid.Column="0" Grid.Row="3" Content="BPM" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding BPM, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding NumBeats, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+        <Label Grid.Column="1" Grid.Row="2" Content="{Binding NumBeatsError}"/>
+        <Label Grid.Column="0" Grid.Row="3" Content="Beat Type" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding BeatType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+        <Label Grid.Column="1" Grid.Row="4" Content="{Binding BeatTypeError}"/>
+        <Label Grid.Column="0" Grid.Row="5" Content="BPM" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding BPM, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+        <Label Grid.Column="1" Grid.Row="6" Content="{Binding BpmError}"/>
     </Grid>
 </UserControl>

@@ -7,15 +7,24 @@ using System.Windows;
 
 namespace GuitarTab
 {
-    public class Selected
+    public interface IHoldTreeNodes
+    {
+        PartTreeNode PartNode { get; set; }
+        List<MeasureTreeNode> MeasureNodes { get; set; }
+        List<ChordTreeNode> ChordNodes { get; set; }
+        List<NoteTreeNode> NoteNodes { get; set; }
+        EffectTreeNode EffectNode { get; set; }
+    }   
+
+    public class Selected : IHoldTreeNodes
     {
         public MouseSelectedView SelectedView { get; set; }
 
-        public PartTreeNode PartNode;
-        public List<MeasureTreeNode> MeasureNodes;
-        public List<ChordTreeNode> ChordNodes;
-        public List<NoteTreeNode> NoteNodes;
-        public EffectTreeNode EffectNode;
+        public PartTreeNode PartNode { get; set; }
+        public List<MeasureTreeNode> MeasureNodes { get; set; }
+        public List<ChordTreeNode> ChordNodes { get; set; }
+        public List<NoteTreeNode> NoteNodes { get; set; }
+        public EffectTreeNode EffectNode { get; set; }
 
         private List<TreeNode> selected;
 
@@ -69,22 +78,22 @@ namespace GuitarTab
 
         private void refreshSelectedTree()
         {
-            foreach (TreeNode node in selected) { node.addToSelected(this); }
+            foreach (TreeNode node in selected) { node.addToIHoldTreeNodes(this); }
             TreeNode curr_node = selected.FirstOrDefault()?.Parent;
             while (curr_node != null)
             {
-                curr_node.addToSelected(this);
+                curr_node.addToIHoldTreeNodes(this);
                 curr_node = curr_node.Parent;
             }
         }
 
-        public List<VisualBounds> getSelected() { return SelectedView.Selected.ToList(); }
+        public List<IBounds> getSelected() { return SelectedView.Backing; }
 
         public bool selectedContainsPoint(Point point)
         {
             foreach (var item in selected)
             {
-                if (item.ObjectBounds.hitTest(point)) { return true; }
+                if (item.hitTest(point)) { return true; }
             }
             return false;
         }

@@ -8,24 +8,29 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <local:DataTypeConverter x:Key="TypeConverter"/>
+        <DataTemplate x:Key="NoneTemplate">
+            <Label/>
+        </DataTemplate>
         <DataTemplate x:Key="VibratoTemplate">
             <UniformGrid Rows="1" Columns="2">
                 <Label Content="Wide"/>
-                <CheckBox IsChecked="{Binding Wide, Mode=TwoWay}"/>
+                <CheckBox IsChecked="{Binding Wide, Mode=TwoWay}" VerticalAlignment="Center"/>
             </UniformGrid>
         </DataTemplate>
         <DataTemplate x:Key="BendTemplate">
-            <UniformGrid Rows="2" Columns="2">
+            <UniformGrid Rows="3" Columns="2">
                 <Label Content="Amount"/>
-                <TextBox Text="{Binding Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+                <Label/>
+                <Label Content="{Binding AmountError}"/>
                 <Label Content="Returns"/>
-                <CheckBox IsChecked="{Binding Returns, Mode=TwoWay}"/>
+                <CheckBox IsChecked="{Binding Returns, Mode=TwoWay}" VerticalAlignment="Center"/>
             </UniformGrid>
         </DataTemplate>
         <DataTemplate x:Key="SlideTemplate">
             <UniformGrid Rows="1" Columns="2">
                 <Label Content="Legato"/>
-                <CheckBox IsChecked="{Binding Legato, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox IsChecked="{Binding Legato, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
             </UniformGrid>
         </DataTemplate>
         <DataTemplate x:Key="BaseEffectTemplate">
@@ -33,6 +38,7 @@
         </DataTemplate>
 
         <Style x:Key="effectStrategy" TargetType="{x:Type ContentControl}">
+            <Setter Property="ContentTemplate" Value="{StaticResource NoneTemplate}"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding CurrentStrategy, Converter={StaticResource TypeConverter}}"
                              Value="{x:Type local:VibratoMenuStrategy}">
@@ -59,7 +65,7 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0" Content="Effect Type" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Types}" SelectedValue="{Binding CurrentType, Mode=TwoWay}"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Types}" SelectedValue="{Binding CurrentType, Mode=TwoWay}" Margin="2"/>
         <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource effectStrategy}"/>
     </Grid>
 </UserControl>

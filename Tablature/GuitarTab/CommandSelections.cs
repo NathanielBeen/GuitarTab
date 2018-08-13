@@ -67,6 +67,12 @@ namespace GuitarTab
         public bool? Wide { get; set; }
         public bool? Legato { get; set; }
 
+        public string Name { get; set; }
+        public string Artist { get; set; }
+        public string Album { get; set; }
+        public InstrumentType? Instrument { get; set; }
+        public int? StringNum { get; set; }
+
         public CommandSelections(MouseStateConverter conv)
         {
             converter = conv;
@@ -86,6 +92,12 @@ namespace GuitarTab
             Returns = null;
             Wide = null;
             Legato = null;
+
+            Name = null;
+            Artist = null;
+            Album = null;
+            Instrument = null;
+            StringNum = null;
         }
 
         public void Clear()
@@ -103,6 +115,12 @@ namespace GuitarTab
             Returns = null;
             Wide = null;
             Legato = null;
+
+            Name = null;
+            Artist = null;
+            Album = null;
+            Instrument = null;
+            StringNum = null;
         }
 
         public void ClearModel()

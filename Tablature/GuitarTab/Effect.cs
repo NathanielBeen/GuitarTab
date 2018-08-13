@@ -65,17 +65,50 @@ namespace GuitarTab
             }
         }
 
-        public static List<string> getSingleEffectNames()
+        public static List<string> getSingleEffectNames(EffectPosition position)
         {
-            return (from effect_value in Enum.GetValues(typeof(EffectType)).Cast<EffectType>()
-                    where !effect_value.isMultiNote()
-                    select effect_value.getMenuName()).ToList();
+            var list = new List<string>();
+            list.Add(getMenuName(EffectType.No_Type));
+            switch (position)
+            {
+                case EffectPosition.Into:
+                    break;
+                case EffectPosition.Strike:
+                    list.Add(getMenuName(EffectType.Palm_Mute));
+                    list.Add(getMenuName(EffectType.Pinch_Harmonic));
+                    break;
+                case EffectPosition.After:
+                    list.Add(getMenuName(EffectType.Bend));
+                    list.Add(getMenuName(EffectType.Vibrato));
+                    break;
+            }
+            return list;
         }
 
-        public static List<string> getAllEffectNames()
+        public static List<string> getAllEffectNames(EffectPosition position)
         {
-            return (from effect_value in Enum.GetValues(typeof(EffectType)).Cast<EffectType>()
-                    select effect_value.getMenuName()).ToList();
+            var list = new List<string>();
+            list.Add(getMenuName(EffectType.No_Type));
+            switch (position)
+            {
+                case EffectPosition.Into:
+                    list.Add(getMenuName(EffectType.HOPO));
+                    list.Add(getMenuName(EffectType.Slide));
+                    list.Add(getMenuName(EffectType.Tie));
+                    break;
+                case EffectPosition.Strike:
+                    list.Add(getMenuName(EffectType.Palm_Mute));
+                    list.Add(getMenuName(EffectType.Pinch_Harmonic));
+                    break;
+                case EffectPosition.After:
+                    list.Add(getMenuName(EffectType.Bend));
+                    list.Add(getMenuName(EffectType.Vibrato));
+                    list.Add(getMenuName(EffectType.HOPO));
+                    list.Add(getMenuName(EffectType.Slide));
+                    list.Add(getMenuName(EffectType.Tie));
+                    break;
+            }
+            return list;
         }
     }
 
@@ -124,8 +157,6 @@ namespace GuitarTab
         {
             get { return EffectType.Palm_Mute; }
         }
-
-        public EffectPosition Position { get; }
 
         private PalmMute() { }
 

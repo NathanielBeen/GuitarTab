@@ -828,4 +828,44 @@ namespace GuitarTab
             return new CreateTupletFromNotesCom(attributes.Measure, attributes.Chords, attributes.NewLengths);
         }
     }
+
+    public class ChangeSongInfoBld : IActionBuilder
+    {
+        private ChangeSongInfoAtr attributes;
+
+        public ChangeSongInfoBld(CommandSelections selections)
+        {
+            attributes = new ChangeSongInfoAtr(selections);
+        }
+
+        public IActionValidator buildValidator()
+        {
+            return new ChangeSongInfoVal(attributes.Part, attributes.Name, attributes.Artist, attributes.Album);
+        }
+
+        public IActionCommand buildCommand()
+        {
+            return new ChangeSongInfoCom(attributes.Part, attributes.Name, attributes.Artist, attributes.Album);
+        }
+    }
+
+    public class ChangeInstrumentInfoBld : IActionBuilder
+    {
+        private ChangeInstrumentInfoAtr attributes;
+
+        public ChangeInstrumentInfoBld(CommandSelections selections)
+        {
+            attributes = new ChangeInstrumentInfoAtr(selections);
+        }
+
+        public IActionValidator buildValidator()
+        {
+            return new ChangeInstrumentInfoVal(attributes.Part, attributes.Instrument, attributes.StringNum);
+        }
+
+        public IActionCommand buildCommand()
+        {
+            return new ChangeInstrumentInfoCom(attributes.Part, (InstrumentType)attributes.Instrument, (int)attributes.StringNum);
+        }
+    }
 }

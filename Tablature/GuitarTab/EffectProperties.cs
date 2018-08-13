@@ -11,15 +11,14 @@ namespace GuitarTab
     //create a set of subclasses to hold the initial variables, with overriden equals to check if the item has changed
     //create a wrapper class to hold a list of menu items for each individual effect. the main effectproperties bindinglist will 
     //link with an event or delegate to this class, which will add or remove items from the list as effects change
-    public class EffectProperties : BaseValidator, IPropertyMenu
+    public class EffectProperties : BasePropertyMenu
     {
         private IEffect effect;
         private EffectType init_type;
+        private EffectPosition position;
 
-        private GuiCommandExecutor executor;
-        private NodeClick click;
-        private Note first;
-        private Note second;
+        private NoteTreeNode first;
+        private NoteTreeNode second;
 
         public List<string> Types { get; }
 
@@ -41,13 +40,13 @@ namespace GuitarTab
             set { SetProperty(ref current_strategy, value); }
         }
 
-        public EffectProperties(GuiCommandExecutor exec, NodeClick c, IEffect e, Note f, Note s)
+        public EffectProperties(GuiCommandExecutor exec, NodeClick c, IEffect e, EffectPosition pos, NoteTreeNode f, NoteTreeNode s)
+            :base(c, exec)
         { 
             effect = e;
             init_type = effect?.Type ?? EffectType.No_Type;
+            position = pos;
 
-            executor = exec;
-            click = c;
             first = f;
             second = s;
 
@@ -58,8 +57,8 @@ namespace GuitarTab
 
         public List<string> genValidEffectTypes()
         {
-            if (first == null || second == null) { return EffectTypeExtensions.getSingleEffectNames(); }
-            else { return EffectTypeExtensions.getAllEffectNames(); }
+            if (first == null || second == null) { return EffectTypeExtensions.getSingleEffectNames(position); }
+            else { return EffectTypeExtensions.getAllEffectNames(position); }
         }
 
         public BaseEffectMenuStrategy createNewStrategy(EffectType type)
@@ -67,16 +66,16 @@ namespace GuitarTab
             switch (type)
             {
                 case EffectType.Vibrato:
-                    return new VibratoMenuStrategy(executor, click, effect as Vibrato);
+                    return new VibratoMenuStrategy(executor, ref_click, effect as Vibrato);
                 case EffectType.Bend:
-                    return new BendMenuStrategy(executor, click, effect as Bend);
+                    return new BendMenuStrategy(executor, ref_click, effect as Bend);
                 case EffectType.Slide:
-                    return new SlideMenuStrategy(executor, click, first, second, effect as Slide);
+                    return new SlideMenuStrategy(executor, ref_click, first, second, effect as Slide);
                 case EffectType.Tie:
                 case EffectType.HOPO:
-                    return new MultiEffectMenuStrategy(executor, click, type, first, second);
+                    return new MultiEffectMenuStrategy(executor, ref_click, type, first, second);
                 default:
-                    return new BaseEffectMenuStrategy(executor, click, type);
+                    return new BaseEffectMenuStrategy(executor, ref_click, type);
             }
         }
 
@@ -88,20 +87,20 @@ namespace GuitarTab
             }
         }
 
-        public void resetToDefault()
+        public override void resetToDefault()
         {
             if (current_type != init_type) { CurrentType = init_type.getMenuName(); }
             else { CurrentStrategy.resetToDefault(); }
         }
 
-        public void submitChanges()
+        public override void submitChanges()
         {
-            if (init_type != EffectType.No_Type && current_type == EffectType.No_Type) { executor.executeRemoveEffectFromNote(click, effect); }
+            if (init_type != EffectType.No_Type && current_type == EffectType.No_Type) { executor.executeRemoveEffectFromNote(getClickCopy(), effect); }
             else if (current_type != EffectType.No_Type && (init_type != current_type || CurrentStrategy.effectChanged())) { CurrentStrategy.addEffect(); }
         }
     }
 
-    public class BaseEffectMenuStrategy : BaseValidator
+    public class BaseEffectMenuStrategy : BaseInputViewModel
     {
         protected EffectType type;
         protected GuiCommandExecutor executor;
@@ -116,11 +115,24 @@ namespace GuitarTab
 
         public virtual bool effectChanged() { return false; }
 
-        public virtual void addEffect() { executor.executeAddEffectToNoteProp(click, type); }
+        public virtual void addEffect() { executor.executeAddEffectToNoteProp(getClickCopy(), type); }
 
         public virtual void resetToDefault() { }
 
         public EffectType getType() { return type; }
+
+        public NodeClick getClickCopy()
+        {
+            NodeClick new_click = new NodeClick(click.Point);
+            new_click.PartNode = click.PartNode;
+            new_click.MeasureNodes.AddRange(click.MeasureNodes);
+            new_click.ChordNodes.AddRange(click.ChordNodes);
+            new_click.NoteNodes.AddRange(click.NoteNodes);
+            new_click.EffectNode = click.EffectNode;
+            new_click.Selected = click.Selected;
+
+            return new_click;
+        }
     }
 
     public class VibratoMenuStrategy : BaseEffectMenuStrategy
@@ -143,27 +155,36 @@ namespace GuitarTab
 
         public override bool effectChanged() { return Wide != init_wide; }
 
-        public override void addEffect() { executor.executeAddVibratoToNoteProp(click, wide); }
+        public override void addEffect() { executor.executeAddVibratoToNoteProp(getClickCopy(), wide); }
 
         public override void resetToDefault() { Wide = init_wide; }
     }
 
     public class BendMenuStrategy : BaseEffectMenuStrategy
     {
+        public const double MIN_BEND = 0;
+        public const double MAX_BEND = 2;
+
         private readonly double init_amount;
         private readonly bool init_returns;
 
-        private double amount;
+        private string amount;
         public string Amount
         {
             get { return amount.ToString(); }
             set
             {
-                if (ValidateProperty(nameof(Amount), value, validateAmount))
-                {
-                    SetProperty(ref amount, Double.Parse(value));
-                }
+                string error = AmountError;
+                setDoubleProperty(ref amount, value, MIN_BEND, MAX_BEND, ref error);
+                AmountError = error;
             }
+        }
+
+        private string amount_error;
+        public string AmountError
+        {
+            get { return amount_error; }
+            set { SetProperty(ref amount_error, value); }
         }
 
         private bool returns;
@@ -182,9 +203,17 @@ namespace GuitarTab
             Returns = init_returns;
         }
 
-        public override bool effectChanged() { return amount != init_amount || Returns != init_returns; }
+        public override bool effectChanged()
+        {
+            if (AmountError == null || !Double.TryParse(amount, out double amount_d)) { return false; }
+            return amount_d != init_amount || Returns != init_returns;
+        }
 
-        public override void addEffect() { executor.executeAddBendToNoteProp(click, amount, returns); }
+        public override void addEffect()
+        {
+            double am = Double.TryParse(amount, out double amount_d) ? amount_d : 1;
+            executor.executeAddBendToNoteProp(getClickCopy(), am, returns);
+        }
 
         public override void resetToDefault()
         {
@@ -208,17 +237,24 @@ namespace GuitarTab
 
     public class MultiEffectMenuStrategy : BaseEffectMenuStrategy
     {
-        protected Note first_note;
-        protected Note second_note;
+        protected NoteTreeNode first_note;
+        protected NoteTreeNode second_note;
 
-        public MultiEffectMenuStrategy(GuiCommandExecutor gui, NodeClick click, EffectType type, Note first, Note second)
+        public MultiEffectMenuStrategy(GuiCommandExecutor gui, NodeClick click, EffectType type, NoteTreeNode first, NoteTreeNode second)
             :base(gui, click, type)
         {
             first_note = first;
             second_note = second;
         }
 
-        public override void addEffect() { executor.executeAddMultiEffectToNoteProp(click, first_note, second_note, type); }
+        public override void addEffect()
+        {
+            var new_click = getClickCopy();
+            new_click.NoteNodes.Clear();
+            new_click.NoteNodes.Add(first_note);
+            new_click.NoteNodes.Add(second_note);
+            executor.executeAddMultiEffectToNoteProp(new_click, type);
+        }
     }
 
     public class SlideMenuStrategy : MultiEffectMenuStrategy
@@ -232,7 +268,7 @@ namespace GuitarTab
             set { SetProperty(ref legato, value); }
         }
 
-        public SlideMenuStrategy(GuiCommandExecutor gui, NodeClick click, Note first, Note second, Slide init_slide)
+        public SlideMenuStrategy(GuiCommandExecutor gui, NodeClick click, NoteTreeNode first, NoteTreeNode second, Slide init_slide)
             :base(gui, click, EffectType.Slide, first, second)
         {
             init_legato = init_slide?.Legato ?? false;
@@ -241,7 +277,14 @@ namespace GuitarTab
 
         public override bool effectChanged() { return legato != init_legato; }
 
-        public override void addEffect() { executor.executeAddSlideToNoteProp(click, first_note, second_note, legato); }
+        public override void addEffect()
+        {
+            var new_click = getClickCopy();
+            new_click.NoteNodes.Clear();
+            new_click.NoteNodes.Add(first_note);
+            new_click.NoteNodes.Add(second_note);
+            executor.executeAddSlideToNoteProp(new_click, legato);
+        }
 
         public override void resetToDefault() { Legato = init_legato; }
     }

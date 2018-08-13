@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,20 +22,21 @@ namespace GuitarTab
     /// </summary>
     public partial class MainWindow : Window
     {
-        public const string FILE_LOC = "../../Resources/ResourceDocument.txt";
+        private MainView view;
 
         public MainWindow()
         {
             InitializeComponent();
-            createViewModel();
+            view = new MainView(null);
+            view.ViewModeChanged += handleViewModeChanged;
+            DataContext = view;
+
+            view.runViewingFactory();
         }
 
-        public void createViewModel()
+        public void handleViewModeChanged(object obj, ViewModeChangedEventArgs args)
         {
-            var factory = new ViewModelFactory();
-            factory.runFactory(FILE_LOC);
-            factory.linkToView(main);
-            factory.initPart();
+            //main.init(view);
         }
     }
 }

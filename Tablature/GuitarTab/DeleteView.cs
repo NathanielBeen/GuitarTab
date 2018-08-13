@@ -33,7 +33,7 @@ namespace GuitarTab
         public ImageBrush getImageBrush(string uri)
         {
             var brush = new ImageBrush();
-            brush.ImageSource = new BitmapImage(new Uri(uri, UriKind.Relative));
+            brush.ImageSource = SettingsReader.getImageFromLocation(uri);
             return brush;
         }
 

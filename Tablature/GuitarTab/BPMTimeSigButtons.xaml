@@ -44,15 +44,15 @@
         <Button Grid.Row="1" Grid.RowSpan="2" Grid.Column="6" Content="Set" Command="{Binding SetMeasureTimeSigCommand}"/>
 
         <Label Grid.Row="0" Grid.Column="8" Grid.ColumnSpan="4" Content="Beat Type" FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <RadioButton Grid.Row="1" Grid.Column="8" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Half]}"
+        <RadioButton Grid.Row="1" Grid.Column="8" GroupName="bpm_length" Background="{Binding Path=LengthImages[(local:NoteLength)Half]}"
                      IsChecked="{Binding Path=BeatType, Converter={StaticResource Converter},ConverterParameter={x:Static local:NoteLength.Half}}"/>
-        <RadioButton Grid.Row="1" Grid.Column="9" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Quarter]}"
+        <RadioButton Grid.Row="1" Grid.Column="9" GroupName="bpm_length" Background="{Binding Path=LengthImages[(local:NoteLength)Quarter]}"
                      IsChecked="{Binding Path=BeatType, Converter={StaticResource Converter},ConverterParameter={x:Static local:NoteLength.Quarter}}"/>
-        <RadioButton Grid.Row="1" Grid.Column="10" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Eighth]}"
+        <RadioButton Grid.Row="1" Grid.Column="10" GroupName="bpm_length" Background="{Binding Path=LengthImages[(local:NoteLength)Eighth]}"
                      IsChecked="{Binding Path=BeatType, Converter={StaticResource Converter},ConverterParameter={x:Static local:NoteLength.Eighth}}"/>
-        <RadioButton Grid.Row="2" Grid.Column="8" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)Sixeteenth]}"
+        <RadioButton Grid.Row="2" Grid.Column="8" GroupName="bpm_length" Background="{Binding Path=LengthImages[(local:NoteLength)Sixeteenth]}"
                      IsChecked="{Binding Path=BeatType, Converter={StaticResource Converter},ConverterParameter={x:Static local:NoteLength.Sixeteenth}}"/>
-        <RadioButton Grid.Row="2" Grid.Column="9" GroupName="length" Background="{Binding Path=LengthImages[(local:NoteLength)ThirtySecond]}"
+        <RadioButton Grid.Row="2" Grid.Column="9" GroupName="bpm_length" Background="{Binding Path=LengthImages[(local:NoteLength)ThirtySecond]}"
                      IsChecked="{Binding Path=BeatType, Converter={StaticResource Converter},ConverterParameter={x:Static local:NoteLength.ThirtySecond}}"/>
         <Button Grid.Row="1" Grid.RowSpan="2" Grid.Column="11" Content="Set" Command="{Binding SetMeasureTimeSigCommand}"/>
     </Grid>

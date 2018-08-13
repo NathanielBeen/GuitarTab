@@ -8,22 +8,27 @@ namespace GuitarTab
 {
     public class Part : IContainModels
     {
-        //some kind of instrumenttype thing
+        public SongInfo SongInfo { get; }
+        public InstrumentInfo InstrumentInfo { get; }
+
         public int DefaultBPM { get; set; }
         public TimeSignature TimeSignature { get; set; }
         public SymbolCollection<Measure> ModelCollection { get; }
 
-        public static Part createInstance(int? bpm, int? num_beats, NoteLength? beat_type)
+        public static Part createInstance(SongInfo song, InstrumentInfo instrument, int? bpm, int? num_beats, NoteLength? beat_type)
         {
-            if (bpm == null || num_beats == null || beat_type == null) { return null; }
+            if (song == null || instrument == null || bpm == null || num_beats == null || beat_type == null) { return null; }
 
             var time_sig = TimeSignature.createInstance((int)num_beats, (NoteLength)beat_type);
             var collection = new PositionedModelCollection<Measure>();
-            return new Part((int)bpm, time_sig, collection);
+            return new Part(song, instrument, (int)bpm, time_sig, collection);
         }
 
-        private Part(int bpm, TimeSignature time_sig, PositionedModelCollection<Measure> collection)
+        private Part(SongInfo song, InstrumentInfo instrument, int bpm, TimeSignature time_sig, PositionedModelCollection<Measure> collection)
         {
+            SongInfo = song;
+            InstrumentInfo = instrument;
+
             DefaultBPM = bpm;
             TimeSignature = time_sig;
             ModelCollection = collection;
@@ -44,11 +49,10 @@ namespace GuitarTab
             ModelRemoved?.Invoke(this, new ObjectRemovedArgs(measure));
         }
 
-        public List<object> getGenericModelList()
+        public List<object> getChildrenToBuild()
         {
             return new List<object>(ModelCollection.Items());
         }
-
 
         public int getLastMeasurePosition()
         {
@@ -58,35 +62,6 @@ namespace GuitarTab
         public Measure getMeasureAtPosition(int pos)
         {
             return ModelCollection.getItemMatchingCondition(x => x.Position.Index == pos);
-        }
-
-        public Note getPreviousNote(Note note)
-        {
-            MultiPosition note_pos = note.getPosition();
-            if (note_pos == null) { return null; }
-
-            Measure measure = getMeasureAtPosition(note_pos.getPreviousMeasurePosition());
-            if (measure == null) { return null; }
-
-            int prev_pos = note_pos.getPreviousPosition(measure.ModelCollection.Count());
-            NoteChord chord = measure.getChordAtPosition(prev_pos) as NoteChord;
-            if (chord == null) { return null; }
-
-            return chord.ModelCollection.getItemMatchingCondition(n => n.String == note.String);
-        }
-
-        public Note getNextNote(Note note)
-        {
-            MultiPosition note_pos = note.getPosition();
-            if (note_pos == null) { return null; }
-
-            Measure measure = getMeasureAtPosition(note_pos.getNextMeasurePosition());
-            if (measure == null) { return null; }
-
-            NoteChord chord = measure.getChordAtPosition(note_pos.getNextPosition()) as NoteChord;
-            if (chord == null) { return null; }
-
-            return chord.ModelCollection.getItemMatchingCondition(n => n.String == note.String);
         }
 
         public void updateMeasureMatching()

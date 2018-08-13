@@ -3,10 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 
 namespace GuitarTab
 {
-    public class TreeNode
+    //use composition to make bounded, handler, drawer all private and have the node reroute all neccisary methods so all references go to
+    //the node instead of the parts
+
+    //make an interface IContainTreeNodes<T> and have each subclass inherit the proper T to avoid having to cast a whole collection
+    //have methods like "getNext", "getPrevious", "getChildAtPosition", "getChildrenAfterPosition", "addChild", "removeChild"
+    public class TreeNode : IBounded, IHandleMouseEvents, IDraw
     {
         public const int PART = 0;
         public const int MEASURE = 1;
@@ -15,18 +22,24 @@ namespace GuitarTab
         public const int EFFECT = 4;
 
         public virtual object BaseObject { get; }
-        public BaseBounded ObjectBounds { get; }
-        public BaseMouseHandler ObjectHandler { get; }
-        public TabDrawingVisual ObjectDrawer { get; }
+        protected IBounded bounds;
+        protected IHandleMouseEvents handler;
+        protected StaticDrawingVisual drawer;
 
         public TreeNode Parent { get; set; }
         public List<TreeNode> Children { get; private set; }
 
-        public TreeNode(BaseBounded bounds, BaseMouseHandler handler, TabDrawingVisual drawer)
+        public IDelegate BoundsDelegate { get => bounds.BoundsDelegate; set => bounds.BoundsDelegate = value; }
+        public IMouseDelegate MouseDelegate { get => handler.MouseDelegate; set => handler.MouseDelegate = value; }
+        public IDelegate DrawDelegate { get => drawer.DrawDelegate; set => drawer.DrawDelegate = value; }
+        public IBounds Bounds { get => bounds.Bounds; set => bounds.Bounds = value; }
+        public IBoundedStrategy Strategy => bounds.Strategy;
+
+        public TreeNode(IBounded b, IHandleMouseEvents h, StaticDrawingVisual d)
         {
-            ObjectBounds = bounds;
-            ObjectHandler = handler;
-            ObjectDrawer = drawer;
+            bounds = b;
+            handler = h;
+            drawer = d;
 
             Parent = null;
             Children = new List<TreeNode>();
@@ -54,13 +67,13 @@ namespace GuitarTab
                     where child.BaseObject.Equals(child_base)
                     select child).FirstOrDefault();
         }
-
+        
         public void addChild(TreeNode child)
         {
             Children.Add(child);
 
             child.Parent = this;
-            child.subscribeToParentDelegates(ObjectBounds.Delegate, ObjectHandler.Delegate, ObjectDrawer.Delegate);
+            child.subscribeToParentDelegates(BoundsDelegate, MouseDelegate, DrawDelegate);
         }
 
         public void removeChild(TreeNode child)
@@ -68,63 +81,42 @@ namespace GuitarTab
             Children.Remove(child);
 
             child.Parent = null;
-            child.unsubscribeFromParentDelegates(ObjectBounds.Delegate, ObjectHandler.Delegate, ObjectDrawer.Delegate);
+            child.unsubscribeFromParentDelegates(BoundsDelegate, MouseDelegate, DrawDelegate);
         }
 
-        public void subscribeToParentDelegates(IDelegate bounding, IMouseDelegate mouse, IDelegate drawing)
+        private void subscribeToParentDelegates(IDelegate bounding, IMouseDelegate mouse, IDelegate drawing)
         {
-            bounding?.subscribeAction(ObjectBounds.updateBounds, this);
-            mouse?.subscribeAction(handleMouseClick, this);
-            drawing?.subscribeAction(ObjectDrawer.refreshVisual, this);
+            bounding?.subscribeAction(updateBounds, this);
+            mouse?.subscribeAction(handleMouseEvent, this);
+            drawing?.subscribeAction(refreshVisual, this);
         }
 
-        public void unsubscribeFromParentDelegates(IDelegate bounding, IMouseDelegate mouse, IDelegate drawing)
+        private void unsubscribeFromParentDelegates(IDelegate bounding, IMouseDelegate mouse, IDelegate drawing)
         {
-            bounding?.unsubscribeAction(ObjectBounds.updateBounds);
-            mouse?.unsubscribeAction(handleMouseClick);
-            drawing?.unsubscribeAction(ObjectDrawer.refreshVisual);
+            bounding?.unsubscribeAction(updateBounds);
+            mouse?.unsubscribeAction(handleMouseEvent);
+            drawing?.unsubscribeAction(refreshVisual);
         }
 
-        public void handleMouseClick(MouseClick click)
+        public virtual void addToIHoldTreeNodes(IHoldTreeNodes nodes) { }
+
+        public virtual void removeFromIHoldTreeNodes(IHoldTreeNodes nodes) { }
+
+        public bool hitTest(Point point) { return bounds.hitTest(point); }
+
+        public void updateBounds() { bounds.updateBounds(); }
+
+        public void handleMouseEvent(MouseClick click)
         {
-            if (click.matchesClickType(ClickType.Position)) { handlePositionClick(click as PositionClick); }
-            else if (click.matchesClickType(ClickType.Select)) { handleSelectClick(click as SelectClick); }
-            else if (click.matchesClickType(ClickType.Bounds)) { handleBoundsClick(click as BoundsClick); }
-
-            else if (ObjectBounds.hitTest(click.Point))
-            {
-                addToMouseClick(click as NodeClick);
-                ObjectHandler.handleMouseEvent(click);
-            }
+            (click as NodeClick)?.setPropNode(this);
+            handler.handleMouseEvent(click);
         }
 
-        public void handleSelectClick(SelectClick click)
-        {
-            if (!ObjectBounds.Bounds.containedInRectangle(click.Rectangle)) { return; }
+        public void refreshVisual() { drawer.refreshVisual(); }
 
-            addToMouseClick(click);
-            click?.setContainsRect(ObjectBounds.Bounds);
-            if (click?.ContainsRect ?? false) { ObjectHandler?.invokeClickDelegate(click); }
-        }
+        public DrawingVisual getVisual() { return drawer.getVisual(); }
 
-        public void handleBoundsClick(BoundsClick click)
-        {
-            if (ObjectBounds.hitTest(click.Point))
-            {
-                click.DeepestBounds = ObjectBounds.Bounds;
-                ObjectHandler?.invokeClickDelegate(click);
-            }
-        }
-
-        public virtual void handlePositionClick(PositionClick click) { }
-
-        public virtual void addToMouseClick(NodeClick click) { }
-
-        public virtual void removeFromMouseClick(NodeClick click) { }
-
-        public virtual void addToSelected(Selected selected) { }
-
-        public virtual void removeFromSelected(Selected selected) { }
+        public IBounds initBounds() { return bounds.initBounds(); }
     }
 
     public class PartTreeNode : TreeNode
@@ -132,7 +124,7 @@ namespace GuitarTab
         private Part part;
         public override object BaseObject { get { return part; } }
 
-        public PartTreeNode(Part p, PartBounds bounds, PartMouseHandler handler, PartDrawingVisual visual)
+        public PartTreeNode(Part p, IBounded bounds, IHandleMouseEvents handler, StaticDrawingVisual visual)
             :base(bounds, handler, visual)
         {
             part = p;
@@ -140,18 +132,11 @@ namespace GuitarTab
 
         public Part getPart() { return part; }
 
-        public override void addToMouseClick(NodeClick click) { click.PartNode = this; }
+        public override void addToIHoldTreeNodes(IHoldTreeNodes nodes) { nodes.PartNode = this; }
 
-        public override void removeFromMouseClick(NodeClick click)
+        public override void removeFromIHoldTreeNodes(IHoldTreeNodes nodes)
         {
-            if (click.PartNode != null && click.PartNode.Equals(this)) { click.PartNode = null; }
-        }
-
-        public override void addToSelected(Selected selected) { selected.PartNode = this; }
-
-        public override void removeFromSelected(Selected selected)
-        {
-            if (selected.PartNode != null && selected.PartNode.Equals(this)) { selected.PartNode = null; }
+            if (nodes.PartNode != null && nodes.PartNode.Equals(this)) { nodes.PartNode = null; }
         }
 
         public MeasureTreeNode getMeasureNodeAtPosition(int pos)
@@ -172,6 +157,38 @@ namespace GuitarTab
         public void beginRedrawMeasureHeads() { part.updateMeasureMatching(); }
 
         public void endRedrawMeasureheads() { foreach (MeasureTreeNode node in Children) { node.redrawMeasureHead(); } }
+
+        
+        public NoteTreeNode getNextNote(NoteTreeNode note_node)
+        {
+            MultiPosition note_pos = note_node.getNote().getPosition();
+            if (note_pos == null) { return null; }
+
+            MeasureTreeNode measure = getMeasureNodeAtPosition(note_pos.getNextMeasurePosition());
+            if (measure == null) { return null; }
+
+            ChordTreeNode chord = measure.getChordNodeAtPosition(note_pos.getNextPosition());
+            if (chord == null) { return null; }
+
+            return chord.getNoteNodeAtString(note_node.getNote().String);
+        }
+        
+
+        public NoteTreeNode getPreviousNote(NoteTreeNode note_node)
+        {
+            MultiPosition note_pos = note_node.getNote().getPosition();
+            if (note_pos == null) { return null; }
+
+            MeasureTreeNode measure = getMeasureNodeAtPosition(note_pos.getPreviousMeasurePosition());
+            if (measure == null) { return null; }
+
+            ChordTreeNode chord = measure.getChordNodeAtPosition(note_pos.getPreviousPosition(measure.Children.Count()));
+            if(chord == null) { return null; }
+
+            return chord.getNoteNodeAtString(note_node.getNote().String);
+        }
+
+        public IRecieveDimensionUpdates getBounds() { return bounds.Strategy as IPartBounds; }
     }
 
     public class MeasureTreeNode : TreeNode
@@ -179,7 +196,7 @@ namespace GuitarTab
         private Measure measure;
         public override object BaseObject { get { return measure; } }
 
-        public MeasureTreeNode(Measure m, MeasureBounds bounds, MeasureMouseHandler handler, MeasureDrawingVisual visual)
+        public MeasureTreeNode(Measure m, IBounded bounds, IHandleMouseEvents handler, StaticDrawingVisual visual)
             :base(bounds, handler, visual)
         {
             measure = m;
@@ -187,28 +204,26 @@ namespace GuitarTab
 
         public Measure getMeasure() { return measure; }
 
-        public override void addToMouseClick(NodeClick click) { click.MeasureNodes.Add(this); }
+        public override void addToIHoldTreeNodes(IHoldTreeNodes nodes) { nodes.MeasureNodes.Add(this); }
 
-        public override void removeFromMouseClick(NodeClick click)
+        public override void removeFromIHoldTreeNodes(IHoldTreeNodes nodes)
         {
-            if (click.MeasureNodes.Contains(this)) { click.MeasureNodes.Remove(this); }
+            if (nodes.MeasureNodes.Contains(this)) { nodes.MeasureNodes.Remove(this); }
         }
 
-        public override void addToSelected(Selected selected) { selected.MeasureNodes.Add(this); }
-
-        public override void removeFromSelected(Selected selected)
+        public ChordTreeNode getChordNodeAtPosition(int pos)
         {
-            if (selected.MeasureNodes.Contains(this)) { selected.MeasureNodes.Remove(this); }
+            return (from node in Children
+                    where (node as ChordTreeNode).getChord().Position.Index == pos
+                    select node as ChordTreeNode).FirstOrDefault();
         }
-
-        public override void handlePositionClick(PositionClick click) { click?.checkItem(measure.Position.Index, ObjectBounds.Bounds); }
 
         public void redrawMeasureHead()
         {
             if (measure.MatchUpdated)
             {
                 measure.MatchUpdated = false;
-                (ObjectDrawer as MeasureDrawingVisual).refreshMeasure();
+                (drawer as DynamicMeasureDrawingVisual).refreshMeasure();
             }
         }
     }
@@ -218,7 +233,7 @@ namespace GuitarTab
         private Chord chord;
         public override object BaseObject { get { return chord; } }
 
-        public ChordTreeNode(Chord c, ChordBounds bounds, ChordMouseHandler handler, ChordDrawingVisual visual)
+        public ChordTreeNode(Chord c, IBounded bounds, IHandleMouseEvents handler, StaticDrawingVisual visual)
             :base(bounds, handler, visual)
         {
             chord = c;
@@ -226,21 +241,21 @@ namespace GuitarTab
 
         public Chord getChord() { return chord; }
 
-        public override void addToMouseClick(NodeClick click) { click.ChordNodes.Add(this); }
+        public override void addToIHoldTreeNodes(IHoldTreeNodes nodes) { nodes.ChordNodes.Add(this); }
 
-        public override void removeFromMouseClick(NodeClick click)
+        public override void removeFromIHoldTreeNodes(IHoldTreeNodes nodes)
         {
-            if (click.ChordNodes.Contains(this)) { click.ChordNodes.Remove(this); }
+            if (nodes.ChordNodes.Contains(this)) { nodes.ChordNodes.Remove(this); }
         }
 
-        public override void addToSelected(Selected selected) { selected.ChordNodes.Add(this); }
-
-        public override void removeFromSelected(Selected selected)
+        public NoteTreeNode getNoteNodeAtString(int str)
         {
-            if (selected.ChordNodes.Contains(this)) { selected.ChordNodes.Remove(this); }
+            return (from node in Children
+                    where (node as NoteTreeNode).getNote().String == str
+                    select node as NoteTreeNode).FirstOrDefault();
         }
 
-        public override void handlePositionClick(PositionClick click) { click?.checkItem(chord.Position.Index, ObjectBounds.Bounds); }
+        public IChordBounds getBounds() { return bounds.Strategy as IChordBounds; }
     }
 
     public class NoteTreeNode : TreeNode
@@ -248,7 +263,7 @@ namespace GuitarTab
         private Note note;
         public override object BaseObject { get { return note; } }
 
-        public NoteTreeNode(Note n, NoteBounds bounds, NoteMouseHandler handler, NoteDrawingVisual visual)
+        public NoteTreeNode(Note n, IBounded bounds, IHandleMouseEvents handler, StaticDrawingVisual visual)
             :base(bounds, handler, visual)
         {
             note = n;
@@ -256,18 +271,11 @@ namespace GuitarTab
 
         public Note getNote() { return note; }
 
-        public override void addToMouseClick(NodeClick click) { click.NoteNodes.Add(this); }
+        public override void addToIHoldTreeNodes(IHoldTreeNodes nodes) { nodes.NoteNodes.Add(this); }
 
-        public override void removeFromMouseClick(NodeClick click)
+        public override void removeFromIHoldTreeNodes(IHoldTreeNodes nodes)
         {
-            if (click.NoteNodes.Contains(this)) { click.NoteNodes.Remove(this); }
-        }
-
-        public override void addToSelected(Selected selected) { selected.NoteNodes.Add(this); }
-
-        public override void removeFromSelected(Selected selected)
-        {
-            if (selected.NoteNodes.Contains(this)) { selected.NoteNodes.Remove(this); }
+            if (nodes.NoteNodes.Contains(this)) { nodes.NoteNodes.Remove(this); }
         }
     }
 
@@ -276,7 +284,7 @@ namespace GuitarTab
         private IEffect effect;
         public override object BaseObject { get { return effect; } }
 
-        public EffectTreeNode(IEffect e, BaseBounded effect_bounds, EffectMouseHandler handler, TabDrawingVisual visual)
+        public EffectTreeNode(IEffect e, IBounded effect_bounds, IHandleMouseEvents handler, StaticDrawingVisual visual)
             :base(effect_bounds, handler, visual)
         {
             effect = e;
@@ -284,11 +292,11 @@ namespace GuitarTab
 
         public IEffect getEffect() { return effect; }
 
-        public override void addToMouseClick(NodeClick click) { click.EffectNode = this; }
+        public override void addToIHoldTreeNodes(IHoldTreeNodes nodes) { nodes.EffectNode = this; }
 
-        public override void removeFromMouseClick(NodeClick click)
+        public override void removeFromIHoldTreeNodes(IHoldTreeNodes nodes)
         {
-            if (click.EffectNode != null && click.EffectNode.Equals(this)) { click.EffectNode = null; }
+            if (nodes.EffectNode != null && nodes.EffectNode.Equals(this)) { nodes.EffectNode = null; }
         }
     }
 }

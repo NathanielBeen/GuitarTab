@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GuitarTab
@@ -624,7 +625,8 @@ namespace GuitarTab
         {
             if (part == null || measure == null || num_beats == null || beat_type == null) { return false; }
             if (!part.ModelCollection.Contains(measure)) { return false; }
-            return (TimeSignature.canSetTimeSignature((int)num_beats, (NoteLength)beat_type));
+            if (!TimeSignature.canSetTimeSignature((int)num_beats, (NoteLength)beat_type)) { return false; }
+            return (measure.getSpaceTaken() <= ((int)num_beats * (int)beat_type));
         }
     }
 
@@ -728,6 +730,53 @@ namespace GuitarTab
             int length = 0;
             foreach (Length l in new_lengths) { length += l.getLength(); }
             return length;
+        }
+    }
+
+    public class ChangeSongInfoVal : IActionValidator
+    {
+        private Part part;
+        private string name;
+        private string artist;
+        private string album;
+
+        public ChangeSongInfoVal(Part p, string n, string ar, string al)
+        {
+            part = p;
+            name = n;
+            artist = ar;
+            album = ar;
+        }
+
+        public bool validateAction()
+        {
+            if (part == null || name == null || artist == null || album == null) { return false; }
+            if (name.Length < 0 || name.Length > 255 || artist.Length < 0 || artist.Length > 255 || album.Length < 0 || album.Length > 255) { return false; }
+
+            var regex = new Regex("^[a-zA-Z0-9_]+( [a-zA-Z0-9_]+)*$");
+            if (!regex.IsMatch(name) || !regex.IsMatch(artist) || !regex.IsMatch(album)) { return false; }
+            return true;
+        }
+    }
+
+    public class ChangeInstrumentInfoVal : IActionValidator
+    {
+        private Part part;
+        private InstrumentType? instrument;
+        private int? string_num;
+
+        public ChangeInstrumentInfoVal(Part p, InstrumentType? i, int? s)
+        {
+            part = p;
+            instrument = i;
+            string_num = s;
+        }
+
+        public bool validateAction()
+        {
+            if (part == null || instrument == null || string_num == null) { return false; }
+            if (string_num < 4 || string_num > 8 || string_num < part.InstrumentInfo.Strings) { return false; }
+            return true;
         }
     }
 }

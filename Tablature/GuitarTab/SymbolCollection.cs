@@ -24,7 +24,7 @@ namespace GuitarTab
 
     public interface IContainModels
     {
-        List<object> getGenericModelList();
+        List<object> getChildrenToBuild();
         event EventHandler<ObjectAddedArgs> ModelAdded;
         event EventHandler<ObjectRemovedArgs> ModelRemoved;
     }
@@ -174,7 +174,7 @@ namespace GuitarTab
         }
 
 
-        public bool Contains(T item) { return (items.Contains(item)); }
+        public bool Contains(T item) { return (items.Contains(item) && items.ToList()[item.Position.Index].Equals(item)); }
 
         public T First() { return items.FirstOrDefault(); }
 

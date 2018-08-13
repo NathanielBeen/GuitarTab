@@ -17,6 +17,6 @@
         </Grid.RowDefinitions>
         <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="Chord Properties" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <Label Grid.Column="0" Grid.Row="1" Content="Chord Length" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Lengths}" SelectedItem="{Binding CurrentLength, Mode=TwoWay}"/>
+        <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding Lengths}" SelectedItem="{Binding CurrentLength, Mode=TwoWay}" Margin="2"/>
     </Grid>
 </UserControl>

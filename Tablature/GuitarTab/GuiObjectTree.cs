@@ -11,18 +11,18 @@ namespace GuitarTab
 {
     public class GuiObjectTree
     {
+        //have the factory attach the node to its parent, as the factory has the more specific type of node and more casting will be avoided
+        //change root to partTreeNode?
         public TreeNode Root { get; set; }
-        private GuiObjectFactory factory;
+        private IGuiObjectFactory factory;
         private TreeChangedHolding click_holding;
-        private TreeRemovedHolding removed_holding;
         private TreeVisualCollection visuals;
 
-        public GuiObjectTree(GuiObjectFactory f, TreeChangedHolding c, TreeRemovedHolding r, TreeVisualCollection v)
+        public GuiObjectTree(IGuiObjectFactory f, TreeChangedHolding c, TreeVisualCollection v)
         {
             Root = null;
             factory = f;
             click_holding = c;
-            removed_holding = r;
             visuals = v;
         }
         
@@ -37,91 +37,48 @@ namespace GuitarTab
             return Root?.findChildWithoutParent(base_object, max_depth, 0) ?? null;
         }
 
-        //this whole mess should not be in the guitree. possibly put it in the guiupdater or guifactory class.
-        //instead of calling buildobject, first call the specific factory method
-        //then call the addvisual, addchild, ect in a common method
-        //have a check for IContainObjects and add to their itemadded and itemremoved events in another common method
-        //(then call to build children if needed)
-        public void buildAddedNode(TreeNode parent, object child)
+        public void buildObject(TreeNode parent, object child)
         {
-            if (child is Part) { buildTree((Part)child); }
-            else if (child is Measure) { buildMeasure((Measure)child, parent); }
-            else if (child is Chord) { buildChord((Chord)child, parent); }
-            else if (child is Note) { buildNote((Note)child, parent); }
-            else if (child is IEffect) { buildEffect((IEffect)child, parent as NoteTreeNode); }
+            TreeNode node = buildNode(child, parent);
+            if (child is Part) { setRoot(node); }
         }
 
-        public void buildTree(Part part)
+        public TreeNode buildNode(object obj, TreeNode parent)
         {
-            TreeNode node = factory.buildPart(part);
+            TreeNode node = factory.buildObject(obj, parent);
             if (node != null)
             {
-                visuals.addVisual(node);
-                attachEventsToTree(part);
-                buildChildren(node, part);
-                Root = node;
+                attachNodeToTree(node, parent);
+                buildIContainModels(obj, node);
                 click_holding.nodeAdded(node);
             }
+
+            return node;
         }
 
-        public void buildMeasure(Measure measure, TreeNode parent)
+        public void buildIContainModels(object obj, TreeNode node)
         {
-            TreeNode child = factory.buildMeasure(measure);
-            if (child != null)
+            if (obj is IContainModels)
             {
-                attachNodeToTree(child, parent);
-                attachEventsToTree(measure);
-                buildChildren(child, measure);
-                click_holding.nodeAdded(child);
+                IContainModels contain = obj as IContainModels;
+                attachEventsToTree(contain);
+                buildChildren(node, contain);
             }
         }
 
-        public void buildChord(Chord chord, TreeNode parent)
+        public void setRoot(TreeNode new_root)
         {
-            TreeNode child = factory.buildChord(chord);
+            IRecieveDimensionUpdates old_bounds = (Root as PartTreeNode)?.getBounds();
+            IRecieveDimensionUpdates new_bounds = (new_root as PartTreeNode)?.getBounds();
 
-            if (child != null)
-            {
-                attachNodeToTree(child, parent);
-                if (chord is IContainModels)
-                {
-                    var contained_chord = chord as IContainModels;
-                    attachEventsToTree(contained_chord);
-                    buildChildren(child, contained_chord);
-                    click_holding.nodeAdded(child);
-                }
-            }
-        }
-
-        public void buildNote(Note note, TreeNode parent)
-        {
-            TreeNode child = factory.buildNote(note);
-            if (child != null)
-            {
-                attachNodeToTree(child, parent);
-                attachEventsToTree(note);
-
-                List<IEffect> effects = note.ModelCollection.getItemsMatchingCondition(e => !(e is IMultiEffect && e.getPosition(note) == EffectPosition.Into));
-                foreach (IEffect effect in effects)
-                {
-                    buildEffect(effect, child as NoteTreeNode);
-                }
-
-                click_holding.nodeAdded(child);
-            }
-        }
-
-        public void buildEffect(IEffect effect, NoteTreeNode parent)
-        {
-            TreeNode child = factory.buildEffectNode(effect, parent);
-            if (child != null) { attachNodeToTree(child, parent); }
-            click_holding.nodeAdded(child);
+            Root = new_root;
+            RootChanged?.Invoke(this, new ReceiverChangedEventArgs(old_bounds, new_bounds));
         }
 
         public void attachNodeToTree(TreeNode child, TreeNode parent)
         {
             visuals.addVisual(child);
-            parent.addChild(child);
+            parent?.addChild(child);
         }
 
         public void attachEventsToTree(IContainModels node)
@@ -130,25 +87,22 @@ namespace GuitarTab
             node.ModelRemoved += handleItemRemoved;
         }
 
+        public void removeEventsFromTree(IContainModels node)
+        {
+            node.ModelAdded -= handleItemAdded;
+            node.ModelRemoved -= handleItemRemoved;
+        }
+
         public void buildChildren(TreeNode node, IContainModels node_obj)
         {
-            foreach (object obj in node_obj.getGenericModelList()) { buildAddedNode(node, obj); }
+            foreach (object obj in node_obj.getChildrenToBuild()) { buildObject(node, obj); }
         }
 
         public void handleItemAdded(object parent_obj, ObjectAddedArgs args)
         {
             object child_obj = args.Added;
             TreeNode parent = findObjectWithoutParents(parent_obj);
-            if (parent != null)
-            {
-                TreeNode child = removed_holding.searchForAddedItem(child_obj);
-                if (child == null) { buildAddedNode(parent, child_obj); }
-                else
-                {
-                    attachNodeToTree(child, parent);
-                    click_holding.nodeAdded(child);
-                }
-            }
+            if (parent != null) { buildObject(parent, child_obj); }
         }
 
         public void handleItemRemoved(object sender, ObjectRemovedArgs args)
@@ -157,20 +111,22 @@ namespace GuitarTab
             if (removed != null)
             {
                 removed.Parent?.removeChild(removed);
-                removed_holding.removeItem(removed);
+                if (args.Removed is IContainModels) { removeEventsFromTree(args.Removed as IContainModels); }
                 click_holding.nodeRemoved(removed);
                 visuals.removeVisual(removed);
             }
         }
 
-        public ObservableCollection<TabDrawingVisual> getTreeVisuals() { return visuals.Visuals; }
+        public ObservableCollection<DrawingVisual> getTreeVisuals() { return visuals.Visuals; }
 
-        public void HandleMouseEvent(MouseClick click) { Root?.handleMouseClick(click); }
+        public void HandleMouseEvent(MouseClick click) { Root?.handleMouseEvent(click); }
 
         public void populateMouseClick(NodeClick click) { click_holding.populateMouseClick(click); }
+
+        public event EventHandler<ReceiverChangedEventArgs> RootChanged;
     }
 
-    public class TreeRemovedHolding
+    /*public class TreeRemovedHolding
     {
         private List<TreeNode> removedNodes;
         private int num_retained;
@@ -195,7 +151,7 @@ namespace GuitarTab
             if (found != null) { removedNodes.Remove(found); }
             return found;
         }
-    }
+    }*/
 
     public class TreeChangedHolding
     {
@@ -216,8 +172,8 @@ namespace GuitarTab
 
         public void populateMouseClick(NodeClick click)
         {
-            foreach (TreeNode node in removedNodes) { node.removeFromMouseClick(click); }
-            foreach (TreeNode node in addedNodes) { node.addToMouseClick(click); }
+            foreach (TreeNode node in removedNodes) { node.removeFromIHoldTreeNodes(click); }
+            foreach (TreeNode node in addedNodes) { node.addToIHoldTreeNodes(click); }
             addedNodes.Clear();
             removedNodes.Clear();
         }
@@ -225,21 +181,21 @@ namespace GuitarTab
 
     public class TreeVisualCollection
     {
-        public ObservableCollection<TabDrawingVisual> Visuals { get; }
+        public ObservableCollection<DrawingVisual> Visuals { get; }
 
         public TreeVisualCollection()
         {
-            Visuals = new ObservableCollection<TabDrawingVisual>();
+            Visuals = new ObservableCollection<DrawingVisual>();
         }
 
         public void tryAddNode(TreeNode node)
         {
-            if (!Visuals.Contains(node.ObjectDrawer)) { Visuals.Add(node.ObjectDrawer); }
+            if (!Visuals.Contains(node.getVisual())) { Visuals.Add(node.getVisual()); }
         }
 
         public void tryRemoveNode(TreeNode node)
         {
-            if (Visuals.Contains(node.ObjectDrawer)) { Visuals.Remove(node.ObjectDrawer); }
+            if (Visuals.Contains(node.getVisual())) { Visuals.Remove(node.getVisual()); }
         }
 
         public void addVisual(TreeNode node)

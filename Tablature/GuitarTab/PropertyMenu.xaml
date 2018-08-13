@@ -5,18 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GuitarTab"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="300" d:DesignWidth="310"
              Visibility="{Binding Visible}">
     <UserControl.Resources>
         <local:DataTypeConverter x:Key="TypeConverter"/>
+        <DataTemplate x:Key="PartMenu">
+            <local:PartPropertyMenu DataContext="{Binding Menu}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="InstrumentMenu">
+            <local:InstrumentPropertyMenu DataContext="{Binding Menu}"/>
+        </DataTemplate>
         <DataTemplate x:Key="MeasureMenu">
-            <local:MeasurePropertyMenu/>
+            <local:MeasurePropertyMenu DataContext="{Binding Menu}"/>
         </DataTemplate>
         <DataTemplate x:Key="ChordMenu">
-            <local:ChordPropertyMenu/>
+            <local:ChordPropertyMenu DataContext="{Binding Menu}"/>
         </DataTemplate>
         <DataTemplate x:Key="NoteMenu">
-            <local:NotePropertyMenu/>
+            <local:NotePropertyMenu DataContext="{Binding Menu}"/>
         </DataTemplate>
         <DataTemplate x:Key="NullMenu">
             <Label/>
@@ -37,23 +43,33 @@
                              Value="{x:Type local:NoteProperties}">
                     <Setter Property="ContentTemplate" Value="{StaticResource NoteMenu}"/>
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Menu, Converter={StaticResource TypeConverter}}"
+                             Value="{x:Type local:PartProperties}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource PartMenu}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Menu, Converter={StaticResource TypeConverter}}"
+                             Value="{x:Type local:InstrumentProperties}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource InstrumentMenu}"/>
+                </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Border Padding="5" Background="Aqua" BorderBrush="LightSkyBlue" BorderThickness="2" CornerRadius="8">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <ContentControl Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Content="{Binding}" Style="{StaticResource MenuType}"/>
-        <Button Grid.Column="0" Grid.Row="1" Name="resetBtn" Content="Reset Selection" Command="{Binding ResetCommand}"/>
-        <Button Grid.Column="1" Grid.Row="1" Name="submitBtn" Content="Submit Selection" Command="{Binding SubmitCommand}"/>
-        <Button Grid.Column="2" Grid.Row="1" Name="closeBtn" Content="Close Menu" Command="{Binding CloseCommand}"/>
-    </Grid>
+            <ContentControl Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Content="{Binding}" Style="{StaticResource MenuType}"/>
+            <Button Grid.Column="0" Grid.Row="1" Name="resetBtn" Content="Reset Selection" Command="{Binding ResetCommand}" Margin="2"/>
+            <Button Grid.Column="1" Grid.Row="1" Name="submitBtn" Content="Submit Selection" Command="{Binding SubmitCommand}" Margin="2"/>
+            <Button Grid.Column="2" Grid.Row="1" Name="closeBtn" Content="Close Menu" Command="{Binding CloseCommand}" Margin="2"/>
+        </Grid>
+    </Border>
 </UserControl>

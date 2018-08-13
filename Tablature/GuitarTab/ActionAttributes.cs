@@ -22,7 +22,7 @@ namespace GuitarTab
 
         public Part genPart(CommandSelections selection)
         {
-            Part part = Part.createInstance(selection.BPM, selection.NumBeats, selection.BeatType);
+            Part part = Part.createInstance(SongInfo.createDefault(), InstrumentInfo.createDefault(), selection.BPM, selection.NumBeats, selection.BeatType);
             selection.SelectedPart = part;
             return part;
         }
@@ -303,6 +303,7 @@ namespace GuitarTab
             FirstMeasure = selection.SelectedMeasure[0];
             SecondMeasure = selection.SelectedMeasure[1];
             Position = selection.Position;
+            if (Position < Chord.Position.Index) { Position++; }
         }
     }
 
@@ -349,7 +350,7 @@ namespace GuitarTab
             int init = (int)selection.Position;
             foreach (Chord chord in Chords)
             {
-                if (chord.Position.Index == init || chord.Position.Index + 1 == init) { return null; }
+                if (FirstMeasure.Equals(SecondMeasure) && (chord.Position.Index == init || chord.Position.Index + 1 == init)) { return null; }
             }
 
             int first_position = (from chord in Chords select chord.Position.Index).Min();
@@ -612,10 +613,17 @@ namespace GuitarTab
             Position = genCorrectedPosition(selection);
         }
 
-        public int genCorrectedPosition(CommandSelections selection)
+        public int? genCorrectedPosition(CommandSelections selection)
         {
             int init = (int)selection.Position;
-            init -= (Measures.Count() - 1);
+            foreach (Measure Measure in Measures)
+            {
+                if (Measure.Position.Index == init) { return null; }
+            }
+
+            int first_pos = (from Measure measure in Measures select measure.Position.Index).Min();
+            if (init > first_pos) { init -= (Measures.Count() - 1); }
+
             return init;
         }
     }
@@ -672,6 +680,36 @@ namespace GuitarTab
                 lengths.Add(TupleLength.createInstance(chord.Length.NoteType, Type));
             }
             return lengths;
+        }
+    }
+
+    public class ChangeSongInfoAtr : IActionAttributes
+    {
+        public Part Part { get; }
+        public string Name { get; }
+        public string Artist { get; }
+        public string Album { get; }
+
+        public ChangeSongInfoAtr(CommandSelections selections)
+        {
+            Part = selections.SelectedPart;
+            Name = selections.Name;
+            Artist = selections.Artist;
+            Album = selections.Album;
+        }
+    }
+
+    public class ChangeInstrumentInfoAtr : IActionAttributes
+    {
+        public Part Part { get; }
+        public InstrumentType? Instrument { get; }
+        public int? StringNum { get; }
+
+        public ChangeInstrumentInfoAtr(CommandSelections selections)
+        {
+            Part = selections.SelectedPart;
+            Instrument = selections.Instrument;
+            StringNum = selections.StringNum;
         }
     }
 }

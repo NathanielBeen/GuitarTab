@@ -44,9 +44,9 @@ namespace GuitarTab
             down_point = default(Point);
         }
 
-        public void setDownPoint(Point down, List<VisualBounds> selected)
+        public void setDownPoint(Point down, List<UpdatingVisualBounds> selected)
         {
-            foreach (VisualBounds bounds in selected)
+            foreach (UpdatingVisualBounds bounds in selected)
             {
                 if (bounds.containsPoint(down)) { return; }
             }

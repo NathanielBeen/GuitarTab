@@ -18,6 +18,7 @@ namespace GuitarTab
         NoteSelect
     }
 
+    //make a prop that holds a proposed treenode, have the mouse handler either confirm or deny addition?
     public class MouseClick
     {
         public Point Point { get; }
@@ -27,7 +28,7 @@ namespace GuitarTab
         public virtual bool matchesClickType(ClickType desired) { return false; }
     }
 
-    public class NodeClick : MouseClick
+    public class NodeClick : MouseClick, IHoldTreeNodes
     {
         public PartTreeNode PartNode { get; set; }
         public List<MeasureTreeNode> MeasureNodes { get; set; }
@@ -35,8 +36,10 @@ namespace GuitarTab
         public List<NoteTreeNode> NoteNodes { get; set; }
         public EffectTreeNode EffectNode { get; set; }
 
-        public VisualBounds Selected { get; set; }
+        public IBounds Selected { get; set; }
         public bool Handled { get; private set; }
+
+        private TreeNode prop_add;
 
         public NodeClick(Point p)
             : base(p)
@@ -49,6 +52,7 @@ namespace GuitarTab
 
             Selected = null;
             Handled = false;
+            prop_add = null;
         }
 
         public void populateCommandSelections(CommandSelections selections)
@@ -77,6 +81,19 @@ namespace GuitarTab
         }
 
         public void setHandled() { Handled = true; }
+
+        public void setPropNode(TreeNode node) { prop_add = node; }
+
+        public void denyPropAdd() { prop_add = null; }
+
+        public void acceptPropAdd()
+        {
+            if (prop_add != null)
+            {
+                prop_add.addToIHoldTreeNodes(this);
+                prop_add = null;
+            }
+        }
     }
 
     public class NoteSelectClick : NodeClick
@@ -144,7 +161,7 @@ namespace GuitarTab
             ContainsRect = false;
         }
 
-        public void setContainsRect(VisualBounds bounds)
+        public void setContainsRect(IBounds bounds)
         {
             ContainsRect = bounds.containsRectangle(Rectangle);
         }
@@ -162,7 +179,7 @@ namespace GuitarTab
             Position = 0;
         }
 
-        public virtual void checkItem(int pos, VisualBounds bounds) { }
+        public virtual void checkItem(int pos, IBounds bounds) { }
 
         public override bool matchesClickType(ClickType desired) { return (desired == ClickType.Position); }
     }
@@ -176,7 +193,7 @@ namespace GuitarTab
             MeasureSet = false;
         }
 
-        public override void checkItem(int pos, VisualBounds bounds)
+        public override void checkItem(int pos, IBounds bounds)
         {
             if (bounds.containsPoint(Point))
             {
@@ -188,7 +205,7 @@ namespace GuitarTab
 
     public class ChordPositionClick : PositionClick
     {
-        private VisualBounds current_closest;
+        private IBounds current_closest;
 
         public ChordPositionClick(Point p)
             :base(p)
@@ -196,7 +213,7 @@ namespace GuitarTab
             current_closest = null;
         }
 
-        public override void checkItem(int pos, VisualBounds bounds)
+        public override void checkItem(int pos, IBounds bounds)
         {
             if (checkChordBar(bounds))
             {
@@ -205,20 +222,20 @@ namespace GuitarTab
             }
         }
 
-        private bool checkChordBar(VisualBounds bounds)
+        private bool checkChordBar(IBounds bounds)
         {
             if (bounds.Top <= Point.Y && bounds.Bottom >= Point.Y && bounds.Right <= Point.X) { return checkSameBar(bounds); }
             else if (bounds.Bottom <= Point.Y) { return checkPrevBar(bounds); }
             return false;
         }
 
-        private bool checkSameBar(VisualBounds bounds)
+        private bool checkSameBar(IBounds bounds)
         {
             if (current_closest is null) { return true; }
             return (current_closest.Bar < bounds.Bar || current_closest.Right <= bounds.Right);
         }
 
-        private bool checkPrevBar(VisualBounds bounds)
+        private bool checkPrevBar(IBounds bounds)
         {
             if (current_closest is null) { return true; }
             if (current_closest.Bar > bounds.Bar) { return false; }
@@ -228,7 +245,7 @@ namespace GuitarTab
 
     public class BoundsClick : MouseClick
     {
-        public VisualBounds DeepestBounds { get; set; }
+        public IBounds DeepestBounds { get; set; }
 
         public BoundsClick(Point p)
             :base(p)

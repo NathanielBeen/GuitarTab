@@ -13,6 +13,9 @@ namespace GuitarTab
         public const int MIN_FRET = 0;
         public const int MAX_FRET = 26;
 
+        public const int WIDTH = 190;
+        public const int HEIGHT = 70;
+
         public ContinueCommandDelegate ContinueDelegate { get; set; }
 
         private string fret;
@@ -28,11 +31,18 @@ namespace GuitarTab
             }
         }
 
-        private Point position;
-        public Point Position
+        private int left;
+        public int Left
         {
-            get { return position; }
-            set { SetProperty(ref position, value); }
+            get { return left; }
+            set { SetProperty(ref left, value); }
+        }
+
+        private int top;
+        public int Top
+        {
+            get { return top; }
+            set { SetProperty(ref top, value); }
         }
 
         private Visibility visible;
@@ -70,7 +80,8 @@ namespace GuitarTab
         public void resetFields()
         {
             Fret = "0";
-            Position = default(Point);
+            Left = 0;
+            Top = 0;
             Visible = Visibility.Collapsed;
             ContinueDelegate = null;
             Click = null;
@@ -95,7 +106,8 @@ namespace GuitarTab
         {
             ContinueDelegate = command;
             Click = click;
-            Position = click.Point;
+            Left = Math.Max(0, (int)click.Point.X - WIDTH/2);
+            Top = (int)click.Point.Y + HEIGHT/2;
             Visible = Visibility.Visible;
         }
     }

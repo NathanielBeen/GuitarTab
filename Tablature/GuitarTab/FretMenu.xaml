@@ -5,21 +5,23 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GuitarTab"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="70" d:DesignWidth="190"
              Visibility="{Binding Visible}">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Enter Fret:"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Fret}"/>
-        <Button Grid.Row="1" Grid.Column="1" Content="Change Fret" Command="{Binding SubmitCommand}"/>
-        <Button Grid.Row="1" Grid.Column="2" Content="Cancel" Command="{Binding CloseCommand}"/>
-    </Grid>
+    <Border Padding="3" Background="Aqua" BorderBrush="LightSkyBlue" BorderThickness="2" CornerRadius="8">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="50"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Enter Fret:"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Fret}"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="Submit" Command="{Binding SubmitCommand}"/>
+            <Button Grid.Row="1" Grid.Column="2" Content="Cancel" Command="{Binding CloseCommand}"/>
+        </Grid>
+    </Border>
 </UserControl>

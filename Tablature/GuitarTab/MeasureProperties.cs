@@ -9,113 +9,98 @@ using System.Windows.Controls;
 
 namespace GuitarTab
 {
-    class MeasureProperties : BaseValidator, IPropertyMenu
+    class MeasureProperties : BasePropertyMenu
     {
-        private Measure measure;
-        private GuiCommandExecutor executor;
-        private NodeClick click;
+        public const int NUM_BEATS_MIN = 1;
+        public const int NUM_BEATS_MAX = 32;
+        public const int BPM_MIN = 20;
+        public const int BPM_MAX = 300;
 
-        private int num_beats;
+        private Measure measure;
+
+        private string num_beats;
         public string NumBeats
         {
             get { return num_beats.ToString(); }
             set
             {
-                if (ValidateProperty(nameof(NumBeats), value, validateNumBeats))
-                {
-                    SetProperty(ref num_beats, int.Parse(value));
-                }
+                string error = NumBeatsError;
+                setIntProperty(ref num_beats, value, NUM_BEATS_MIN, NUM_BEATS_MAX, ref error);
+                NumBeatsError = error;
             }
         }
 
-        private NoteLength beat_type;
+        private string num_beats_error;
+        public string NumBeatsError
+        {
+            get { return num_beats_error; }
+            set { SetProperty(ref num_beats_error, value); }
+        }
+
+        private string beat_type;
         public string BeatType
         {
-            get { return beat_type.getStringFromNoteLength(); }
+            get { return beat_type; }
             set
             {
-                if (ValidateProperty(nameof(BeatType), value, validateBeatType))
-                {
-                    SetProperty(ref beat_type, NoteLengthExtensions.getNoteLengthFromVisualLength(int.Parse(value)));
-                }
+                string error = BeatTypeError;
+                setTimeSigNoteLengthProperty(ref beat_type, value, ref error);
+                BeatTypeError = error;
             }
         }
 
-        private int bpm;
+        private string beat_type_error;
+        public string BeatTypeError
+        {
+            get { return beat_type_error; }
+            set { SetProperty(ref beat_type_error, value); }
+        }
+
+        private string bpm;
         public string BPM
         {
             get { return bpm.ToString(); }
             set
             {
-                if(ValidateProperty(nameof(BPM), value, validateBPM))
-                {
-                    SetProperty(ref bpm, int.Parse(value));
-                }
+                string error = BpmError;
+                setIntProperty(ref bpm, value, BPM_MIN, BPM_MAX, ref error);
+                BpmError = error;
             }
         }
 
-        public MeasureProperties(Measure m, GuiCommandExecutor exec, NodeClick c)
+        private string bpm_error;
+        public string BpmError
         {
-            measure = m;
-            executor = exec;
-            click = c;
+            get { return bpm_error; }
+            set { SetProperty(ref bpm_error, value); }
         }
 
-        public void resetToDefault()
+        public MeasureProperties(MeasureTreeNode m, GuiCommandExecutor exec, NodeClick c)
+            :base(c, exec)
+        {
+            measure = m.getMeasure();
+            resetToDefault();
+        }
+
+        public override void resetToDefault()
         {
             NumBeats = measure.TimeSignature.NumberOfBeats.ToString();
             BeatType = measure.TimeSignature.BeatType.getVisualNoteLength().ToString();
             BPM = measure.Bpm.ToString();
         }
 
-        public void submitChanges()
+        public override void submitChanges()
         {
-            if (num_beats != measure.TimeSignature.NumberOfBeats || beat_type != measure.TimeSignature.BeatType)
+            int beat_type_i = (Int32.TryParse(BeatType, out int beat)) ? beat : 0;
+            NoteLength beat_type_n = NoteLengthExtensions.getNoteLengthFromVisualLength(beat_type_i);
+            if (NumBeatsError == String.Empty || BeatTypeError == String.Empty || BpmError == String.Empty || !Int32.TryParse(NumBeats, out int num_beats_i)
+                || beat_type_n == NoteLength.None || !Int32.TryParse(BPM, out int bpm_i)) { return; }
+
+            if (num_beats_i != measure.TimeSignature.NumberOfBeats || beat_type_n != measure.TimeSignature.BeatType)
             {
-                executor.executeChangeMeasureTimeSigFromMenu(click, num_beats, beat_type);
+                executor.executeChangeMeasureTimeSigFromMenu(getClickCopy(), num_beats_i, beat_type_n);
             }
-            if (bpm != measure.Bpm) { executor.executeChangeMeasureBpmFromMenu(click, bpm); }
-        }
-
-        //write a validator for num_beats, beat_type, and bpm
-        public ICollection<string> validateNumBeats(string new_beats)
-        {
-            var errors = new List<string>();
-            int beats = 0;
-
-            if (int.TryParse(new_beats, out beats))
-            {
-                if (beats <= 0 || beats > 32) { errors.Add("must be between 1 and 32"); }
-            }
-            else { errors.Add("must be a number"); }
-            return errors;
-        }
-
-        public ICollection<string> validateBeatType(string new_type)
-        {
-            var errors = new List<string>();
-            int length = 0;
-
-            if (int.TryParse(new_type, out length))
-            {
-                NoteLength type = NoteLengthExtensions.getNoteLengthFromVisualLength(length);
-                if (type == NoteLength.None) { errors.Add("must be a valid beat type"); }
-            }
-            else { errors.Add("must be a number"); }
-            return errors;
-        }
-
-        public ICollection<string> validateBPM(string new_bpm)
-        {
-            var errors = new List<string>();
-            int n_bpm = 0;
-
-            if (int.TryParse(new_bpm, out n_bpm))
-            {
-                if (n_bpm < 20 || n_bpm > 250) { errors.Add("must be between 20 and 250"); }
-            }
-            else { errors.Add("must be a number"); }
-            return errors;
+            if (bpm_i != measure.Bpm) { executor.executeChangeMeasureBpmFromMenu(getClickCopy(), bpm_i); }
         }
     }
 }

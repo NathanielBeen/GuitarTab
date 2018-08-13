@@ -9,66 +9,73 @@ using System.Threading.Tasks;
 
 namespace GuitarTab
 {
-    public interface IPropertyMenu
+    public class NoteProperties : BasePropertyMenu
     {
-        void resetToDefault();
-        void submitChanges();
-    }
+        public const int MIN_STRING = 0;
+        public const int MAX_STRING = 6;
+        public const int MIN_FRET = 0;
+        public const int MAX_FRET = 26;
 
-    public class NoteProperties : BaseValidator, IPropertyMenu
-    {
         private Note note;
-        private GuiCommandExecutor executor;
-        private NodeClick click;
 
-        private int note_string;
+        private string note_string;
         public string String
         {
-            get { return note_string.ToString(); }
+            get { return note_string; }
             set
             {
-                if (ValidateProperty(nameof(String), value, validateString))
-                {
-                    SetProperty(ref note_string, int.Parse(value));
-                }
+                string error = StringError;
+                setIntProperty(ref note_string, value, MIN_STRING, MAX_STRING, ref error);
+                StringError = error;
             }
         }
 
-        private int fret;
+        private string note_string_error;
+        public string StringError
+        {
+            get { return note_string_error; }
+            set { SetProperty(ref note_string_error, value); }
+        }
+
+        private string fret;
         public string Fret
         {
             get { return fret.ToString(); }
             set
             {
-                if (ValidateProperty(nameof(Fret), value, validateFret))
-                {
-                    SetProperty(ref fret, int.Parse(value));
-                }
+                string error = FretError;
+                setIntProperty(ref fret, value, MIN_FRET, MAX_FRET, ref error);
+                FretError = error;
             }
+        }
+
+        private string fret_error;
+        public string FretError
+        {
+            get { return fret_error; }
+            set { SetProperty(ref fret_error, value); }
         }
 
         public EffectProperties IntoEffectProperties { get; }
         public EffectProperties StrikeEffectProperties { get; }
         public EffectProperties AfterEffectProperties { get; }
 
-        public NoteProperties(Note n, GuiCommandExecutor ex, NodeClick c)
-            :base()
+        public NoteProperties(NoteTreeNode n, GuiCommandExecutor ex, NodeClick c)
+            :base(c, ex)
         {
-            note = n;
-            executor = ex;
-            click = c;
+            note = n.getNote();
 
             String = note.String.ToString();
             Fret = note.Fret.ToString();
 
-            Note prev_note = click.PartNode?.getPart()?.getPreviousNote(note) ?? null;
-            Note next_note = click.PartNode?.getPart()?.getNextNote(note) ?? null;
-            IntoEffectProperties = new EffectProperties(executor, click, note.getEffectAtPosition(EffectPosition.Into), prev_note, note);
-            StrikeEffectProperties = new EffectProperties(executor, click, note.getEffectAtPosition(EffectPosition.Strike), null, null);
-            AfterEffectProperties = new EffectProperties(executor, click, note.getEffectAtPosition(EffectPosition.After), note, next_note);
+            NoteTreeNode prev_note = ref_click.PartNode?.getPreviousNote(n) ?? null;
+            NoteTreeNode next_note = ref_click.PartNode?.getNextNote(n) ?? null;
+            IntoEffectProperties = new EffectProperties(executor, ref_click, note.getEffectAtPosition(EffectPosition.Into), EffectPosition.Into, prev_note, n);
+            StrikeEffectProperties = new EffectProperties(executor, ref_click, note.getEffectAtPosition(EffectPosition.Strike), EffectPosition.Strike, null, null);
+            AfterEffectProperties = new EffectProperties(executor, ref_click, note.getEffectAtPosition(EffectPosition.After), EffectPosition.After, n, next_note);
         }
 
-        public void resetToDefault()
+        public override void resetToDefault()
         {
             Fret = note.Fret.ToString();
             String = note.String.ToString();
@@ -77,13 +84,16 @@ namespace GuitarTab
             AfterEffectProperties.resetToDefault();
         }
 
-        public void submitChanges()
+        public override void submitChanges()
         {
-            if (fret != note.Fret) { executor.continueChangeNoteFret(click, fret); }
+            if (StringError != String.Empty || FretError != String.Empty || !Int32.TryParse(fret, out int fret_i)
+                || !Int32.TryParse(note_string, out int note_string_i)) { return; }
 
-            if (note_string != note.String)
+            if (fret_i != note.Fret) { executor.continueChangeNoteFret(getClickCopy(), fret_i); }
+
+            if (note_string_i != note.String)
             {
-                executor.executeChangeNoteStringFromMenu(click, note_string);
+                executor.executeChangeNoteStringFromMenu(getClickCopy(), note_string_i);
                 //popup error if any effects tried to change
             }
             else
@@ -92,32 +102,6 @@ namespace GuitarTab
                 StrikeEffectProperties.submitChanges();
                 AfterEffectProperties.submitChanges();
             }
-        }
-
-        public ICollection<string> validateFret(string new_fret)
-        {
-            var errors = new List<string>();
-            int n_fret = -1;
-
-            if (int.TryParse(new_fret, out n_fret))
-            {
-                if (n_fret < 0 || n_fret > 24) { errors.Add("must be between 0 and 24"); }
-            }
-            else { errors.Add("must be a number"); }
-            return errors;
-        }
-
-        public ICollection<string> validateString(string new_string)
-        {
-            var errors = new List<string>();
-            int str = 0;
-
-            if (int.TryParse(new_string, out str))
-            {
-                if (str <= 0 || str > 6) { errors.Add("Must be between 1 and 6"); }
-            }
-            else { errors.Add("must be a number"); }
-            return errors;
         }
     }
 }

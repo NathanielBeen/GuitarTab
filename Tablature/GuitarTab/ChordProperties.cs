@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace GuitarTab
 {
-    class ChordProperties : BaseValidator, IPropertyMenu
+    class ChordProperties : BasePropertyMenu
     {
         private Chord chord;
-        private GuiCommandExecutor executor;
-        private NodeClick click;
 
         private NoteLength current_length;
         public string CurrentLength
@@ -22,24 +20,23 @@ namespace GuitarTab
 
         public List<string> Lengths { get; }
 
-        public ChordProperties(Chord c, GuiCommandExecutor ex, NodeClick cl)
+        public ChordProperties(ChordTreeNode c, GuiCommandExecutor ex, NodeClick cl)
+            :base(cl, ex)
         {
-            chord = c;
-            executor = ex;
-            click = cl;
+            chord = c.getChord();
 
             CurrentLength = chord.Length.NoteType.getStringFromNoteLength();
             Lengths = NoteLengthExtensions.getAllLengthStrings();
         }
 
-        public void resetToDefault()
+        public override void resetToDefault()
         {
             CurrentLength = chord.Length.NoteType.getStringFromNoteLength();
         }
 
-        public void submitChanges()
+        public override void submitChanges()
         {
-            if (current_length != chord.Length.NoteType) { executor.executeChangeChordLengthFromMenu(click, Length.createInstance(current_length)); }
+            if (current_length != chord.Length.NoteType) { executor.executeChangeChordLengthFromMenu(getClickCopy(), current_length); }
         }
     }
 }

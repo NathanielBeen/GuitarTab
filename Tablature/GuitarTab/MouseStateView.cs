@@ -49,7 +49,7 @@ namespace GuitarTab
             foreach (var entry in uris)
             {
                 Selection state = (Selection)int.Parse(entry.Key);
-                var image = new BitmapImage(new Uri(entry.Value, UriKind.Relative));
+                var image = SettingsReader.getImageFromLocation(entry.Value);
                 dict.Add(state, image);
             }
             return dict;

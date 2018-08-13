@@ -208,12 +208,12 @@ namespace GuitarTab
     {
         public static void barMeasure(MeasureTreeNode measure_node)
         {
-            List<ChordBounds> chords = (from node in measure_node.Children
+            List<IChordBounds> chords = (from node in measure_node.Children
                                         orderby (node as ChordTreeNode).getChord().Position.Index
-                                        select node.ObjectBounds as ChordBounds).ToList();
+                                        select (node as ChordTreeNode).getBounds()).ToList();
 
             TupleGroup current_group = null;
-            foreach (ChordBounds bounds in chords)
+            foreach (IChordBounds bounds in chords)
             {
                 bounds.ChordTuple.readInLength(bounds.getChord().Length);
 

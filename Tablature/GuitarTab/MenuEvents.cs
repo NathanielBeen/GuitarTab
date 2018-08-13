@@ -19,6 +19,21 @@ namespace GuitarTab
         }
     }
 
+    public class PartMenuEventArgs : PropertyMenuEventArgs
+    {
+        public bool InstrumentMenu { get; }
+        public int Width { get; }
+        public int Height { get; }
+
+        public PartMenuEventArgs(NodeClick click, bool instrument, int width, int height)
+            :base(click)
+        {
+            InstrumentMenu = instrument;
+            Width = width;
+            Height = height;
+        }
+    }
+
     public class IntMenuEventArgs : EventArgs
     {
         public NodeClick Click { get; }

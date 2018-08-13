@@ -76,7 +76,7 @@ namespace GuitarTab
                 if (needed_lengths.Contains(length))
                 {
                     var brush = new ImageBrush();
-                    brush.ImageSource = new BitmapImage(new Uri(entry.Value, UriKind.Relative));
+                    brush.ImageSource = SettingsReader.getImageFromLocation(entry.Value);
 
                     image_dict[length] = brush;
                 }
@@ -88,11 +88,11 @@ namespace GuitarTab
         public void getOtherImages(Dictionary<string, string> uri_dict)
         {
             var inc_brush = new ImageBrush();
-            inc_brush.ImageSource = new BitmapImage(new Uri(uri_dict["incButton"], UriKind.Relative));
+            inc_brush.ImageSource = SettingsReader.getImageFromLocation(uri_dict["incButton"]);
             IncrementImage = inc_brush;
 
             var dec_brush = new ImageBrush();
-            dec_brush.ImageSource = new BitmapImage(new Uri(uri_dict["decButton"], UriKind.Relative));
+            dec_brush.ImageSource = SettingsReader.getImageFromLocation(uri_dict["decButton"]);
             DecrementImage = dec_brush;
         }
 

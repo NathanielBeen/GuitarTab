@@ -8,10 +8,12 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="3*"/>
+            <RowDefinition Height="6*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -19,10 +21,12 @@
         </Grid.ColumnDefinitions>
         <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="Note Properties" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         <Label Grid.Column="0" Grid.Row="1" Content="Note String" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding String, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label Grid.Column="0" Grid.Row="2" Content="Fret" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Fret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <Grid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">
+        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding String, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+        <Label Grid.Column="1" Grid.Row="2" Content="{Binding StringError}"/>
+        <Label Grid.Column="0" Grid.Row="3" Content="Fret" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Fret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+        <Label Grid.Column="1" Grid.Row="4" Content="{Binding FretError}"/>
+        <Grid Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>

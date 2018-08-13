@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuitarTab", "GuitarTab\GuitarTab.csproj", "{0372ECF0-90A6-4507-B806-C29FA6152155}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{349E4BF9-D18A-49F7-8A16-184F145648FA}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Installer", "Installer\Installer.vdproj", "{969F1EA9-3001-41A6-AA43-2DC247D7E4A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,12 @@ Global
 		{0372ECF0-90A6-4507-B806-C29FA6152155}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0372ECF0-90A6-4507-B806-C29FA6152155}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0372ECF0-90A6-4507-B806-C29FA6152155}.Release|Any CPU.Build.0 = Release|Any CPU
+		{349E4BF9-D18A-49F7-8A16-184F145648FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{349E4BF9-D18A-49F7-8A16-184F145648FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{349E4BF9-D18A-49F7-8A16-184F145648FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{349E4BF9-D18A-49F7-8A16-184F145648FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{969F1EA9-3001-41A6-AA43-2DC247D7E4A0}.Debug|Any CPU.ActiveCfg = Debug
+		{969F1EA9-3001-41A6-AA43-2DC247D7E4A0}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

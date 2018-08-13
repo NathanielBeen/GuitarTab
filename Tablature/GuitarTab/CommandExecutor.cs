@@ -53,7 +53,9 @@ namespace GuitarTab
         ChangeMultipleMeasurePosition,
         ChangeMeasureBPM,
         ChangeMeasureTimeSig,
-        CreateTupletFromNotes
+        CreateTupletFromNotes,
+        ChangeSongInfo,
+        ChangeInstrumentInfo
     }
 
     public static class ExecutorFactory
@@ -124,6 +126,10 @@ namespace GuitarTab
                     return new ChangeMeasureTimeSigBld(selections);
                 case CommandType.CreateTupletFromNotes:
                     return new CreateTupletFromNotesBld(selections);
+                case CommandType.ChangeSongInfo:
+                    return new ChangeSongInfoBld(selections);
+                case CommandType.ChangeInstrumentInfo:
+                    return new ChangeInstrumentInfoBld(selections);
                 default:
                     return null;
             }
