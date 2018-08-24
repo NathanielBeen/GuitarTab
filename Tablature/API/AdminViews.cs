@@ -1,30 +1,24 @@
 ﻿using GuitarTab;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 namespace API
 {
-    public class AdminNavigationBar : BaseViewModel
+    public class EnumToBooleanConverter : IValueConverter
     {
-        private AdminMode mode;
-        public AdminMode Mode
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            get { return mode; }
-            set
-            {
-                SetProperty(ref mode, value);
-                ModeChanged?.Invoke(this, value);
-            }
+            return value.Equals(parameter);
         }
 
-        public AdminNavigationBar()
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Mode = AdminMode.MAIN;
+            return value.Equals(true) ? parameter : Binding.DoNothing;
         }
-
-        public event EventHandler<AdminMode> ModeChanged;
     }
 }

@@ -197,9 +197,9 @@ namespace GuitarTab
             return image_dict;
         }
 
-        public Uri getRestImagePath(NoteLength length) { return new Uri(rest_image_paths[length], UriKind.Relative); }
+        public string getRestImagePath(NoteLength length) { return rest_image_paths[length]; }
 
-        public Uri getEffectImagePath(int code) { return new Uri(effect_image_paths[code], UriKind.Relative); }
+        public string getEffectImagePath(int code) { return effect_image_paths[code]; }
 
         public static BitmapImage loadImage(string loc)
         {

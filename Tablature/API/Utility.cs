@@ -24,14 +24,15 @@ namespace API
             return attemptLogin(username, password);
         }
 
-        public static Result<SongModel> attemptSearch(string name, string artist, string album, string author, double? rating, string[] tags)
+        public static Result<SongModel> attemptSearch(SearchTerms terms)
         {
-            if (name == null && artist == null && album == null && author == null && rating == null && tags.Length == 0)
+            if (terms == null) { return new Result<SongModel>(); }
+            if (terms.Name == null && terms.Artist == null && terms.Album == null && terms.Author == null && terms.Rating == 0 && terms.Tags.Length == 0)
             {
                 return APIRequest.getAllSongs().GetAwaiter().GetResult();
             }
 
-            SongSearchRequest search = new SongSearchRequest(name, artist, album, author, rating, tags); 
+            SongSearchRequest search = new SongSearchRequest(terms.Name, terms.Artist, terms.Album, terms.Author, terms.Rating, terms.Tags); 
             return APIRequest.searchSongs(search).GetAwaiter().GetResult();
         }
 

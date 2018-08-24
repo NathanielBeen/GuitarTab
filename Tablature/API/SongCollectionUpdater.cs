@@ -70,7 +70,7 @@ namespace API
 
         private void handleAddTag()
         {
-            if (AddTag.Error != String.Empty) { return; }
+            if (AddTag.hasErrors()) { return; }
             foreach (var tag in Tags)
             {
                 if (tag.Name.Equals(AddTag)) { return; }
@@ -91,7 +91,7 @@ namespace API
 
         private bool hasErrors()
         {
-            return (Artist.Error != String.Empty || Album.Error != String.Empty);
+            return (Artist.hasErrors() || Album.hasErrors());
         }
 
         private IUpdater<SongModel> createUpdater()

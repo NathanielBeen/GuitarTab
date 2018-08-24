@@ -96,7 +96,7 @@ namespace GuitarTab
 
         public void refreshDrawingContext(DrawingContext dc)
         {
-            var image = new BitmapImage(info.Images.getEffectImagePath(TabImages.PINCH_HARMONIC));
+            var image = SettingsReader.getImageFromLocation(info.Images.getEffectImagePath(TabImages.PINCH_HARMONIC));
             var dest_rect = new Rect(Bounds.Width / 2 - image.Width / 2, Bounds.Height / 2 - image.Height / 2, image.Width, image.Height);
             dc.DrawImage(image, dest_rect);
         }
@@ -123,7 +123,7 @@ namespace GuitarTab
         {
             if (Bounds.Width == 0 || Bounds.Height == 0) { return; }
             var image_code = vibrato.Wide ? TabImages.WIDE_VIBRATO : TabImages.VIBRATO;
-            var image = new BitmapImage(info.Images.getEffectImagePath(image_code));
+            var image = SettingsReader.getImageFromLocation(info.Images.getEffectImagePath(image_code));
             var image_rect = new Int32Rect(0, 0, Bounds.Width, Bounds.Height);
             var cropped_image = new CroppedBitmap(image, image_rect);
 

@@ -8,13 +8,16 @@ using System.Windows.Input;
 
 namespace GuitarTab
 {
-    public class FretMenuView : BaseViewModel
+    public class FretMenuView : BaseViewModel, IRecieveDimensionUpdates
     {
         public const int MIN_FRET = 0;
         public const int MAX_FRET = 26;
 
         public const int WIDTH = 190;
         public const int HEIGHT = 70;
+
+        private int screen;
+        private int scroll;
 
         public ContinueCommandDelegate ContinueDelegate { get; set; }
 
@@ -59,6 +62,7 @@ namespace GuitarTab
         }
 
         private ICommand closeCommand;
+
         public ICommand CloseCommand
         {
             get { return closeCommand ?? (closeCommand = new RelayCommand(() => handleClose())); }
@@ -102,13 +106,20 @@ namespace GuitarTab
             resetFields();
         }
 
+        //this needs to recieve dimension updates
         public void launchMenu(ContinueCommandDelegate command, NodeClick click)
         {
             ContinueDelegate = command;
             Click = click;
             Left = Math.Max(0, (int)click.Point.X - WIDTH/2);
-            Top = (int)click.Point.Y + HEIGHT/2;
+            Top = Math.Min((int)click.Point.Y + HEIGHT/2 - scroll, screen - 2 * HEIGHT);
             Visible = Visibility.Visible;
+        }
+
+        public void handleDimensionUpdate(int new_val, DimensionType type)
+        {
+            if (type == DimensionType.ScrollAmount) { scroll = new_val; }
+            else if (type == DimensionType.ScreenHeight) { screen = new_val; }
         }
     }
 }

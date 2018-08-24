@@ -11,8 +11,9 @@ namespace API
     public class TagViewModel : IViewModel<TagModel>
     {
         public TagModel Base { get; }
+        public VMType ViewType { get { return VMType.BASE; } }
 
-        public int Int
+        public int Id
         {
             get { return Base.Id; }
         }
@@ -36,6 +37,7 @@ namespace API
     public class EditTagViewModel : BaseInputViewModel, IEditModel<TagModel>
     {
         public TagModel Base { get; }
+        public VMType ViewType { get { return VMType.BASE_EDIT; } }
 
         public int Id { get { return Base.Id; } }
 

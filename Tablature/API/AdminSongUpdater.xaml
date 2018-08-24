@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="API.AdminSongUpdater"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:API"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <StackPanel Orientation="Vertical">
+        <Border BorderThickness="2" BorderBrush="LightGray" Background="LightBlue" CornerRadius="10,10,10,10" Margin="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1" Content="Delete Selected Songs" Command="{Binding DeleteCommand}" Margin="3"/>
+            </Grid>
+        </Border>
+
+        <Border BorderThickness="2" BorderBrush="LightGray" Background="LightBlue" CornerRadius="10,10,10,10" Margin="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Content="Update Selected Songs" HorizontalAlignment="Center"/>
+
+                <local:InputFieldControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" DataContext="{Binding Artist}"/>
+                <local:InputFieldControl Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" DataContext="{Binding Album}"/>
+
+                <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Content="Tags:" HorizontalAlignment="Center"/>
+                <local:ListedTagCollection Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" DataContext="{Binding Tags}"/>
+                <Label Grid.Row="4" Grid.Column="0" Content="Name:" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding AddTag.Value}"/>
+                <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Content="{Binding AddTag.Error}"/>
+
+                <Button Grid.Row="5" Grid.Column="2" Content="Add Tag" Command="{Binding AddTagCommand}" Margin="3"/>
+                <Button Grid.Row="5" Grid.Column="3" Content="Remove Tag" Command="{Binding RemoveTagCommand}" Margin="3"/>
+
+                <Button Grid.Row="6" Grid.Column="2" Content="Clear" Command="{Binding ClearUpdateCommand}" Margin="3"/>
+                <Button Grid.Row="6" Grid.Column="3" Content="Update" Command="{Binding ConfirmCommand}" Margin="3"/>
+            </Grid>
+        </Border>
+    </StackPanel>
+</UserControl>

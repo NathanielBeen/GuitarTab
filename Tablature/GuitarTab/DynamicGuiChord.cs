@@ -184,7 +184,7 @@ namespace GuitarTab
         public override void refreshDrawingContext(DrawingContext dc)
         {
             var length = chord.Length.NoteType;
-            var image = new BitmapImage(info.Images.getRestImagePath(length));
+            var image = SettingsReader.getImageFromLocation(info.Images.getRestImagePath(length));
             int top = getTopRestPosition((int)image.Height);
             var dest_rect = new Rect(Bounds.Width/2 - image.Width/2, top, image.Width, image.Height);
 

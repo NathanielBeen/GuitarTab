@@ -9,8 +9,8 @@ namespace API
 {
     public enum LoginMode
     {
-        LOGIN = 1,
-        SIGNUP = 2
+        LOGIN = 0,
+        SIGNUP = 1
     }
 
     public class LoginPage : BaseViewModel

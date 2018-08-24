@@ -11,6 +11,7 @@ namespace API
     public class UserViewModel : IViewModel<UserModel>
     {
         public UserModel Base { get; }
+        public VMType ViewType { get { return VMType.BASE; } }
 
         public int Id
         {
@@ -36,6 +37,7 @@ namespace API
     public class EditUserViewModel : BaseInputViewModel, IEditModel<UserModel>
     {
         public UserModel Base { get; }
+        public VMType ViewType { get { return VMType.BASE_EDIT; } }
 
         public int Id { get { return Base.Id; } }
 

@@ -201,11 +201,15 @@ namespace GuitarTab
             var scroll_amount = new DimensionUpdater(DimensionType.ScrollAmount);
 
             screen_height.addReciever(page_height);
+            screen_height.addReciever(fret_view);
+            screen_height.addReciever(property_view);
             page_height.addReciever(visuals_view);
             page_width.addReciever(canvas_view.SelectedView);
             page_width.addReciever(canvas_view);
             scroll_amount.addReciever(canvas_view);
             scroll_amount.addReciever(canvas_view.SelectedView);
+            scroll_amount.addReciever(fret_view);
+            scroll_amount.addReciever(property_view);
 
             tree.RootChanged += page_height.handleRecieverChanged;
 

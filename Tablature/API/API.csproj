@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{349E4BF9-D18A-49F7-8A16-184F145648FA}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>API</RootNamespace>
     <AssemblyName>API</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -31,37 +31,129 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.6\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountPage.cs" />
+    <Compile Include="AccountPageControl.xaml.cs">
+      <DependentUpon>AccountPageControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AccountViews.cs" />
+    <Compile Include="AdminModelCollection.xaml.cs">
+      <DependentUpon>AdminModelCollection.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AdminPage.cs" />
+    <Compile Include="AdminPageControl.xaml.cs">
+      <DependentUpon>AdminPageControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminRatingUpdater.xaml.cs">
+      <DependentUpon>AdminRatingUpdater.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminSongUpdater.xaml.cs">
+      <DependentUpon>AdminSongUpdater.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminTagUpdater.xaml.cs">
+      <DependentUpon>AdminTagUpdater.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AdminUserUpdater.xaml.cs">
+      <DependentUpon>AdminUserUpdater.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AdminViews.cs" />
     <Compile Include="APIRequest.cs" />
     <Compile Include="BaseModelCollection.cs" />
+    <Compile Include="ChangePasswordControl.xaml.cs">
+      <DependentUpon>ChangePasswordControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientRatingView.xaml.cs">
+      <DependentUpon>ClientRatingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClientTagView.xaml.cs">
+      <DependentUpon>ClientTagView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CollectionRequests.cs" />
     <Compile Include="CollectionUpdater.cs" />
     <Compile Include="Credentials.cs" />
+    <Compile Include="DeleteView.xaml.cs">
+      <DependentUpon>DeleteView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EditSongControl.xaml.cs">
+      <DependentUpon>EditSongControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EditTableView.xaml.cs">
+      <DependentUpon>EditTableView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EditTagControl.xaml.cs">
+      <DependentUpon>EditTagControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EditUserControl.xaml.cs">
+      <DependentUpon>EditUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EditView.xaml.cs">
+      <DependentUpon>EditView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExpandedView.xaml.cs">
+      <DependentUpon>ExpandedView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExpandView.xaml.cs">
+      <DependentUpon>ExpandView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HighlightView.xaml.cs">
+      <DependentUpon>HighlightView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InputField.cs" />
+    <Compile Include="InputFieldControl.xaml.cs">
+      <DependentUpon>InputFieldControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainAccountControl.xaml.cs">
+      <DependentUpon>MainAccountControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ModelCollection.xaml.cs">
+      <DependentUpon>ModelCollection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ModelComponent.xaml.cs">
+      <DependentUpon>ModelComponent.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LoginPage.cs" />
     <Compile Include="LoginViews.cs" />
     <Compile Include="RatingCollectionUpdater.cs" />
+    <Compile Include="RatingSearchControl.xaml.cs">
+      <DependentUpon>RatingSearchControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RemoveAccountControl.xaml.cs">
+      <DependentUpon>RemoveAccountControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SearchPage.cs" />
+    <Compile Include="SearchTermsControl.xaml.cs">
+      <DependentUpon>SearchTermsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SelectView.xaml.cs">
+      <DependentUpon>SelectView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TableRatingControl.xaml.cs">
+      <DependentUpon>TableRatingControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RatingModel.cs" />
     <Compile Include="RatingRequestHandler.cs" />
     <Compile Include="RatingViewModel.cs" />
@@ -69,14 +161,32 @@
     <Compile Include="Result.cs" />
     <Compile Include="Search.cs" />
     <Compile Include="SongCollectionUpdater.cs" />
+    <Compile Include="TableSongControl.xaml.cs">
+      <DependentUpon>TableSongControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SongModel.cs" />
     <Compile Include="SongRequestHandler.cs" />
     <Compile Include="SongViewModel.cs" />
+    <Compile Include="TableTagControl.xaml.cs">
+      <DependentUpon>TableTagControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StandardTableView.xaml.cs">
+      <DependentUpon>StandardTableView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TagCollectionUpdater.cs" />
+    <Compile Include="ListedTagCollection.xaml.cs">
+      <DependentUpon>ListedTagCollection.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TagModel.cs" />
     <Compile Include="TagRequestHandler.cs" />
+    <Compile Include="TagSearchControl.xaml.cs">
+      <DependentUpon>TagSearchControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TagViewModel.cs" />
     <Compile Include="UserCollectionUpdater.cs" />
+    <Compile Include="TableUserControl.xaml.cs">
+      <DependentUpon>TableUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -84,6 +194,7 @@
     <Compile Include="UserViewModel.cs" />
     <Compile Include="AdminViewModelFactory.cs" />
     <Compile Include="Utility.cs" />
+    <Compile Include="ViewModelConverter.cs" />
     <Compile Include="ViewModelFactory.cs" />
     <Compile Include="ViewModels.cs" />
   </ItemGroup>
@@ -96,6 +207,144 @@
       <Project>{0372ECF0-90A6-4507-B806-C29FA6152155}</Project>
       <Name>GuitarTab</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="AccountPageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AdminModelCollection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AdminPageControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AdminRatingUpdater.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AdminSongUpdater.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AdminTagUpdater.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AdminUserUpdater.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChangePasswordControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClientRatingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ClientTagView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeleteView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditSongControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditTableView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditTagControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExpandedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExpandView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HighlightView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InputFieldControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainAccountControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ModelCollection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ModelComponent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RatingSearchControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RemoveAccountControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchTermsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SelectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TableRatingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TableSongControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ListedTagCollection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TableTagControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TableUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StandardTableView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TagSearchControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="API.ModelComponent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:API"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:ViewModelConverter x:Key="VMC"/>
+        <DataTemplate x:Key="Standard">
+            <local:StandardTableView/>
+        </DataTemplate>
+        <DataTemplate x:Key="BaseEdit">
+            <local:EditTableView/>
+        </DataTemplate>
+        <DataTemplate x:Key="Delete">
+            <local:DeleteView/>
+        </DataTemplate>
+        <DataTemplate x:Key="Select">
+            <local:SelectView/>
+        </DataTemplate>
+        <DataTemplate x:Key="Highlight">
+            <local:HighlightView/>
+        </DataTemplate>
+        <DataTemplate x:Key="Edit">
+            <local:EditView/>
+        </DataTemplate>
+        <DataTemplate x:Key="Expand">
+            <local:ExpandView/>
+        </DataTemplate>
+
+        <Style x:Key="ComponentStyle" TargetType="ContentControl">
+            <Setter Property="ContentTemplate" Value="{StaticResource Standard}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ViewType}" Value="{x:Static local:VMType.BASE_EDIT}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource BaseEdit}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ViewType}" Value="{x:Static local:VMType.HIGHLIGHT}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Highlight}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ViewType}" Value="{x:Static local:VMType.SELECT}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Select}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ViewType}" Value="{x:Static local:VMType.EXPAND}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Expand}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ViewType}" Value="{x:Static local:VMType.EDIT}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Edit}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ViewType}" Value="{x:Static local:VMType.DELETE}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Delete}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <ContentControl Content="{Binding}" Style="{StaticResource ComponentStyle}"/>
+</UserControl>

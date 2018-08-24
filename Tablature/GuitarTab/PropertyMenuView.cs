@@ -10,7 +10,7 @@ using System.Windows.Input;
 
 namespace GuitarTab
 {
-    public class PropertyMenuView : BaseViewModel
+    public class PropertyMenuView : BaseViewModel, IRecieveDimensionUpdates
     {
         public const int HEIGHT = 70;
         public const int WIDTH = 300;
@@ -19,6 +19,9 @@ namespace GuitarTab
         private VisualInfo info;
         private NodeClick ref_click;
         private bool instrument_menu;
+
+        private int scroll;
+        private int screen;
         
         private BasePropertyMenu menu;
         public BasePropertyMenu Menu
@@ -107,7 +110,8 @@ namespace GuitarTab
             Selected = new_click.getFirstSelected();
             Visible = Visibility.Visible;
             Left = Math.Max(0, (int)new_click.Point.X - WIDTH/2);
-            Top = (int)new_click.Point.Y + HEIGHT/2;
+            //this needs to be improved somehow
+            Top = Math.Min((int)new_click.Point.Y + HEIGHT/2 - scroll, screen - HEIGHT*4);
         }
 
         public void launchPartMenu(NodeClick node, int width, int height, bool instrument)
@@ -130,6 +134,12 @@ namespace GuitarTab
         }
 
         public void handleClose() { Visible = Visibility.Collapsed; }
+
+        public void handleDimensionUpdate(int new_val, DimensionType type)
+        {
+            if (type == DimensionType.ScrollAmount) { scroll = new_val; }
+            else if (type == DimensionType.ScreenHeight) { screen = new_val; }
+        }
     }
 
     public class PropertyMenuFactory

@@ -14,23 +14,23 @@
         <DataTemplate x:Key="VibratoTemplate">
             <UniformGrid Rows="1" Columns="2">
                 <Label Content="Wide"/>
-                <CheckBox IsChecked="{Binding Wide, Mode=TwoWay}" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding CurrentStrategy.Wide, Mode=TwoWay}" VerticalAlignment="Center"/>
             </UniformGrid>
         </DataTemplate>
         <DataTemplate x:Key="BendTemplate">
             <UniformGrid Rows="3" Columns="2">
                 <Label Content="Amount"/>
-                <TextBox Text="{Binding Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
+                <TextBox Text="{Binding CurrentStrategy.Amount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="2"/>
                 <Label/>
-                <Label Content="{Binding AmountError}"/>
+                <Label Content="{Binding CurrentStrategy.AmountError}"/>
                 <Label Content="Returns"/>
-                <CheckBox IsChecked="{Binding Returns, Mode=TwoWay}" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding CurrentStrategy.Returns, Mode=TwoWay}" VerticalAlignment="Center"/>
             </UniformGrid>
         </DataTemplate>
         <DataTemplate x:Key="SlideTemplate">
             <UniformGrid Rows="1" Columns="2">
                 <Label Content="Legato"/>
-                <CheckBox IsChecked="{Binding Legato, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+                <CheckBox IsChecked="{Binding CurrentStrategy.Legato, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
             </UniformGrid>
         </DataTemplate>
         <DataTemplate x:Key="BaseEffectTemplate">
@@ -66,6 +66,6 @@
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0" Content="Effect Type" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Types}" SelectedValue="{Binding CurrentType, Mode=TwoWay}" Margin="2"/>
-        <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource effectStrategy}"/>
+        <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource effectStrategy}" Content="{Binding}"/>
     </Grid>
 </UserControl>

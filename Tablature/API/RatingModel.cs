@@ -18,36 +18,26 @@ namespace API
         [JsonProperty(PropertyName = "UserId")]
         public int UserId { get; set; }
 
+        [JsonProperty(PropertyName = "Name")]
+        public string Name { get; set; }
+
         [JsonProperty(PropertyName = "Rating")]
         public double Rating { get; set; }
 
         [JsonProperty(PropertyName = "Text")]
         public string Text { get; set; }
 
-        public RatingModel(int id, int song_id, int user_id, double rating, string text)
+        public RatingModel(int id, int song_id, int user_id, double rating, string text, string name)
         {
             Id = id;
             SongId = song_id;
             UserId = user_id;
             Rating = rating;
             Text = text;
-        }
-
-        public RatingModel() { }
-    }
-
-    public class RatingWithNameModel : RatingModel
-    {
-        [JsonProperty(PropertyName = "Name")]
-        public string Name { get; set; }
-
-        public RatingWithNameModel(int id, int song_id, int user_id, double rating, string text, string name)
-            :base(id, song_id, user_id, rating, text)
-        {
             Name = name;
         }
 
-        public RatingWithNameModel() { }
+        public RatingModel() { }
     }
 
     public class MultipleRatingIdRequest
@@ -111,7 +101,7 @@ namespace API
 
         public RatingModel createRequestModel(RatingModel model)
         {
-            return new RatingModel(model.Id, model.SongId, model.UserId, rating, text);
+            return new RatingModel(model.Id, model.SongId, model.UserId, rating, text, model.Name);
         }
 
         public RatingModel updateModel(RatingModel model)
@@ -119,7 +109,7 @@ namespace API
             double new_rating = (rating_set) ? rating : model.Rating;
             string new_text = text ?? model.Text;
 
-            return new RatingModel(model.Id, model.SongId, model.UserId, new_rating, new_text);
+            return new RatingModel(model.Id, model.SongId, model.UserId, new_rating, new_text, model.Name);
         }
     }
 }

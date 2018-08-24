@@ -22,45 +22,40 @@ namespace API
         public AdminMode Mode
         {
             get { return mode; }
-            set { SetProperty(ref mode, value); }
+            set
+            {
+                handleViewModeChanged(value);
+                SetProperty(ref mode, value);
+            }
         }
 
-        public AdminNavigationBar NavigationView { get; }
         public BaseViewModel CurrentView { get; set; }
         public ICollectionUpdater UpdaterView { get; set; }
 
         public AdminPage()
         {
-            NavigationView = new AdminNavigationBar();
-            NavigationView.ModeChanged += handleViewModeChanged;
-
             Mode = AdminMode.MAIN;
         }
 
-        private void handleViewModeChanged(object sender, AdminMode new_mode)
+        private void handleViewModeChanged(AdminMode new_mode)
         {
             if (new_mode == Mode) { return; }
             switch (new_mode)
             {
                 case AdminMode.MAIN:
                     CurrentView = new BaseViewModel();
-                    Mode = new_mode;
                     return;
                 case AdminMode.RATING:
                     CurrentView = createRatingCollection();
-                    Mode = new_mode;
                     return;
                 case AdminMode.SONG:
                     CurrentView = createSongCollection();
-                    Mode = new_mode;
                     return;
                 case AdminMode.TAG:
                     CurrentView = createTagCollection();
-                    Mode = new_mode;
                     return;
                 case AdminMode.USER:
                     CurrentView = createUserCollection();
-                    Mode = new_mode;
                     return;
 
             }
@@ -100,3 +95,4 @@ namespace API
 
     }
 }
+

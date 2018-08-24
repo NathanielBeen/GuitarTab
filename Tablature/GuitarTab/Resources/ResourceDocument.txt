@@ -19,7 +19,7 @@ DotSize_:_2
 DotMargin_:_2
 SingleBarLength_:_5
 BarSpacing_:_4
-FontSize_:_9
+FontSize_:_11
 LargeFontSize_:_15
 SmallFontSize_:_7
 <>//Length Numbers

@@ -11,6 +11,7 @@ namespace API
     public class SongViewModel : IViewModel<SongModel>
     {
         public SongModel Base { get; }
+        public VMType ViewType { get { return VMType.BASE; } }
 
         public int Id
         {
@@ -54,6 +55,7 @@ namespace API
     public class EditSongViewModel : BaseInputViewModel, IEditModel<SongModel>
     {
         public SongModel Base { get; }
+        public VMType ViewType { get { return VMType.BASE_EDIT; } }
 
         public int Id { get { return Base.Id; } }
 

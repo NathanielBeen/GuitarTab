@@ -15,7 +15,10 @@ namespace API
         public StringInputField Name;
         public StringInputField Type;
 
+        public StringInputField UpdateType;
+
         public ICommand ClearCommand { get; set; }
+        public ICommand ClearUpdateCommand { get; set; }
         public ICommand ConfirmCommand { get; set; }
         public ICommand AddCommand { get; set; }
         public ICommand DeleteCommand { get; set; }
@@ -25,12 +28,14 @@ namespace API
             Collection = collection;
             Name = new StringInputField("Name", 1, 64);
             Type = new StringInputField("Type", 1, 64);
+            UpdateType = new StringInputField("Type", 1, 64);
             initCommands();
         }
 
         private void initCommands()
         {
             ClearCommand = new RelayCommand(clear);
+            ClearUpdateCommand = new RelayCommand(clearUpdate);
             ConfirmCommand = new RelayCommand(handleUpdate);
             AddCommand = new RelayCommand(handleAdd);
             DeleteCommand = new RelayCommand(handleDelete);
@@ -43,15 +48,15 @@ namespace API
 
         private void handleUpdate()
         {
-            if (Type.Error != String.Empty) { return; }
-            IUpdater<TagModel> updater = TagUpdater.createTypeUpdater(Type.Value);
+            if (UpdateType.hasErrors()) { return; }
+            IUpdater<TagModel> updater = TagUpdater.createTypeUpdater(UpdateType.Value);
             Collection.handleMultipleUpdateRequest(updater);
             clear();
         }
 
         private void handleAdd()
         {
-            if (Type.Error != String.Empty || Name.Error != String.Empty) { return; }
+            if (Type.hasErrors() || Name.hasErrors()) { return; }
             TagModel model = new TagModel(0, Name.Value, Type.Value);
             Collection.handleAddRequest(model);
             clear();
@@ -61,6 +66,11 @@ namespace API
         {
             Name.clearField();
             Type.clearField();
+        }
+
+        private void clearUpdate()
+        {
+            UpdateType.clearField();
         }
     }
 }

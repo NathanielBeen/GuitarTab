@@ -8,27 +8,6 @@ using System.Windows.Input;
 
 namespace API
 { 
-    public class AccountNavigationView : BaseViewModel
-    {
-        private AccountMode mode;
-        public AccountMode Mode
-        {
-            get { return mode; }
-            set
-            {
-                SetProperty(ref mode, value);
-                ModeChanged?.Invoke(this, value);
-            }
-        }
-
-        public AccountNavigationView()
-        {
-            Mode = AccountMode.MAIN;
-        }
-
-        public event EventHandler<AccountMode> ModeChanged;
-    }
-
     public class ChangePasswordView : BaseErrorViewModel
     {
         private UserModel model;
@@ -67,7 +46,7 @@ namespace API
         {
             if (NewPassword.Value.Equals(Password.Value)) { NewPassword.Error = "must enter a new password"; }
             if (NewPassword.Value.Equals(ConfirmNewPassword.Value)) { ConfirmNewPassword.Error = "password must match"; }
-            return (Password.Error != string.Empty || NewPassword.Error != string.Empty || ConfirmNewPassword.Error != string.Empty);
+            return (Password.hasErrors() || NewPassword.hasErrors() || ConfirmNewPassword.hasErrors());
         }
     }
 
@@ -121,5 +100,32 @@ namespace API
         }
 
         public event EventHandler LoggedOut;
+    }
+
+    public class AccountRatingsView : BaseViewModel
+    {
+        private UserModel model;
+
+        public BaseModelCollection<RatingModel> Ratings { get; set; }
+
+        public AccountRatingsView(UserModel m, BaseViewModelFactory<RatingModel> factory)
+        {
+            model = m;
+            Ratings = new BaseModelCollection<RatingModel>(factory, handleRatingSelected);
+            populateRatings();
+        }
+
+        private void populateRatings()
+        {
+            Result<RatingModel> ratings = APIRequest.getRatingsByUserId(model.Id).GetAwaiter().GetResult();
+            if (ratings.Error == null) { Ratings.populateModels(ratings.Items); }
+        }
+
+        private void handleRatingSelected(RatingModel model)
+        {
+            if (model != null) { RatingSelected?.Invoke(this, model); }
+        }
+
+        public event EventHandler<RatingModel> RatingSelected;
     }
 }

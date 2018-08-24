@@ -8,9 +8,11 @@ using System.Windows.Input;
 
 namespace API
 {
+    //need a version that also gets the name of the author, not just the id
     public class RatingViewModel : IViewModel<RatingModel>
     {
         public RatingModel Base { get; }
+        public VMType ViewType { get { return VMType.BASE; } }
 
         public int Id
         {
@@ -46,6 +48,8 @@ namespace API
     public class EditRatingViewModel : BaseInputViewModel, IEditModel<RatingModel>
     {
         public RatingModel Base { get; }
+
+        public VMType ViewType { get { return VMType.BASE_EDIT; } }
 
         public int Id { get { return Base.Id; } }
 

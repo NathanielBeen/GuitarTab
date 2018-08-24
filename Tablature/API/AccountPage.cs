@@ -23,43 +23,38 @@ namespace API
         public AccountMode Mode
         {
             get { return mode; }
-            set { SetProperty(ref mode, value); }
+            set
+            {
+                handleViewModeChanged(value);
+                SetProperty(ref mode, value);
+            }
         }
 
         public BaseViewModel CurrentView { get; set; }
 
-        public AccountNavigationView NavigationView { get; set; }
-
         public AccountPage(UserModel model)
         {
             this.model = model;
-            NavigationView = new AccountNavigationView();
-            NavigationView.ModeChanged += handleViewModeChanged;
-
             CurrentView = new BaseViewModel();
             Mode = AccountMode.MAIN;
         }
 
-        private void handleViewModeChanged(object sender, AccountMode new_mode)
+        private void handleViewModeChanged(AccountMode new_mode)
         {
             if (new_mode == Mode) { return; }
             switch (new_mode)
             {
                 case AccountMode.MAIN:
                     CurrentView = createMainView();
-                    Mode = new_mode;
                     return;
                 case AccountMode.CHANGE_PASSWORD:
                     CurrentView = new ChangePasswordView(model);
-                    Mode = new_mode;
                     return;
                 case AccountMode.VIEW_RATINGS:
                     CurrentView = createRatingView();
-                    Mode = new_mode;
                     return;
                 case AccountMode.REMOVE:
                     CurrentView = createRemoveView();
-                    Mode = new_mode;
                     return;
             }
         }

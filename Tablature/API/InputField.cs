@@ -44,6 +44,10 @@ namespace API
 
         protected abstract void setField(string value);
         public abstract T getConvertedField();
+        public virtual bool hasErrors()
+        {
+            return (Error != String.Empty || Value == String.Empty);
+        }
 
         public void clearField()
         {
@@ -158,9 +162,14 @@ namespace API
                 if (val.Length >= min_length && val.Length <= max_length) { Error = ""; }
                 else { Error = "length must be between " + min_length + " and " + max_length; }
             }
-            else { Error = "must not contain special chars or start/end with spaces"; }
+            else if (val != String.Empty) { Error = "must not contain special chars or start/end with spaces"; }
             value = val;
             onPropertyChanged(nameof(Value));
+        }
+
+        public override bool hasErrors()
+        {
+            return (Error != String.Empty);
         }
     }
 }

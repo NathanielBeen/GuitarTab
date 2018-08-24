@@ -8,9 +8,21 @@ using System.Windows.Input;
 
 namespace API
 {
+    public enum VMType
+    {
+        BASE,
+        BASE_EDIT,
+        HIGHLIGHT,
+        SELECT,
+        EXPAND,
+        EDIT,
+        DELETE
+    }
+
     public interface IViewModel<T>
     {
         T Base { get; }
+        VMType ViewType { get; }
     }
 
     public interface IEditModel<T> : IViewModel<T>
@@ -29,7 +41,8 @@ namespace API
 
     public class HighlightView<T> : BaseViewModel, IViewModel<T>
     {
-        private IViewModel<T> core;
+        public IViewModel<T> Core { get; }
+        public VMType ViewType { get { return VMType.HIGHLIGHT; } }
 
         private bool highlighted;
         public bool Highlighted
@@ -39,11 +52,11 @@ namespace API
         }
 
         public ICommand HighlightCommand { get; set; }
-        public T Base { get { return core.Base; } }
+        public T Base { get { return Core.Base; } }
 
         public HighlightView(IViewModel<T> core)
         {
-            this.core = core;
+            this.Core = core;
             HighlightCommand = new RelayCommand(handleItemSelected);
         }
 
@@ -55,14 +68,15 @@ namespace API
 
     public class SelectView<T> : BaseViewModel, IViewModel<T>
     {
-        private IViewModel<T> core;
-        
+        public IViewModel<T> Core { get; }
+        public VMType ViewType { get { return VMType.SELECT; } }
+
         public ICommand SelectCommand { get; set; }
-        public T Base { get { return core.Base; } }
+        public T Base { get { return Core.Base; } }
 
         public SelectView(IViewModel<T> core)
         {
-            this.core = core;
+            this.Core = core;
             SelectCommand = new RelayCommand(handleSelected);
         }
 
@@ -73,7 +87,8 @@ namespace API
 
     public class ExpandView<T> : BaseViewModel, IViewModel<T>
     {
-        private IViewModel<T> core;
+        public IViewModel<T> Core { get; }
+        public VMType ViewType { get { return VMType.EXPAND; } }
 
         private bool expanded;
         public bool Expanded
@@ -83,11 +98,11 @@ namespace API
         }
 
         public ICommand ExpandCommand { get; set; }
-        public T Base { get { return core.Base; } }
+        public T Base { get { return Core.Base; } }
 
         public ExpandView(IViewModel<T> core)
         {
-            this.core = core;
+            this.Core = core;
             ExpandCommand = new RelayCommand(handleExpand);
         }
 
@@ -99,14 +114,15 @@ namespace API
 
     public class EditView<T> : IViewModel<T>
     {
-        private IViewModel<T> core;
+        public IViewModel<T> Core { get; }
+        public VMType ViewType { get { return VMType.EDIT; } }
 
         public ICommand EditCommand { get; set; }
-        public T Base { get { return core.Base; } }
+        public T Base { get { return Core.Base; } }
 
         public EditView(IViewModel<T> core)
         {
-            this.core = core;
+            this.Core = core;
             EditCommand = new RelayCommand(handleEdit);
         }
 
@@ -117,14 +133,15 @@ namespace API
 
     public class DeleteView<T> : IViewModel<T>
     {
-        private IViewModel<T> core;
+        public IViewModel<T> Core { get; }
+        public VMType ViewType { get { return VMType.DELETE; } }
 
         public ICommand DeleteCommand { get; set; }
-        public T Base { get { return core.Base; } }
+        public T Base { get { return Core.Base; } }
 
         public DeleteView(IViewModel<T> core)
         {
-            this.core = core;
+            this.Core = core;
         }
 
         public void handleDeleted() { Deleted?.Invoke(this, Base); }

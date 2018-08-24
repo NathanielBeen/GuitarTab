@@ -42,7 +42,7 @@ namespace API
 
         public bool hasErrors()
         {
-            return (Username.Error != String.Empty || Password.Error != String.Empty);
+            return (Username.hasErrors() || Password.hasErrors());
         }
 
         public event EventHandler<LoginResult> Login;
@@ -90,7 +90,7 @@ namespace API
         {
             if (!Password.Value.Equals(ConfirmPassword.Value)) { ConfirmPassword.Error = "passwords do not match"; }
 
-            return (Username.Error != String.Empty || Password.Error != String.Empty || ConfirmPassword.Error != String.Empty);
+            return (Username.hasErrors() || Password.hasErrors() || ConfirmPassword.hasErrors());
         }
 
         public event EventHandler<LoginResult> SignedUp;
