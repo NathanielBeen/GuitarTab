@@ -10,7 +10,7 @@ namespace API
 { 
     public class ChangePasswordView : BaseErrorViewModel
     {
-        private UserModel model;
+        private Credentials credentials;
 
         private string message;
         public string Message
@@ -24,10 +24,10 @@ namespace API
         public StringInputField ConfirmNewPassword { get; }
         public ICommand SubmitCommand { get; }
 
-        public ChangePasswordView(UserModel model)
+        public ChangePasswordView(Credentials cred)
             :base()
         {
-            this.model = model;
+            credentials = cred;
             Password = new StringInputField(nameof(Password), 8, 32);
             NewPassword = new StringInputField(nameof(NewPassword), 8, 32);
             ConfirmNewPassword = new StringInputField(nameof(ConfirmNewPassword), 8, 32);
@@ -37,7 +37,7 @@ namespace API
         private void handleSubmitCommand()
         {
             if (hasErrors()) { return; }
-            TokenIDMessageResult res = Utility.attemptChangePassword(model.Name, Password.Value, NewPassword.Value);
+            TokenIDMessageResult res = Utility.attemptChangePassword(credentials.CurrentUser.Name, Password.Value, NewPassword.Value);
             if (res.Error != null) { Error = res.Error.Message; }
             else { Message = res.Message; }
         }
@@ -52,13 +52,16 @@ namespace API
 
     public class RemoveAccountView : BaseErrorViewModel
     {
+        private Credentials credentials;
+
         public StringInputField Username { get; }
         public StringInputField Password { get; }
 
         public ICommand DeleteCommand { get; set; }
 
-        public RemoveAccountView()
+        public RemoveAccountView(Credentials cred)
         {
+            credentials = cred;
             Username = new StringInputField("Username", 4, 32);
             Password = new StringInputField("Password", 8, 32);
         }
@@ -68,29 +71,28 @@ namespace API
             MessageResult res = Utility.attemptRemoveAccount(Username.Value, Password.Value);
 
             if (res.Error != null) { Error = res.Error.Message; }
-            else { Deleted?.Invoke(this, new EventArgs()); }
+            else { credentials.LogOut(); }
         }
-
-        public event EventHandler Deleted;
     }
 
     public class MainAccountView : BaseViewModel
     {
-        private UserModel model;
+        private Credentials credentials;
 
         public string Name
         {
-            get { return model.Name; }
+            get { return credentials.CurrentUser.Name; }
         }
 
-        public string Admin
+        public bool Admin
         {
-            get { return (model.Type == 0) ? "False" : "True"; }
+            get { return (credentials.CurrentUser.Type == 0); }
         }
         public ICommand LogOutCommand { get; set; }
 
-        public MainAccountView(UserModel model)
+        public MainAccountView(Credentials cred)
         {
+            credentials = cred;
             LogOutCommand = new RelayCommand(handleLogOut);
         }
 

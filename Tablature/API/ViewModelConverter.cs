@@ -20,4 +20,18 @@ namespace API
             throw new NotImplementedException();
         }
     }
+
+    public class IsAdminConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            UserModel model = (value as Credentials)?.CurrentUser;
+            return (model != null && model.Type != 0);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

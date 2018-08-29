@@ -10,14 +10,18 @@ namespace API
 {
     public class LoginView : BaseErrorViewModel
     {
+        private Credentials credentials;
+
         public StringInputField Username { get; }
         public StringInputField Password { get; }
 
         public ICommand SubmitCommand { get; set; }
         public ICommand GoToSignupCommand { get; set; }
 
-        public LoginView()
+        public LoginView(Credentials cred)
         {
+            credentials = cred;
+
             Username = new StringInputField(nameof(Username), 4, 32);
             Password = new StringInputField(nameof(Password), 8, 32);
 
@@ -34,7 +38,7 @@ namespace API
             else
             {
                 Error = string.Empty;
-                Login?.Invoke(this, res);
+                credentials.Login(res);
             }
         }
 
@@ -45,12 +49,13 @@ namespace API
             return (Username.hasErrors() || Password.hasErrors());
         }
 
-        public event EventHandler<LoginResult> Login;
         public event EventHandler GoToSignup;
     }
 
     public class SignUpView : BaseErrorViewModel
     {
+        private Credentials credentials;
+
         public StringInputField Username { get; }
         public StringInputField Password { get; }
         public StringInputField ConfirmPassword { get; }
@@ -58,8 +63,10 @@ namespace API
         public ICommand SubmitCommand { get; set; }
         public ICommand GoToLoginCommand { get; set; }
 
-        public SignUpView()
+        public SignUpView(Credentials cred)
         {
+            credentials = cred;
+
             Username = new StringInputField(nameof(Username), 4, 32);
             Password = new StringInputField(nameof(Password), 8, 32);
             ConfirmPassword = new StringInputField(nameof(ConfirmPassword), 8, 32);
@@ -77,7 +84,7 @@ namespace API
             else
             {
                 Error = string.Empty;
-                SignedUp?.Invoke(this, res);
+                credentials.Login(res);
             }
         }
 
@@ -93,7 +100,6 @@ namespace API
             return (Username.hasErrors() || Password.hasErrors() || ConfirmPassword.hasErrors());
         }
 
-        public event EventHandler<LoginResult> SignedUp;
         public event EventHandler GoToLogin;
     }
 }

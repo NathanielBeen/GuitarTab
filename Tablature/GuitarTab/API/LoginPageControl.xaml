@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="GuitarTab.API.LoginPageControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GuitarTab.API"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <DataTemplate x:Key="Login">
+            <local:LoginControl/>
+        </DataTemplate>
+        <DataTemplate x:Key="Signup">
+            <local:SignUpControl/>
+        </DataTemplate>
+        <Style x:Key="MainStyle" TargetType="ContentControl">
+            <Setter Property="ContentTemplate" Value="{StaticResource Login}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Mode}" Value="{x:Static local:LoginMode.SIGNUP}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Signup}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <ContentControl Content="{Binding}" DataContext="{Binding CurrentView}"/>
+</UserControl>

@@ -63,13 +63,13 @@ namespace API
 
     public class LoginResult
     {
-        public int Id { get; }
+        public UserModel Model { get; }
         public string Token { get; }
         public Error Error { get; }
 
-        public LoginResult(int id, string token, Error error)
+        public LoginResult(UserModel model, string token, Error error)
         {
-            Id = id;
+            Model = model;
             Token = token;
             Error = error;
         }

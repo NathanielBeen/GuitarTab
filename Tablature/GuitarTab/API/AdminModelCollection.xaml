@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="GuitarTab.API.AdminModelCollection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GuitarTab.API"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:ViewModelConverter x:Key="VMC"/>
+        <DataTemplate x:Key="Song">
+            <local:AdminSongUpdater DataContext="{Binding Updater}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="Rating">
+            <local:AdminRatingUpdater DataContext="{Binding Updater}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="User">
+            <local:AdminUserUpdater DataContext="{Binding Updater}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="Tag">
+            <local:AdminTagUpdater DataContext="{Binding Updater}"/>
+        </DataTemplate>
+        <DataTemplate x:Key="Empty">
+            <Label Content=""/>
+        </DataTemplate>
+
+        <Style x:Key="Updater" TargetType="ContentControl">
+            <Setter Property="ContentTemplate" Value="{StaticResource Empty}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Converter={StaticResource VMC}}" Value="{x:Type local:AdminSongCollection}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Song}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Converter={StaticResource VMC}}" Value="{x:Type local:AdminRatingCollection}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Rating}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Converter={StaticResource VMC}}" Value="{x:Type local:AdminTagCollection}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource Tag}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Converter={StaticResource VMC}}" Value="{x:Type local:AdminUserCollection}">
+                    <Setter Property="ContentTemplate" Value="{StaticResource User}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <StackPanel>
+        <ListBox Background="LightGray" ItemsSource="{Binding Collection}"/>
+        <ContentControl Content="{Binding}" Style="{StaticResource Updater}"/>
+    </StackPanel>
+</UserControl>

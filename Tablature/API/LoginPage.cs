@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace API
 {
@@ -15,6 +16,15 @@ namespace API
 
     public class LoginPage : BaseViewModel
     {
+        private Credentials credentials;
+
+        private Visibility visible;
+        public Visibility Visible
+        {
+            get { return visible; }
+            set { SetProperty(ref visible, value); }
+        }
+
         private LoginMode mode;
         public LoginMode Mode
         {
@@ -24,21 +34,35 @@ namespace API
 
         public BaseViewModel CurrentView { get; set; }
 
-        public LoginPage()
+        public LoginPage(Credentials cred)
         {
+            credentials = cred;
+            credentials.LoggedIn += handleLoggedIn;
+
+            Visible = Visibility.Collapsed;
+
             CurrentView = createLoginView();
             Mode = LoginMode.LOGIN;
         }
 
         private void handleViewModeChanged(LoginMode new_mode)
         {
+            if (credentials.isLoggedIn())
+            {
+                Visible = Visibility.Collapsed;
+                return;
+            }
+            if (new_mode == Mode) { return; }
+
             switch (new_mode)
             {
                 case LoginMode.LOGIN:
+                    Visible = Visibility.Visible;
                     CurrentView = createLoginView();
                     Mode = new_mode;
                     return;
                 case LoginMode.SIGNUP:
+                    Visible = Visibility.Visible;
                     CurrentView = createSignUpView();
                     Mode = new_mode;
                     return;
@@ -47,23 +71,27 @@ namespace API
 
         private LoginView createLoginView()
         {
-            var view = new LoginView();
-            view.GoToSignup += ((o, m) => handleViewModeChanged(LoginMode.SIGNUP));
-            view.Login += handleLoginOrSignUp;
+            var view = new LoginView(credentials);
+            view.GoToSignup += ((o, m) => Mode = LoginMode.SIGNUP);
             return view;
         }
 
         private SignUpView createSignUpView()
         {
-            var view = new SignUpView();
-            view.GoToLogin += ((o, m) => handleViewModeChanged(LoginMode.LOGIN));
-            view.SignedUp += handleLoginOrSignUp;
+            var view = new SignUpView(credentials);
+            view.GoToLogin += ((o, m) => Mode = LoginMode.LOGIN);
             return view;
         }
 
-        private void handleLoginOrSignUp(object sender, LoginResult result)
+        private void handleLoggedIn(object sender, EventArgs args)
         {
-            //fire an event or something (maybe reference current user like in the account page)
+            Visible = Visibility.Collapsed;
+        }
+
+        private void handleLoggedOut(object sender, EventArgs args)
+        {
+            mode = LoginMode.LOGIN;
+            Visible = Visibility.Collapsed;
         }
     }
 }

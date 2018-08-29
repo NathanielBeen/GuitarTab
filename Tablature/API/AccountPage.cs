@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace API
 {
@@ -17,7 +18,7 @@ namespace API
 
     public class AccountPage : BaseViewModel
     {
-        private UserModel model;
+        private Credentials credentials;
 
         private AccountMode mode;
         public AccountMode Mode
@@ -30,40 +31,46 @@ namespace API
             }
         }
 
+        private Visibility visible;
+        public Visibility Visible
+        {
+            get { return visible; }
+            set { SetProperty(ref visible, value); }
+        }
+
         public BaseViewModel CurrentView { get; set; }
 
-        public AccountPage(UserModel model)
+        public AccountPage(Credentials cred)
         {
-            this.model = model;
+            credentials = cred;
+            credentials.LoggedOut += handleLogout;
             CurrentView = new BaseViewModel();
             Mode = AccountMode.MAIN;
         }
 
         private void handleViewModeChanged(AccountMode new_mode)
         {
+            if (!credentials.isLoggedIn())
+            {
+                Visible = Visibility.Collapsed;
+                return;
+            }
             if (new_mode == Mode) { return; }
             switch (new_mode)
             {
                 case AccountMode.MAIN:
-                    CurrentView = createMainView();
+                    CurrentView = new MainAccountView(credentials);
                     return;
                 case AccountMode.CHANGE_PASSWORD:
-                    CurrentView = new ChangePasswordView(model);
+                    CurrentView = new ChangePasswordView(credentials);
                     return;
                 case AccountMode.VIEW_RATINGS:
                     CurrentView = createRatingView();
                     return;
                 case AccountMode.REMOVE:
-                    CurrentView = createRemoveView();
+                    CurrentView = new RemoveAccountView(credentials);
                     return;
             }
-        }
-
-        private MainAccountView createMainView()
-        {
-            var view = new MainAccountView(model);
-            view.LoggedOut += handleLogoutOrAccountRemoved;
-            return view;
         }
 
         private BaseModelCollection<RatingModel> createRatingView()
@@ -71,15 +78,8 @@ namespace API
             var factory = new RatingVMFactory();
             var collection = new BaseModelCollection<RatingModel>(factory, handleRatingSelected);
 
-            collection.populateModels(APIRequest.getRatingsByUserId(model.Id).GetAwaiter().GetResult().Items);
+            collection.populateModels(APIRequest.getRatingsByUserId(credentials.CurrentUser.Id).GetAwaiter().GetResult().Items);
             return collection;
-        }
-
-        private RemoveAccountView createRemoveView()
-        {
-            var view = new RemoveAccountView();
-            view.Deleted += handleLogoutOrAccountRemoved;
-            return view;
         }
 
         private void handleRatingSelected(RatingModel model)
@@ -87,10 +87,12 @@ namespace API
             //fire event or something that prompts the main screen to go to the rating
         }
 
-        private void handleLogoutOrAccountRemoved(object sender, EventArgs args)
+        private void handleLogout(object sender, EventArgs args)
         {
-            //probably fire an event that collapses menu and adjusts current user (maybe have reference to
-            // current user in the view and that adjusts so all other references recieve it
+            mode = AccountMode.MAIN;
+            Visible = Visibility.Collapsed;
         }
+
+        public event EventHandler<RatingModel> RatingSelected;
     }
 }

@@ -12,7 +12,12 @@ namespace API
         {
             var req = new UserLoginRequest(username, password);
             TokenIDMessageResult res = APIRequest.login(req).GetAwaiter().GetResult();
-            return new LoginResult(res.Id, res.Token, res.Error);
+            if (res.Error != null) { return new LoginResult(null, res.Token, res.Error); }
+            else
+            {
+                Result<UserModel> user = APIRequest.getUserById(res.Id).GetAwaiter().GetResult();
+                return new LoginResult(user.Items.FirstOrDefault(), res.Token, res.Error);
+            }
         }
 
         public static LoginResult attemptSignUp(string username, string password)
@@ -20,7 +25,7 @@ namespace API
             var req = new UserFieldsRequest(new UserModel(0, username, password, 0));
             IDMessageResult res = APIRequest.createUser(req).GetAwaiter().GetResult();
 
-            if (res.Error != null) { return new LoginResult(0, "", res.Error); }
+            if (res.Error != null) { return new LoginResult(null, "", res.Error); }
             return attemptLogin(username, password);
         }
 
