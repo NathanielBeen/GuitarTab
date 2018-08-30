@@ -12,19 +12,8 @@ namespace GuitarTab.API
     {
         private Credentials credentials;
 
-        private bool logged_in;
-        public bool LoggedIn
-        {
-            get { return logged_in; }
-            set { SetProperty(ref logged_in, value); }
-        }
-
-        private bool logged_in_admin;
-        public bool LoggedInAdmin
-        {
-            get { return logged_in_admin; }
-            set { SetProperty(ref logged_in_admin, value); }
-        }
+        public NotificationField<bool> LoggedIn { get; private set; }
+        public NotificationField<bool> LoggedInAdmin { get; private set; }
 
         public ICommand PopupCommand { get; set; }
         public ICommand AdminCommand { get; set; }
@@ -35,20 +24,32 @@ namespace GuitarTab.API
             credentials.LoggedIn += handleLogin;
             credentials.LoggedOut += handleLogout;
 
+            initFields();
+            initCommands();
+        }
+
+        private void initFields()
+        {
+            LoggedIn = new NotificationField<bool>();
+            LoggedInAdmin = new NotificationField<bool>();
+        }
+
+        private void initCommands()
+        {
             PopupCommand = new RelayCommand(() => PopupLaunched?.Invoke(this, null));
             AdminCommand = new RelayCommand(() => AdminSelected?.Invoke(this, null));
         }
 
         private void handleLogin(object sender, EventArgs args)
         {
-            LoggedIn = (credentials.CurrentUser != null);
-            LoggedInAdmin = (credentials.CurrentUser != null && credentials.CurrentUser.Type != 0);
+            LoggedIn.Value = (credentials.CurrentUser != null);
+            LoggedInAdmin.Value = (credentials.CurrentUser != null && credentials.CurrentUser.Type != 0);
         }
 
         private void handleLogout(object sender, EventArgs args)
         {
-            LoggedIn = false;
-            LoggedInAdmin = false;
+            LoggedIn.Value = false;
+            LoggedInAdmin.Value = false;
         }
 
         public event EventHandler PopupLaunched;

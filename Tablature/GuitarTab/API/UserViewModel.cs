@@ -43,24 +43,7 @@ namespace GuitarTab.API
 
         public string Name { get { return Base.Name; } }
 
-        private string type;
-        public string Type
-        {
-            get { return type; }
-            set
-            {
-                string error = TypeError;
-                setIntProperty(ref type, value, 0, 1, ref error);
-                TypeError = error;
-            }
-        }
-
-        private string type_error;
-        public string TypeError
-        {
-            get { return type_error; }
-            set { SetProperty(ref type_error, value); }
-        }
+        public StringInputField Type { get; private set; }
 
         public ICommand CancelCommand { get; set; }
         public ICommand ResetCommand { get; set; }
@@ -73,11 +56,17 @@ namespace GuitarTab.API
         {
             Base = model;
 
-            Type = model.Type.ToString();
-            TypeError = "";
+            initFields(model);
+            initCommands();
         }
 
-        public void initCommands()
+        private void initFields(UserModel model)
+        {
+            Type = new StringInputField("Type", 1, 32);
+            Type.Value = model.Type.ToString();
+        }
+
+        private void initCommands()
         {
             CancelCommand = new RelayCommand(handleCancel);
             ResetCommand = new RelayCommand(handleReset);
@@ -86,17 +75,16 @@ namespace GuitarTab.API
 
         public void handleReset()
         {
-            Type = Base.Type.ToString();
-            TypeError = "";
+            Type.Value = Base.Type.ToString();
         }
 
         public void handleCancel() { CancelEdit?.Invoke(this, Base); }
 
         public void handleConfirm()
         {
-            if (TypeError != String.Empty) { return; }
+            if (Type.hasErrors()) { return; }
 
-            var updater = new UserUpdater(Int32.Parse(Type));
+            var updater = new UserUpdater(Int32.Parse(Type.Value));
             var args = new UpdateEventArgs<UserModel>(Base, updater);
             ConfirmEdit?.Invoke(this, args);
         }

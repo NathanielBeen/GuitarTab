@@ -10,12 +10,8 @@ namespace GuitarTab.API
 {
     public class SearchPage : BaseInputViewModel
     {
-        private string error;
-        public string Error
-        {
-            get { return error; }
-            set { SetProperty(ref error, value); }
-        }
+
+        public NotificationField<string> Error;
 
         public SearchParametersViewModel Search { get; set; }
         public BaseModelCollection<SongModel> Results { get; set; }
@@ -25,10 +21,20 @@ namespace GuitarTab.API
 
         public SearchPage(SearchParametersViewModel search, BaseViewModelFactory<SongModel> factory)
         {
-            Error = String.Empty;
             Search = search;
             Results = new BaseModelCollection<SongModel>(factory, handleSongSelected);
 
+            initFields();
+            initCommands();
+        }
+
+        private void initFields()
+        {
+            Error = new NotificationField<string>();
+        }
+
+        private void initCommands()
+        {
             SearchCommand = new RelayCommand(handleSearch);
             ClearCommand = new RelayCommand(handleClear);
         }
@@ -36,7 +42,7 @@ namespace GuitarTab.API
         public void addSimpleSearchTerms(string name, Result<SongModel> results)
         {
             Search.Name.Value = name;
-            Error = (results.Error == null) ? String.Empty : results.Error.Message;
+            Error.Value = (results.Error == null) ? String.Empty : results.Error.Message;
             Results.populateModels(results.Items);
         }
 
@@ -55,11 +61,11 @@ namespace GuitarTab.API
 
             if (res.Error != null)
             {
-                Error = res.Error.Message;
+                Error.Value = res.Error.Message;
             }
             else
             {
-                Error = String.Empty;
+                Error.Value = String.Empty;
                 Results.populateModels(res.Items);
             }
         }

@@ -37,47 +37,13 @@ namespace GuitarTab.API
     public class EditTagViewModel : BaseInputViewModel, IEditModel<TagModel>
     {
         public TagModel Base { get; }
+
+        public StringInputField Name { get; private set; }
+        public StringInputField Type { get; private set; }
+
         public VMType ViewType { get { return VMType.BASE_EDIT; } }
 
         public int Id { get { return Base.Id; } }
-
-        private string name;
-        public string Name
-        {
-            get { return name; }
-            set
-            {
-                string error = NameError;
-                setStringProperty(ref name, value, ref error);
-                NameError = error;
-            }
-        }
-
-        private string name_error;
-        public string NameError
-        {
-            get { return name_error; }
-            set { SetProperty(ref name_error, value); }
-        }
-
-        private string type;
-        public string Type
-        {
-            get { return type; }
-            set
-            {
-                string error = TypeError;
-                setStringProperty(ref type, value, ref error);
-                TypeError = error;
-            }
-        }
-
-        private string type_error;
-        public string TypeError
-        {
-            get { return type_error; }
-            set { SetProperty(ref type_error, value); }
-        }
 
         public ICommand CancelCommand { get; set; }
         public ICommand ResetCommand { get; set; }
@@ -90,15 +56,20 @@ namespace GuitarTab.API
         {
             Base = model;
 
-            Name = Base.Name;
-            NameError = "";
-            Type = Base.Type;
-            TypeError = "";
-
+            initFields(model);
             initCommands();
         }
 
-        public void initCommands()
+        private void initFields(TagModel model)
+        {
+            Name = new StringInputField("Name", 1, 32);
+            Type = new StringInputField("Type", 1, 32);
+
+            Name.Value = model.Name;
+            Type.Value = model.Type;
+        }
+
+        private void initCommands()
         {
             CancelCommand = new RelayCommand(handleCancel);
             ResetCommand = new RelayCommand(handleReset);
@@ -107,19 +78,17 @@ namespace GuitarTab.API
 
         public void handleReset()
         {
-            Name = Base.Name;
-            NameError = "";
-            Type = Base.Type;
-            TypeError = "";
+            Name.Value = Base.Name;
+            Type.Value = Base.Type;
         }
 
         public void handleCancel() { CancelEdit?.Invoke(this, Base); }
 
         public void handleConfirm()
         {
-            if (NameError != String.Empty || TypeError != String.Empty) { return; }
+            if (Name.hasErrors() || Type.hasErrors()) { return; }
 
-            var updater = TagUpdater.createNameTypeUpdater(Name, Type);
+            var updater = TagUpdater.createNameTypeUpdater(Name.Value, Type.Value);
             var args = new UpdateEventArgs<TagModel>(Base, updater);
             ConfirmEdit?.Invoke(this, args);
         }
@@ -130,12 +99,7 @@ namespace GuitarTab.API
         public string Name { get; }
         public string Type { get; }
 
-        private bool selected;
-        public bool Selected
-        {
-            get { return selected; }
-            set { SetProperty(ref selected, value); }
-        }
+        public NotificationField<bool> Selected { get; private set; }
 
         public ICommand SelectCommand { get; set; }
 
@@ -143,14 +107,24 @@ namespace GuitarTab.API
         {
             Name = name;
             Type = type;
-            Selected = false;
+            initFields();
+            initCommands();
+        }
 
+        private void initFields()
+        {
+            Selected = new NotificationField<bool>();
+            Selected.Value = false;
+        }
+
+        private void initCommands()
+        {
             SelectCommand = new RelayCommand(handleSelected);
         }
 
         public void handleSelected()
         {
-            Selected = !Selected;
+            Selected.Value = !Selected.Value;
         }
     }
 }

@@ -65,69 +65,10 @@ namespace GuitarTab.API
 
         public double Rating { get { return Base.Rating; } }
 
-        private string artist;
-        public string Artist
-        {
-            get { return artist; }
-            set
-            {
-                string error = ArtistError;
-                setStringProperty(ref artist, value, ref error);
-                ArtistError = error;
-            }
-        }
-
-        private string artist_error;
-        public string ArtistError
-        {
-            get { return artist_error; }
-            set { SetProperty(ref artist_error, value); }
-        }
-
-        private string album;
-        public string Album
-        {
-            get { return album; }
-            set
-            {
-                string error = AlbumError;
-                setStringProperty(ref album, value, ref error);
-                AlbumError = error;
-            }
-        }
-
-        private string album_error;
-        public string AlbumError
-        {
-            get { return album_error; }
-            set { SetProperty(ref album_error, value); }
-        }
-
-        private string add_tag;
-        public string AddTag
-        {
-            get { return add_tag; }
-            set
-            {
-                string error = AddTagError;
-                setStringProperty(ref add_tag, value, ref error);
-                AddTagError = error;
-            }
-        }
-
-        private string add_tag_error;
-        public string AddTagError
-        {
-            get { return add_tag_error; }
-            set { SetProperty(ref add_tag_error, value); }
-        }
-
-        private List<SimpleTagViewModel> tags;
-        public List<SimpleTagViewModel> Tags
-        {
-            get { return tags; }
-            set { SetProperty(ref tags, value); }
-        }
+        public StringInputField Artist { get; private set; }
+        public StringInputField Album { get; private set; }
+        public StringInputField AddTag { get; private set; }
+        public NotificationField<List<SimpleTagViewModel>> Tags { get; private set; }
 
         public ICommand CancelCommand { get; set; }
         public ICommand ResetCommand { get; set; }
@@ -141,17 +82,23 @@ namespace GuitarTab.API
         public EditSongViewModel(SongModel model)
         {
             Base = model;
-
-            Artist = model.Artist;
-            ArtistError = "";
-            Album = model.Album;
-            AlbumError = "";
-            Tags = Base.CreateTagList();
-
+            initFields(model);
             initCommands();
         }
 
-        public void initCommands()
+        private void initFields(SongModel model)
+        {
+            Artist = new StringInputField("Artist", 0, 32);
+            Album = new StringInputField("Album", 0, 32);
+            AddTag = new StringInputField("Added Tag Name", 0, 32);
+            Tags = new NotificationField<List<SimpleTagViewModel>>();
+
+            Artist.Value = model.Artist;
+            Album.Value = model.Album;
+            Tags.Value = Base.CreateTagList();
+        }
+
+        private void initCommands()
         {
             CancelCommand = new RelayCommand(handleCancel);
             ResetCommand = new RelayCommand(handleReset);
@@ -162,47 +109,44 @@ namespace GuitarTab.API
 
         public void handleReset()
         {
-            Artist = Base.Artist;
-            ArtistError = "";
-            Album = Base.Album;
-            AlbumError = "";
-            AddTag = "";
-            AddTagError = "";
-            Tags = Base.CreateTagList();
+            Artist.Value = Base.Artist;
+            Album.Value = Base.Album;
+            AddTag.clearField();
+            Tags.Value = Base.CreateTagList();
         }
 
         public void handleCancel() { CancelEdit?.Invoke(this, Base); }
 
         public void handleConfirm()
         {
-            if (ArtistError != String.Empty || AlbumError != String.Empty) { return; }
+            if (Artist.hasErrors() || Album.hasErrors()) { return; }
 
-            string new_tags = String.Join(",", (from tag in Tags select tag.Name));
+            string new_tags = String.Join(",", (from tag in Tags.Value select tag.Name));
             //string new_types = String.Join(",", (from tag in Tags select tag.Type));
 
-            var updater = SongUpdater.createNoTabUpdater(null, artist, album, new_tags);
+            var updater = SongUpdater.createNoTabUpdater(null, Artist.Value, Album.Value, new_tags);
             var args = new UpdateEventArgs<SongModel>(Base, updater);
             ConfirmEdit?.Invoke(this, args);
         }
 
         public void handleTagAdded()
         {
-            if (AddTagError != String.Empty) { return; }
-            foreach (var tag in Tags)
+            if (AddTag.hasErrors()) { return; }
+            foreach (var tag in Tags.Value)
             {
                 if (tag.Name.Equals(AddTag)) { return; }
             }
 
-            Tags.Add(new SimpleTagViewModel(AddTag, TagModel.NO_TYPE));
+            Tags.Value.Add(new SimpleTagViewModel(AddTag.Value, TagModel.NO_TYPE));
             onPropertyChanged(nameof(Tags));
         }
 
         public void handleTagRemoved()
         {
-            SimpleTagViewModel model = Tags.Where(t => t.Selected).FirstOrDefault();
+            SimpleTagViewModel model = Tags.Value.Where(t => t.Selected.Value).FirstOrDefault();
             if (model == null) { return; }
 
-            Tags.Remove(model);
+            Tags.Value.Remove(model);
             onPropertyChanged(nameof(Tags));
         }
     }

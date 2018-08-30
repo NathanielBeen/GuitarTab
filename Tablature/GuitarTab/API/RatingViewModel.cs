@@ -57,43 +57,8 @@ namespace GuitarTab.API
 
         public int UserId { get { return Base.UserId; } }
 
-        private string rating;
-        public string Rating
-        {
-            get { return rating; }
-            set
-            {
-                string error = RatingError;
-                setDoubleProperty(ref rating, value, 0, 5, ref error);
-                RatingError = error;
-            }
-        }
-
-        private string rating_error;
-        public string RatingError
-        {
-            get { return rating_error; }
-            set { SetProperty(ref rating_error, value); }
-        }
-
-        private string text;
-        public string Text
-        {
-            get { return text; }
-            set
-            {
-                string error = TextError;
-                setStringProperty(ref text, value, ref error);
-                TextError = error;
-            }
-        }
-
-        private string text_error;
-        public string TextError
-        {
-            get { return text_error; }
-            set { SetProperty(ref text_error, value); }
-        }
+        public DoubleInputField Rating { get; private set; }
+        public StringInputField Text { get; private set; }
 
         public ICommand CancelCommand { get; set; }
         public ICommand ResetCommand { get; set; }
@@ -106,12 +71,16 @@ namespace GuitarTab.API
         {
             Base = model;
 
-            Rating = model.Rating.ToString();
-            RatingError = "";
-            Text = model.Text;
-            TextError = "";
-
+            initFields();
             initCommands();
+        }
+
+        private void initFields()
+        {
+            Rating = new DoubleInputField("Rating", 0, 5);
+            Text = new StringInputField("Text", 0, 256);
+            Rating.Value = Base.Rating.ToString();
+            Text.Value = Base.Text;
         }
 
         public void initCommands()
@@ -123,19 +92,17 @@ namespace GuitarTab.API
 
         public void handleReset()
         {
-            Rating = Base.Rating.ToString();
-            RatingError = "";
-            Text = Base.Text;
-            TextError = "";
+            Rating.Value = Base.Rating.ToString();
+            Text.Value = Base.Text;
         }
 
         public void handleCancel() { CancelEdit?.Invoke(this, Base); }
 
         public void handleConfirm()
         {
-            if (RatingError != String.Empty || TextError != String.Empty) { return; }
+            if (Rating.hasErrors() || Text.hasErrors()) { return; }
 
-            var updater = new RatingUpdater(Double.Parse(Rating), Text);
+            var updater = new RatingUpdater(Rating.getConvertedField(), Text.Value);
             var args = new UpdateEventArgs<RatingModel>(Base, updater);
             ConfirmEdit?.Invoke(this, args);
         }

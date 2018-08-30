@@ -166,4 +166,31 @@ namespace GuitarTab.API
 
         }
     }
+
+    public class PopupViewModeFactory : IViewModeFactory<PopupViewMode>
+    {
+        private Credentials credentials;
+
+        public PopupViewModeFactory(Credentials cred)
+        {
+            credentials = cred;
+        }
+
+        public BaseViewModel createView(PopupViewMode value)
+        {
+            switch (value)
+            {
+                case PopupViewMode.LOGIN:
+                    return createLoginPage();
+                case PopupViewMode.USER:
+                    return createAccountPage();
+                default:
+                    return new BaseViewModel();
+            }
+        }
+
+        private BaseViewModel createLoginPage() { return new LoginPage(credentials); }
+
+        private BaseViewModel createAccountPage() { return new AccountPage(credentials); }
+    }
 }

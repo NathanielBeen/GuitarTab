@@ -26,10 +26,15 @@ namespace GuitarTab.API
         public AdminTagCollection(BaseAdminModelCollection<TagModel> collection)
         {
             Collection = collection;
+            initFields();
+            initCommands();
+        }
+
+        private void initFields()
+        {
             Name = new StringInputField("Name", 1, 64);
             Type = new StringInputField("Type", 1, 64);
             UpdateType = new StringInputField("Type", 1, 64);
-            initCommands();
         }
 
         private void initCommands()

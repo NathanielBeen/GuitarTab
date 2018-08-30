@@ -12,15 +12,9 @@ namespace GuitarTab.API
     {
         public BaseAdminModelCollection<UserModel> Collection { get; }
 
-        public StringInputField Name;
-        public StringInputField Password;
-
-        private bool is_admin;
-        public bool IsAdmin
-        {
-            get { return is_admin; }
-            set { SetProperty(ref is_admin, value); }
-        }
+        public StringInputField Name { get; private set; }
+        public StringInputField Password { get; private set; }
+        public NotificationField<bool> IsAdmin { get; private set; }
 
         public ICommand AddCommand { get; set; }
         public ICommand ClearCommand { get; set; }
@@ -28,6 +22,19 @@ namespace GuitarTab.API
         public AdminUserCollection(BaseAdminModelCollection<UserModel> collection)
         {
             Collection = collection;
+            initFields();
+            initCommands();
+        }
+
+        private void initFields()
+        {
+            Name = new StringInputField("Name", 4, 32);
+            Pasword = new StringInputField("Password", 6, 32);
+            IsAdmin = new NotificationField<bool>();
+        }
+
+        private void initCommands()
+        {
             AddCommand = new RelayCommand(handleAdded);
             ClearCommand = new RelayCommand(clear);
         }
@@ -36,7 +43,7 @@ namespace GuitarTab.API
         {
             if (Name.hasErrors() || Password.hasErrors()) { return; }
 
-            int type = (IsAdmin) ? 1 : 0;
+            int type = (IsAdmin.Value) ? 1 : 0;
             var model = new UserModel(0, Name.Value, Password.Value, type);
         }
 
