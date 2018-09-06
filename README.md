@@ -32,15 +32,18 @@ The top menu contains many of the controls you will use to create the tablature.
 ![side editing GUI](GTImages/SideMenu.PNG)
 The side menu contains the note length panel and the tuple panel. These panels, when combined, will determine the length of any added or changed note. Only one length and one tuple amount may be selected at any one time.
 
-### Performing Actions
+### Performing Editing Actions
 #### Adding measures, notes, and effects
 At a high level, a song is composed of a set of measures, which are denoted as a set of black vertical bars. A measure, in turn, is a set of chords, each of which is a "stack" of notes that are played at the same time. Each note is a single number which represents the fret to play and the string to play it on. notes can then contain effects, which occur before, on, or after a note and can be notated in a number of different ways, as can be seen in the guide to reading tablature above.
 
+##### Adding Measures
 To add a measure to the song, select the "Add Measure" mode in the top menu and select a place on the song to put it. Clicking on an already existing measure when placing the new measure will put the new measure in the place of the clicked measure and subsequently move the following measures (including the one clicked on) to after the new measure.
 
-To add a rest, have "Add Rest" selected and click on the song. The rest will be plac ed as follows:
+##### Adding Rests
+To add a rest, have "Add Rest" selected and click on the song. The rest will be placed as follows:
 - If the rest is placed in a measure, it will be added to the measure at the clicked location (if the user clicked on another chord when placing the rest, the rest will be placed first, then the chord and all subsequent chords will be moved to after the new rest)
 
+##### Adding Notes
 To add a note, have "Add Note" selected and click anywhere on the song as desired. The note will be placed as follows:
 - If the note is placed on top of an already existing one, nothing will happen
 - If the note is placed in a chord but not on top of a note, the note will be added to the chord (will become part of the "stack" of notes) on the string clicked.
@@ -49,6 +52,38 @@ To add a note, have "Add Note" selected and click anywhere on the song as desire
 
 (Note: Whenever a new chord is created, whether by placing a rest or a note on a new stack, the addition will only be allowed if the measure has enough available space to hold the new chord. Additionally, whenever a chord is added between existing chords, it will break all multi-effects between the existing chords)
 
-To add an effect to a note, have one of the Note Effect toggles selected, and then select the desired note. If the effect is a multi-effect (meaning it dictates a technique to user when transitioning between notes), a message will display that prompts the user to select a note in an adjacent chord to connect to. (Note: a multi-effect can only occur on notes in adjacent chords on the same string. If a tie is being added, the two notes must also have the same fret number)
+##### Adding Effects
+To add an effect to a note, have one of the Note Effect toggles selected, and then select the desired note. If the effect is a multi-effect (meaning it dictates a technique to user when transitioning between notes), a message will display that prompts the user to select a note in an adjacent chord to connect to. Select the second note and the effect will be added. 
+
+Effects come in two varieties (single and multi) and three positions (before, strike, and after). The former indicates whether the effect acts as a transition between two notes or is only placed on a single note, and the latter indicates whether the effect occurs before the note it is on is played, when the note is played, or after the note is played. As a multi-effect ties together stwo notes, it is an after effect for the first note and a before effect for the second. The following effects are available:
+- Bend (after)
+- Vibrato (after)
+- Pinch Harmonic (strike)
+- Palm Mute (strike)
+- Tie (multi effect, the two notes it is placed on must be adjacent, on the same string, and have the same fret)
+- Slide (multi effect, its two notes must be adjacent and on the same string)
+- Hammer On/Pull Off (multi effect, its two notes must be adjacent, on the same string, and have different frets)
 
 #### Deleting measures, notes, and chords
+In order to delete any object, from note to measure, first have that item selected (a dark grey border will indicate which item is selected). Then, simply press the "Delete" button and the item will be removed.
+
+To remove an effect from a note, it is not possible to select the effect and then hit "Delete". Instead, double click on the connected note to launch the note property mehu and then use the appropriate effect dropdown, changing it to "No Effect". For a multi-effect, either note can be used to remove the effect.
+
+#### Moving measures, notes, and chords
+To move any object, first have that object selected. Then mouse down on the selected object and drag it to the desired location. For notes, the note will also be dragged to the string closest to the mouse. Additionally, if a note in a chord is dragged and dropped to a location outside of the chord, a new chord will be created (if possible) with the same length as the old chord.
+
+#### Changing measure, note, and chord properties
+Each type of object (measure, chord, and note) has its own pop-up property menu allowing the user to change the following values:
+- Measure: beats per minute, beat type, number of beats
+- Chord: length
+- Note: string, fret, and effects (has a slot for an effect before the note is played, when the note is payed, and after the snote is played)
+- Bend: Bend amount, whether the bend returns
+- Slide: if the slide is played legato
+- Vibrato: if the vibrato is a wide vibrato
+
+In order to gain access to these menus, double-click the desired item on the tab. For effects, the property menu will be displayed under the appropriate drop-donw in the effect section of the note's property menu.
+
+### Creating, Uploading, Updating, and Searching for Songs
+Coming soon
+### Account Management
+coming soon
