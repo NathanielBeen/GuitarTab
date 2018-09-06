@@ -22,17 +22,18 @@ This project is currently in active development, and as such, is recieving updat
 While guitar tablature looks like standard sheet music, it slightly varies from its more popular counterpart. A full introduction to the subject can be found at the [Songsterr webstite](https://www.songsterr.com/a/wa/howToReadTab). 
 
 ### The GUI
-![main editing GUI](GTImages/Menu.PNG)
+![main editing GUI](TabImages/Menu.PNG)
 The editing GUI is comprised of three primary areas: the central viewer, the top menu, and the side menu.
 #### Top Menu
-![top editing GUI](GTImages/TopMenu.PNG)
+![top editing GUI](TabImages/TopMenu.PNG)
 The top menu contains many of the controls you will use to create the tablature. The "Song Settings" and "Instrument Settings" buttons will open up pop-up menus that will allow the user to change things such as the instruments used or the name/album/artist of the song. The "Standard Selection" through "Change Length" buttons will change the mode the user is in (and the mouse will change symbols to reflect that fact). In order to perform an action, ensure that the mouse is in the desired mode first. Similarily, the set of buttons that add an effect are also a set of toggle-able modes.
 
 ##### Side Menu
-![side editing GUI](GTImages/SideMenu.PNG)
+![side editing GUI](TabImages/SideMenu.PNG)
 The side menu contains the note length panel and the tuple panel. These panels, when combined, will determine the length of any added or changed note. Only one length and one tuple amount may be selected at any one time.
 
 ### Performing Editing Actions
+![the main tab](TabImages/MainViewer.png)
 #### Adding measures, notes, and effects
 At a high level, a song is composed of a set of measures, which are denoted as a set of black vertical bars. A measure, in turn, is a set of chords, each of which is a "stack" of notes that are played at the same time. Each note is a single number which represents the fret to play and the string to play it on. notes can then contain effects, which occur before, on, or after a note and can be notated in a number of different ways, as can be seen in the guide to reading tablature above.
 
